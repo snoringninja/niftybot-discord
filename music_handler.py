@@ -65,6 +65,7 @@ class MusicHandler():
 
 	@classmethod
 	def compare_songs(self):
+		""" Compare the song and do stuff depending on if they are the same or not """
 		self.update_next_song()
 		if (self.get_current_song() != self.get_next_song()):
 			self.update_current_song(self.get_next_song())
