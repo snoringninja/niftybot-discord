@@ -1,7 +1,14 @@
+# 
+# TODO : clean up everything, and by that I mean organize plugins into
+#        their own folder and import based on that...possibly just write something to import them all
+#        at once based on a config file
+# 
+
 import discord
 import asyncio
 import spotilib
 
+# Show what song is playing on the local Spotify
 from music_handler import MusicHandler
 
 client = discord.Client()
@@ -21,10 +28,11 @@ async def on_message(message):
     #     await asyncio.sleep(5)
     #     await client.send_message(message.channel, 'Done sleeping')
     if (message.content.startswith('!kill_bot')):# and 
+        # This doesn't actually do anything...
         if (message.author == 'shaLLow#8086'):
             print("Shut down received.")
             await client.send_message(message.channel, "Shutting down...")
-            await client.logout()
+            await client.close()
     if (message.content.startswith('!owner')):
         await client.send_message(message.channel, "shaLLow / TD");
 
@@ -40,7 +48,7 @@ async def on_ready():
     print('------')
 
     if (MusicHandler().get_current_song() == 'Spotify'):
-        await client.change_presence(game=discord.Game(name='Awaiting Music'))
+        await client.change_presence(game=discord.Game(name='Idle'))
     else:
         await client.change_presence(game=discord.Game(name=MusicHandler().get_current_song()))
 
