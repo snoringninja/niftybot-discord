@@ -41,18 +41,18 @@ class MusicHandler():
 	@classmethod
 	def hard_update_current_song(self):
 		#print("Called.")
-		x = spotilib.song_info()
-		if (x != ''):
-			self.current_song = x
+		current_song = spotilib.song_info()
+		if (current_song != ''):
+			self.current_song = current_song
 		else:
 			# Honestly, having to do this is dumb...need a better way
 			self.current_song = 'Forcing proper update.'
 
 	@classmethod
 	def update_next_song(self):
-		x = spotilib.song_info()
-		if (x != ''):
-			self.next_song = x
+		next_song = spotilib.song_info()
+		if (next_song != ''):
+			self.next_song = next_song
 		else:
 			self.next_song = ''
 
