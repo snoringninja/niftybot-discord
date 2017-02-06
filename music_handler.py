@@ -45,6 +45,7 @@ class MusicHandler():
 		if (x != ''):
 			self.current_song = x
 		else:
+			# Honestly, having to do this is dumb...need a better way
 			self.current_song = 'Forcing proper update.'
 
 	@classmethod
