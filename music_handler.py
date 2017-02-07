@@ -40,7 +40,6 @@ class MusicHandler():
 
 	@classmethod
 	def hard_update_current_song(self):
-		#print("Called.")
 		current_song = spotilib.song_info()
 		if (current_song != ''):
 			self.current_song = current_song
@@ -87,7 +86,7 @@ class MusicHandler():
 		"""
 
 		# Just a debugging statement to make sure this was getting called
-		print("initial call.")
+		# print("initial call.")
 
 		# Keep running as long as the client is connected
 		while not client.is_closed:
@@ -99,15 +98,11 @@ class MusicHandler():
 				if (self.get_current_song() != 'Spotify' and self.get_current_song() != ''):
 					await client.change_presence(game=discord.Game(name=self.get_current_song()))
 				elif (self.get_current_song() == 'Spotify' and self.song_needs_update == True):
-					#print("Updating song to 'Idle'.")
 					self.update_current_song('Spotify')
 					await client.change_presence(game=discord.Game(name='Idle'))
 				else:
 					if (self.song_needs_update == True):
-						#print("Unknown error (Spotify not running?) encountered.")
 						await client.change_presence(game=discord.Game(name='Spotify not loaded.'))
 				await asyncio.sleep(3)
 			else:
-				# I don't recommend printing the following out, it'll just spam the console.
-				# print("Song update was skipped.")
 				await asyncio.sleep(3)
