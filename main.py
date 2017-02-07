@@ -1,3 +1,8 @@
+# main.py
+# @author Ryan Malacina
+# @SnoringNinja - https://snoring.ninja
+# Built on discord.py
+
 import discord
 import asyncio
 import spotilib
