@@ -1,16 +1,5 @@
 # This is the configuration file for the bot; most of these settings SHOULD be self explanatory
 # Head's up, this is a YAML comment
-irc:
- host: irc.twitch.tv
- ssl: false
- port: 6667
- nickname: bot_name
- realname: realname # it's an IRC thing
- password: oauth:xxxxxxxxxxxxxxxxxxxxxxxx
- version: 0.0.1 # this is just for your knowledge
- debugging: true # we should remove this entire thing at some point
- ircv3: true
- channel: channel_without_poundsign
 database:
  host: host
  username: username
