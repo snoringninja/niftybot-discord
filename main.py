@@ -1,16 +1,14 @@
-<<<<<<< HEAD
 # main.py
 # @author Ryan Malacina
 # @SnoringNinja - https://snoring.ninja
 # Built on discord.py
 # Above files not included
-=======
 # 
+
 # TODO : clean up everything, and by that I mean organize plugins into
 #        their own folder and import based on that...possibly just write something to import them all
 #        at once based on a config file
 # 
->>>>>>> ca5f5ef0d5482128aa67c6cc4fe463ed5cda1b43
 
 import discord
 import asyncio
