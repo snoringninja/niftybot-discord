@@ -10,6 +10,8 @@
 #        at once based on a config file
 # 
 
+import sys
+
 import discord
 import asyncio
 import spotilib
@@ -18,14 +20,27 @@ import spotilib
 # from music_handler import MusicHandler
 
 import plugins
+import commands
 
-client = discord.Client()
+from resources import database
+
+from discord.ext import commands
+
+
+#client = discord.Client()
+
+startup_extensions = ["credit_bet"]
+
+description = '''Betting system for monthly prizes.'''
+client = commands.Bot(command_prefix='&', description=description)
 
 @client.event
 async def on_message(message):
     server = message.server
     if (message.content.startswith('!owner')):
         await client.send_message(message.channel, "shaLLow / TD");
+    else:
+        await client.process_commands(message)
 
 @client.event
 async def on_ready():
@@ -46,4 +61,22 @@ async def on_ready():
     # This starts the update_song as a background task that will continue to run until we kill it
     client.loop.create_task(plugins.MusicHandler().update_song(client))
 
-client.run('Mjc3ODc0NTUzOTU3NTE1MjY2.C3kGWw.815k4zhNa2HO-CasYs3yCf1XvBI')
+
+
+if __name__ == "__main__":
+    print('Checking database before continuing...')
+    database.DatabaseHandler().get_conn_details()
+    try:
+        database.DatabaseHandler().attemptConnection()
+        for extension in startup_extensions:
+            try:
+                client.load_extension(extension)
+            except Exception as e:
+                exc = '{}: {}'.format(type(e).__name__, e)
+                print('Failed to load extension {}\n{}'.format(extension, exc))
+        client.run('Mjc3ODc0NTUzOTU3NTE1MjY2.C3kGWw.815k4zhNa2HO-CasYs3yCf1XvBI')
+        
+    except:
+        print('Database connection failed; killing bot.')
+        client.logout()
+        sys.exit(0)
