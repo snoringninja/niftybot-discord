@@ -27,8 +27,6 @@ from resources import database
 from discord.ext import commands
 
 
-#client = discord.Client()
-
 startup_extensions = ["credit_bet"]
 
 description = '''Betting system for monthly prizes.'''
@@ -64,6 +62,8 @@ async def on_ready():
 
 
 if __name__ == "__main__":
+    # attempt to connect to the database first before trying anything else
+    # try catch for obvious reasons
     print('Checking database before continuing...')
     database.DatabaseHandler().get_conn_details()
     try:
@@ -77,6 +77,7 @@ if __name__ == "__main__":
         client.run('Mjc3ODc0NTUzOTU3NTE1MjY2.C3kGWw.815k4zhNa2HO-CasYs3yCf1XvBI')
         
     except:
+        # TODO : log error for looking at later
         print('Database connection failed; killing bot.')
         client.logout()
         sys.exit(0)
