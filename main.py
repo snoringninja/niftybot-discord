@@ -16,10 +16,12 @@ import discord
 import asyncio
 import spotilib
 
-# Show what song is playing on the local Spotify
-# from music_handler import MusicHandler
-
+# Import the plugins folder
+# TODO : config to enable / disable plugin files to be imported
 import plugins
+
+# Import the commands folder
+# TODO : config to enable / disable command files to be imported
 import commands
 
 from resources import database
@@ -32,6 +34,7 @@ startup_extensions = ["credit_bet"]
 description = '''Betting system for monthly prizes.'''
 client = commands.Bot(command_prefix='&', description=description)
 
+# TODO : can we move these out of here? I like the idea of the main file literally just initiating the bot and nothing else
 @client.event
 async def on_message(message):
     server = message.server
