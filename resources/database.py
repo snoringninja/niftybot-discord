@@ -61,6 +61,12 @@ class DatabaseHandler(object):
 		self._db_curdict.execute(query)
 		return self._db_curdict.fetchall()
 
+	def executeStoredProcedureCommit(self, query, params):
+		print(query)
+		print(params)
+		self._db_cur.callproc(query, params)
+		return self._db_connection.commit()
+
 	def executeStoredProcedure(self, query, params):
 		#print(query)
 		#print(params)
