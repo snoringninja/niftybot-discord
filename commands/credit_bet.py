@@ -39,6 +39,8 @@ class CreditBet():
 						print("Member found.")
 				else:
 					print("Error: member was not none.")
+			else:
+				print("Not an int value, but the bot should have caught that by default.")
 		except Exception as e: 
 			await self.bot.say("Error occured: {}".format(e))
 
