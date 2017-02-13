@@ -1,8 +1,9 @@
 # Lottery system
 # Resets monthly -> for our server, we use this as a way to give out monthly prizes
-# Only runs of executing stored procedures
+# Only runs off executing stored procedures
 
-# TODO : finish
+# @TODO : finish
+# @TODO : how do we want to handle spam? globally limit to only one bet per xxx seconds, or let users run wild...
 
 import discord
 from discord.ext import commands
@@ -21,12 +22,12 @@ class CreditBet():
 			if isinstance(amount, int):
 				if member is None:
 					member = ctx.message.author
-					print("User: {}".format(member))
+					print("credit_bet: User: {}".format(member))
 					#command_dict = DatabaseHandler().executeStoredProcedure("BuildCommandDictionary", (channel, ))
 					row = DatabaseHandler().fetchresult("""SELECT 1 FROM `users` WHERE `username` = %s""", (str(member)))
 					print("Row: {}".format(row))
 					if row is None:
-						print("Member not found; todo: insert user into database and allocate credits")
+						print("credit_bet: Member not found, inserting them into the database.")
 						try:
 							print(member)
 							args = (str(member), 500)
@@ -36,13 +37,26 @@ class CreditBet():
 						except Exception as e:
 							print(e)
 					else:
-						print("Member found.")
+						print("Member found, generating 'random' numbers for roll.")
+						# @TODO : use the system to generate slightly better random numbers...entropy?
+						botNumber = random.randint(0, 100)
+						userNumber = random.randint(0, 100)
+						if (butNumber > userNumber):
+							# @TODO : subtract bet amount here, or when the bet is made...
+							print("User lost. Bot number: {0}, User number: {1}".format(botNumber, userNumber))
+						elif (userNumber > botNumber):
+							# @TODO : double the bet amount and update the user's credit total
+							print("User won. Bot number: {0}, User number: {1}".format(botNumber, userNumber))
+						else:
+							# @TODO : just return the bet amount to the user...if we only subtract on loss, then do nothing
+							print("Appears a tie...bot number: {0}; user number: {1}".format(botNumber, userNumber))
 				else:
-					print("Error: member was not none.")
+					print("Error in credit_bet: member was not none.")
 			else:
-				print("Not an int value, but the bot should have caught that by default.")
-		except Exception as e: 
-			await self.bot.say("Error occured: {}".format(e))
+				print("Error in credit_bet: Not an int value, but the bot should have caught that by default.")
+		except Exception as e:
+			print("Error occured in credit_bet: {}".format(e))
+			await self.bot.say("Something went wrong and has been reported to the bot owner.")
 
 def setup(bot):
     bot.add_cog(CreditBet(bot))
