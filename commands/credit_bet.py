@@ -59,4 +59,5 @@ class CreditBet():
 			await self.bot.say("Something went wrong and has been reported to the bot owner.")
 
 def setup(bot):
-    bot.add_cog(CreditBet(bot))
+	"""This makes it so we can actually use it."""
+	bot.add_cog(CreditBet(bot))
