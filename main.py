@@ -45,22 +45,29 @@ async def on_message(message):
 
 @client.event
 async def on_ready():
-    # hard set original song
-    plugins.MusicHandler().hard_update_current_song()
-
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
-    print(plugins.MusicHandler().get_current_song())
+    if (plugins.MusicHandler().get_enabled_status() == True):
+        # hard set original song
+        plugins.MusicHandler().hard_update_current_song()
+        print(plugins.MusicHandler().get_current_song())
+        if (plugins.MusicHandler().get_current_song() == 'Spotify'):
+            await client.change_presence(game=discord.Game(name='Idle'))
+        else:
+            await client.change_presence(game=discord.Game(name=plugins.MusicHandler().get_current_song()))
+        # This starts the update_song as a background task that will continue to run until we kill it
+        client.loop.create_task(plugins.MusicHandler().update_song(client))
+    else:
+        await client.change_presence(game=discord.Game(name="snoring.ninja"))
+
     print('------')
 
-    if (plugins.MusicHandler().get_current_song() == 'Spotify'):
-        await client.change_presence(game=discord.Game(name='Idle'))
-    else:
-        await client.change_presence(game=discord.Game(name=plugins.MusicHandler().get_current_song()))
-
-    # This starts the update_song as a background task that will continue to run until we kill it
-    client.loop.create_task(plugins.MusicHandler().update_song(client))
+@client.event
+async def on_member_join(member):
+    server = member.server
+    fmt = 'Welcome to {0.name}''s Discord, {1.mention}! Relax and have some fun! :wink:'
+    await client.send_message(server, fmt.format(server, member))
 
 
 
@@ -78,7 +85,7 @@ if __name__ == "__main__":
                 exc = '{}: {}'.format(type(e).__name__, e)
                 print('Failed to load extension {}\n{}'.format(extension, exc))
         client.run('Mjc3ODc0NTUzOTU3NTE1MjY2.C3kGWw.815k4zhNa2HO-CasYs3yCf1XvBI')
-        
+
     except:
         # TODO : log error for looking at later
         print('Database connection failed; killing bot.')

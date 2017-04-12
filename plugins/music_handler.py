@@ -24,7 +24,6 @@ class MusicHandler():
 			that currently is; needs to be tested
 	"""
 	def __init__(self):
-
 		# The currently playing song
 		self.current_song = ''
 
@@ -33,6 +32,8 @@ class MusicHandler():
 
 		# Flag for flood prevention
 		self.song_needs_update = False
+
+		self.songs_enabled = False
 
 	@classmethod
 	def update_current_song(self, next_song):
@@ -46,6 +47,10 @@ class MusicHandler():
 		else:
 			# Honestly, having to do this is dumb...need a better way
 			self.current_song = 'Forcing proper update.'
+
+	@classmethod
+	def get_enabled_status(self):
+		return False
 
 	@classmethod
 	def update_next_song(self):
@@ -89,20 +94,21 @@ class MusicHandler():
 		# print("initial call.")
 
 		# Keep running as long as the client is connected
-		while not client.is_closed:
+		if (self.songs_enabled == True):
+			while not client.is_closed:
 
-			# Now we do the logic checks
-			# NOTE: this is on a 3 second asyncio sleep, I don't really see a need to go lower...
-			# 		5 seconds could possibly be better
-			if (self.compare_songs()):
-				if (self.get_current_song() != 'Spotify' and self.get_current_song() != ''):
-					await client.change_presence(game=discord.Game(name=self.get_current_song()))
-				elif (self.get_current_song() == 'Spotify' and self.song_needs_update == True):
-					self.update_current_song('Spotify')
-					await client.change_presence(game=discord.Game(name='Idle'))
+				# Now we do the logic checks
+				# NOTE: this is on a 3 second asyncio sleep, I don't really see a need to go lower...
+				# 		5 seconds could possibly be better
+				if (self.compare_songs()):
+					if (self.get_current_song() != 'Spotify' and self.get_current_song() != ''):
+						await client.change_presence(game=discord.Game(name=self.get_current_song()))
+					elif (self.get_current_song() == 'Spotify' and self.song_needs_update == True):
+						self.update_current_song('Spotify')
+						await client.change_presence(game=discord.Game(name='Idle'))
+					else:
+						if (self.song_needs_update == True):
+							await client.change_presence(game=discord.Game(name='Spotify not loaded.'))
+					await asyncio.sleep(3)
 				else:
-					if (self.song_needs_update == True):
-						await client.change_presence(game=discord.Game(name='Spotify not loaded.'))
-				await asyncio.sleep(3)
-			else:
-				await asyncio.sleep(3)
+					await asyncio.sleep(3)
