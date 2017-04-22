@@ -14,7 +14,7 @@ import sys
 
 import discord
 import asyncio
-import spotilib
+#import spotilib
 
 # Import the plugins folder
 # TODO : config to enable / disable plugin files to be imported
@@ -29,7 +29,7 @@ from resources import database
 from discord.ext import commands
 
 
-startup_extensions = ["credit_bet"]
+startup_extensions = ["credit_bet", "logout"]
 
 description = '''Betting system for monthly prizes.'''
 client = commands.Bot(command_prefix='&', description=description)
@@ -48,18 +48,18 @@ async def on_ready():
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
-    if (plugins.MusicHandler().get_enabled_status() == True):
+   # if (plugins.MusicHandler().get_enabled_status() == True):
         # hard set original song
-        plugins.MusicHandler().hard_update_current_song()
-        print(plugins.MusicHandler().get_current_song())
-        if (plugins.MusicHandler().get_current_song() == 'Spotify'):
-            await client.change_presence(game=discord.Game(name='Idle'))
-        else:
-            await client.change_presence(game=discord.Game(name=plugins.MusicHandler().get_current_song()))
+   #     plugins.MusicHandler().hard_update_current_song()
+   #     print(plugins.MusicHandler().get_current_song())
+   #     if (plugins.MusicHandler().get_current_song() == 'Spotify'):
+   #         await client.change_presence(game=discord.Game(name='Idle'))
+   #     else:
+	#await client.change_presence(game=discord.Game(name=plugins.MusicHandler().get_current_song()))
         # This starts the update_song as a background task that will continue to run until we kill it
-        client.loop.create_task(plugins.MusicHandler().update_song(client))
-    else:
-        await client.change_presence(game=discord.Game(name="snoring.ninja"))
+        #client.loop.create_task(plugins.MusicHandler().update_song(client))
+#    else
+    await client.change_presence(game=discord.Game(name="snoring.ninja"))
 
     print('------')
 

@@ -17,24 +17,24 @@ class CreditBet():
 		self.bot = bot
 		self.channel_id = 276214890832592897
 		#277596190701387777
-
+		
 		self.server_id = 224989457445552129
 		#171311472855613441
 
-	@commands.command(pass_context=True, no_pm=True)
+	@commands.command(pass_context=True)
 	async def bet(self, ctx, amount: int, member: discord.Member = None):
 		""" Bet if the member exists, otherwise insert them and tell them to reroll. """
-		try:
+		try: 
 			if isinstance(amount, int):
 				# Have to cast ctx.message.channel and ctx.message.server to strings
-				if (member is None and amount >= 10 and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
+				if (member is None and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
 					member = ctx.message.author
 					memberID = ctx.message.author.id
 					display_name = ctx.message.author.name
-					#print("credit_bet: User: {} / Amount: {}".format(member, amount))
+					print("credit_bet: User: {} / Amount: {}".format(member, amount))
 					#command_dict = DatabaseHandler().executeStoredProcedure("BuildCommandDictionary", (channel, ))
 					row = DatabaseHandler().fetchresult("""SELECT 1 FROM `users` WHERE `userID` = %s""", (memberID))
-					#print("Row: {}".format(row))
+					print("Row: {}".format(row))
 					if row is None:
 						await self.bot.say("{0.mention}: please do &register to join the lotto.".format(member))
 						return
@@ -42,7 +42,7 @@ class CreditBet():
 						print("Member found, checking remaining credits and generating 'random' numbers for roll.")
 						# @TODO : use the system to generate slightly better random numbers...entropy?
 						remCredits = DatabaseHandler().fetchresult("""SELECT `credits` FROM `users` WHERE `userID` = %s""", (memberID))
-						#print(remCredits)
+						print(remCredits)
 						if (remCredits[0] < amount):
 							await self.bot.say("Insufficient credits ({0})".format(remCredits[0]))
 							return
@@ -54,26 +54,28 @@ class CreditBet():
 								DatabaseHandler().executeStoredProcedureCommit("RemoveUserCredits", args)
 								newBalance = remCredits[0] - amount
 								await self.bot.say("Sorry, {0.mention}, you lost with a roll of {1} against {2}! Your balance is now {3}!".format(member, userNumber, botNumber, newBalance))
-								#print("User lost. Bot number: {0}, User number: {1}".format(botNumber, userNumber))
+								print("User lost. Bot number: {0}, User number: {1}".format(botNumber, userNumber))
 							elif (userNumber > botNumber):
 								args = (str(member), amount, memberID, display_name)
 								DatabaseHandler().executeStoredProcedureCommit("IncreaseUserCredits", args)
 								newBalance = remCredits[0] + amount
 								await self.bot.say("Congratulations, {0.mention}, you won with a roll of {1} against {2}! Your balance is now {3}!".format(member, userNumber, botNumber, newBalance))
-								#print("User won. Bot number: {0}, User number: {1}".format(botNumber, userNumber))
+								print("User won. Bot number: {0}, User number: {1}".format(botNumber, userNumber))
 							else:
 								await self.bot.say("It was a tie, {0.mention}, with a roll of {1}! Your balance remains {2}!".format(member, userNumber, remCredits[0]))
-								#print("Appears a tie...bot number: {0}; user number: {1}".format(botNumber, userNumber))
+								print("Appears a tie...bot number: {0}; user number: {1}".format(botNumber, userNumber))
+				else:
+					print("Error in credit_bet: member was not none, channel not test, or server not iBeNifty.")
 			else:
 				print("Error in credit_bet: Not an int value, but the bot should have caught that by default.")
 		except Exception as e:
-			print("ERROR! Function: credit_bet. Exception: {}".format(e))
-			await self.bot.say("I failed, sorry...please let TD know (reference: betting error).")
+			print("Error occured in credit_bet: {}".format(e))
+			await self.bot.say("I failed, sorry...please let TD know.")
 
-	@commands.command(pass_context=True, no_pm=True)
+	@commands.command(pass_context=True)
 	async def balance(self, ctx, member: discord.Member = None):
 		""" Get balannce."""
-		try:
+		try: 
 			# Have to cast ctx.message.channel and ctx.message.server to strings
 			if (member is None and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
 				member = ctx.message.author
@@ -84,15 +86,17 @@ class CreditBet():
 					await self.bot.say("{0.mention}: please do &register to join the lotto.".format(member))
 					return
 				else:
-					remCredits = DatabaseHandler().fetchresult("""SELECT `credits` FROM `users` WHERE `userID` = %s""", (str(memberID)))
+					remCredits = DatabaseHandler().fetchresult("""SELECT `credits` FROM `users` WHERE `username` = %s""", (str(member)))
 					await self.bot.say("{0.mention}: your balance is {1}.".format(member, remCredits[0]))
+			else:
+				print("Error in credit_bet (balance): member was not none, channel not test, or server not iBeNifty.")
 		except Exception as e:
-			print("ERROR! Function: balance. Exception: {0}".format(e))
-			await self.bot.say("I failed, sorry...please let TD know (reference: balance error).")
+			print("Error occured in credit_bet (balance): {}".format(e))
+			await self.bot.say("I failed, sorry...please let TD know.")
 
-	@commands.command(pass_context=True, no_pm=True)
+	@commands.command(pass_context=True)
 	async def register(self, ctx, member: discord.Member = None):
-		""" Register member with the bot. """
+		""" Insert user. """
 		try: 
 			# Have to cast ctx.message.channel and ctx.message.server to strings
 			if (member is None and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
@@ -100,21 +104,23 @@ class CreditBet():
 				memberID = ctx.message.author.id
 				display_name = ctx.message.author.name
 				row = DatabaseHandler().fetchresult("""SELECT 1 FROM `users` WHERE `userID` = %s""", (memberID))
-				#print("Row: {}".format(row))
+				print("Row: {}".format(row))
 				if row is None:
 					try:
-						#print(member)
+						print(member)
 						args = (str(member), 500, str(datetime.now()), memberID, display_name)
-						#print(args)
+						print(args)
 						DatabaseHandler().executeStoredProcedureCommit("addMember", args)
-						await self.bot.say("{0.mention}, you have now been entered into the database! &bet AMOUNT to play! Goodluck!".format(member))
+						await self.bot.say("Congratulations, {0.mention}, you have been entered into the database! &bet AMOUNT to play!".format(member))
 					except Exception as e:
-						print("ERROR! Function: register (inner try). Exception: {0}".format(e))
+						print(e)
 				else:
 					await self.bot.say("{0.mention}: you're already registered. Please do &bet AMOUNT to play!".format(member))
+			else:
+				print("Error in credit_bet(register): member was not none, channel not test, or server not iBeNifty.")
 		except Exception as e:
-			print("ERROR! Function: register. Exception: {0}".format(e))
-			await self.bot.say("I failed, sorry...please let TD know (reference: register error).")
+			print("Error occured in credit_bet (register): {}".format(e))
+			await self.bot.say("I failed, sorry...please let TD know.")
 
 	@commands.command(pass_context=True, no_pm=True)
 	@commands.cooldown(2, 60, commands.BucketType.user)
@@ -125,65 +131,38 @@ class CreditBet():
 				memberID = ctx.message.author.id
 				display_name = ctx.message.author.name
 				output_string = ''
+				args = ()
 				row = DatabaseHandler().selectAllOptions("""SELECT `displayName`, `credits`, `timesBet` FROM `users` ORDER BY `credits` DESC LIMIT 5""")
 				row2 = DatabaseHandler().selectAllOptionsDict("""SELECT `displayName`, `credits`, `timesBet` FROM `users` ORDER BY `credits` DESC LIMIT 5""")
 				names = {d['displayName'] for d in row2}
+				#{uid: m.nick if m.nick else m.name for uid, m in members.items()}
+				#print(names)
 				max_name_len = max(map(len, names))
+				#print(max_name_len)
 				max_name_len = 22 if max_name_len > 22 else max_name_len
 				spacer = max_name_len + 4
+				#print(spacer)
+				#print(len(row))
 				output_string = '```{0: <{1}}  Credits\n'.format('User', spacer)
 				output_string = output_string + '{0: <{1}}  -------\n'.format('----', spacer)
+				#print("Tuple?")
 				for x in range(len(row)):
-					# Add the name and credit amounts of the top 5 users. Truncate usernames at 22 spaces and add '..'
+					# print("STARTING! {0}".format(x))
+					# print(row[x][0])
+					# print(row[x][1])
+					# print(row[x][2])
+					# print("------------------")
 					output_string = output_string + "{0: <{1}}  {2}\n".format(row[x][0][:22] + '..' if len(row[x][0]) > 22 else row[x][0], spacer, row[x][1])
 				output_string = output_string + "\n```"
 				await self.bot.say(output_string)
+				#await self.bot.say("```".format(member))
 			else:
 				print("Error in credit_bet(register): member was not none, channel not test, or server not iBeNifty.")
 		except Exception as e:
 			print("Error occured in credit_bet (register): {}".format(e))
 			await self.bot.say("I failed, sorry...please let TD know.")
 
-	@commands.command(pass_context=True, no_pm=True)
-	async def helpme(self, ctx, member : discord.Member = None):
-		""" 100 free credits every 24 hours. """
-		memberID = ctx.message.author.id
-		member = ctx.message.author
-		try:
-			lastUsedTime = DatabaseHandler().fetchresult("""SELECT `lastClaimTime` FROM `users` WHERE `userID` = %s""", (str(memberID)))
-			currentDate = datetime.now()
-			#print(lastUsedTime[0])
-			#print(currentDate)
-			if lastUsedTime[0] is not None:
-				total_seconds = (currentDate - lastUsedTime[0]).total_seconds()
-				#print(total_seconds)
-			if int(total_seconds) >= 86400:
-				total_seconds = int(86400 - total_seconds)
-				total_hours = int(total_seconds / 3600)
-				used_secs = int(total_hours * 3600)
-				seconds_left = int(total_seconds - used_secs)
-				final_minutes = int(seconds_left / 60)
-				formatted_string = "{0}h:{1}m".format(total_hours * -1, final_minutes * -1)
-				args = (memberID, str(currentDate))
-				DatabaseHandler().executeStoredProcedureCommit("helpMe", args)
-				await self.bot.say("{0.mention}, you have been given an additional 100 credits! You were eligible {1} ago!".format(member, formatted_string))
-				#print("Helped.")
-			else:
-				total_seconds = int(86400 - total_seconds)
-				total_hours = int(total_seconds / 3600)
-				used_secs = int(total_hours * 3600)
-				seconds_left = int(total_seconds - used_secs)
-				final_minutes = int(seconds_left / 60)
-				#print(total_seconds)
-				#print(total_hours)
-				#print(used_secs)
-				#print(seconds_left)
-				#print(final_minutes)
-				formatted_string = "{0}h:{1}m".format(total_hours, final_minutes)
-				await self.bot.say("{0.mention}, you can only use this command every 24 hours ({1}) :middle_finger:".format(member, formatted_string))
-		except Exception as e:
-			print("Exception: {0}".format(e))
-
 def setup(bot):
 	"""This makes it so we can actually use it."""
 	bot.add_cog(CreditBet(bot))
+

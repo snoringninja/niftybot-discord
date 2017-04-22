@@ -1,7 +1,0 @@
-# This is the configuration file for the bot; most of these settings SHOULD be self explanatory
-# Head's up, this is a YAML comment
-database:
- host: host
- username: username
- password: password
- database: database
