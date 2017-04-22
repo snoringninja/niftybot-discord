@@ -6,6 +6,7 @@
 # @TODO : how do we want to handle spam? globally limit to only one bet per xxx seconds, or let users run wild...
 
 import discord
+import logging
 from discord.ext import commands
 import random
 from datetime import datetime
@@ -14,11 +15,13 @@ from resources.database import DatabaseHandler
 
 class CreditBet():
 	def __init__(self, bot):
+		# TODO : import from config if we are in debug, and swap channel_id and server_id depending
 		self.bot = bot
-		self.channel_id = 276214890832592897
+
+		self.channel_id = 277596190701387777 #276214890832592897
 		#277596190701387777
 
-		self.server_id = 224989457445552129
+		self.server_id = 171311472855613441 #224989457445552129
 		#171311472855613441
 
 	@commands.command(pass_context=True, no_pm=True)
@@ -26,7 +29,7 @@ class CreditBet():
 		""" Bet if the member exists, otherwise insert them and tell them to reroll. """
 		try:
 			if isinstance(amount, int):
-				# Have to cast ctx.message.channel and ctx.message.server to strings
+				# Have to cast ctx.message.channel.id and ctx.message.server.id to ints
 				if (member is None and amount >= 10 and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
 					member = ctx.message.author
 					memberID = ctx.message.author.id
@@ -67,7 +70,7 @@ class CreditBet():
 			else:
 				print("Error in credit_bet: Not an int value, but the bot should have caught that by default.")
 		except Exception as e:
-			print("ERROR! Function: credit_bet. Exception: {}".format(e))
+			print("ERROR! Function: credit_bet. Exception: {0}".format(e))
 			await self.bot.say("I failed, sorry...please let TD know (reference: betting error).")
 
 	@commands.command(pass_context=True, no_pm=True)
@@ -125,6 +128,7 @@ class CreditBet():
 				memberID = ctx.message.author.id
 				display_name = ctx.message.author.name
 				output_string = ''
+				# This is pretty stupid...I should really redo so I only need one database select.
 				row = DatabaseHandler().selectAllOptions("""SELECT `displayName`, `credits`, `timesBet` FROM `users` ORDER BY `credits` DESC LIMIT 5""")
 				row2 = DatabaseHandler().selectAllOptionsDict("""SELECT `displayName`, `credits`, `timesBet` FROM `users` ORDER BY `credits` DESC LIMIT 5""")
 				names = {d['displayName'] for d in row2}
@@ -138,49 +142,54 @@ class CreditBet():
 					output_string = output_string + "{0: <{1}}  {2}\n".format(row[x][0][:22] + '..' if len(row[x][0]) > 22 else row[x][0], spacer, row[x][1])
 				output_string = output_string + "\n```"
 				await self.bot.say(output_string)
-			else:
-				print("Error in credit_bet(register): member was not none, channel not test, or server not iBeNifty.")
 		except Exception as e:
-			print("Error occured in credit_bet (register): {}".format(e))
-			await self.bot.say("I failed, sorry...please let TD know.")
+			print("ERROR! Function: scores. Exception: {0}".format(e))
+			await self.bot.say("I failed, sorry...please let TD know (reference: scores error).")
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def helpme(self, ctx, member : discord.Member = None):
 		""" 100 free credits every 24 hours. """
+		# @TODO : once a user hits the amount given for a register, don't allow them to use the command (alongside 24 hour cooldown)
 		memberID = ctx.message.author.id
 		member = ctx.message.author
 		try:
-			lastUsedTime = DatabaseHandler().fetchresult("""SELECT `lastClaimTime` FROM `users` WHERE `userID` = %s""", (str(memberID)))
+			information = DatabaseHandler().selectAllOptionsParams("""SELECT `credits`, `lastClaimTime` FROM `users` WHERE `userID` = %s""", (str(memberID)))
 			currentDate = datetime.now()
-			#print(lastUsedTime[0])
+			#print(lastUsedTime)
 			#print(currentDate)
-			if lastUsedTime[0] is not None:
-				total_seconds = (currentDate - lastUsedTime[0]).total_seconds()
-				#print(total_seconds)
-			if int(total_seconds) >= 86400:
-				total_seconds = int(86400 - total_seconds)
-				total_hours = int(total_seconds / 3600)
-				used_secs = int(total_hours * 3600)
-				seconds_left = int(total_seconds - used_secs)
-				final_minutes = int(seconds_left / 60)
-				formatted_string = "{0}h:{1}m".format(total_hours * -1, final_minutes * -1)
-				args = (memberID, str(currentDate))
-				DatabaseHandler().executeStoredProcedureCommit("helpMe", args)
-				await self.bot.say("{0.mention}, you have been given an additional 100 credits! You were eligible {1} ago!".format(member, formatted_string))
-				#print("Helped.")
+			member_credits = information[0][0]
+			lastUsedTime = information[0][1]
+			if member_credits >= 500:
+				await self.bot.say("{0.mention}, you are above the minumum threshhold for using this command (balance of {1}).".format(str(member), member_credits))
+				return
 			else:
-				total_seconds = int(86400 - total_seconds)
-				total_hours = int(total_seconds / 3600)
-				used_secs = int(total_hours * 3600)
-				seconds_left = int(total_seconds - used_secs)
-				final_minutes = int(seconds_left / 60)
-				#print(total_seconds)
-				#print(total_hours)
-				#print(used_secs)
-				#print(seconds_left)
-				#print(final_minutes)
-				formatted_string = "{0}h:{1}m".format(total_hours, final_minutes)
-				await self.bot.say("{0.mention}, you can only use this command every 24 hours ({1}) :middle_finger:".format(member, formatted_string))
+				if lastUsedTime is not None:
+					total_seconds = (currentDate - lastUsedTime).total_seconds()
+					#print(total_seconds)
+				if int(total_seconds) >= 86400:
+					total_seconds = int(86400 - total_seconds)
+					total_hours = int(total_seconds / 3600)
+					used_secs = int(total_hours * 3600)
+					seconds_left = int(total_seconds - used_secs)
+					final_minutes = int(seconds_left / 60)
+					formatted_string = "{0}h:{1}m".format(total_hours * -1, final_minutes * -1)
+					args = (memberID, str(currentDate))
+					DatabaseHandler().executeStoredProcedureCommit("helpMe", args)
+					await self.bot.say("{0.mention}, you have been given an additional 100 credits! You were eligible {1} ago!".format(member, formatted_string))
+					#print("Helped.")
+				else:
+					total_seconds = int(86400 - total_seconds)
+					total_hours = int(total_seconds / 3600)
+					used_secs = int(total_hours * 3600)
+					seconds_left = int(total_seconds - used_secs)
+					final_minutes = int(seconds_left / 60)
+					#print(total_seconds)
+					#print(total_hours)
+					#print(used_secs)
+					#print(seconds_left)
+					#print(final_minutes)
+					formatted_string = "{0}h:{1}m".format(total_hours, final_minutes)
+					await self.bot.say("{0.mention}, you can only use this command every 24 hours ({1}) :middle_finger:".format(member, formatted_string))
 		except Exception as e:
 			print("Exception: {0}".format(e))
 

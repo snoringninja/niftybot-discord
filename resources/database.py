@@ -14,6 +14,7 @@ from resources.resourcepath import *
 from resources.config import DATABASE, load_config
 
 class DatabaseHandler(object):
+	# TODO : comment this shit so we know what everything does
 	_db_connection = None
 	_db_cur = None
 
@@ -62,8 +63,8 @@ class DatabaseHandler(object):
 		return self._db_curdict.fetchall()
 
 	def executeStoredProcedureCommit(self, query, params):
-		print(query)
-		print(params)
+		#print(query)
+		#print(params)
 		self._db_cur.callproc(query, params)
 		return self._db_connection.commit()
 
