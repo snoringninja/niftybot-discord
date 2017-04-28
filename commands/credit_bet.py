@@ -4,6 +4,8 @@
 
 # @TODO : finish
 # @TODO : how do we want to handle spam? globally limit to only one bet per xxx seconds, or let users run wild...
+# @TODO : use ConfigLoader
+# @TODO : create a function in database that does our generic select one query? Same with credits...
 
 import discord
 import logging

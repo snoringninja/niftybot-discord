@@ -29,7 +29,7 @@ from discord.ext import commands
 
 import os
 import sys
-from resources.resourcepath import *
+
 from resources.config import BOTSETTINGS, DEBUGGING, load_config, ConfigLoader
 
 # TODO : load these dynamically based on yaml setting file...
