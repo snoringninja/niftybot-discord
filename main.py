@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # main.py
 # @author Ryan Malacina
 # @SnoringNinja - https://snoring.ninja
@@ -8,9 +10,6 @@
 # TODO : clean up everything, and by that I mean organize plugins into
 #        their own folder and import based on that...possibly just write something to import them all
 #        at once based on a config file
-# 
-
-import sys
 
 import discord
 import asyncio
@@ -28,66 +27,62 @@ from resources import database
 
 from discord.ext import commands
 
+import os
+import sys
+from resources.resourcepath import *
+from resources.config import BOTSETTINGS, DEBUGGING, load_config, ConfigLoader
 
+# TODO : load these dynamically based on yaml setting file...
 startup_extensions = ["credit_bet", "logout"]
 
-description = '''Betting system for monthly prizes.'''
-client = commands.Bot(command_prefix='&', description=description)
+# TODO : this is just...well, ugly
+description = ConfigLoader().load_config_setting(BOTSETTINGS, 'description')
+command_prefix = ConfigLoader().load_config_setting(BOTSETTINGS, 'command_prefix')
+bot_token = ConfigLoader().load_config_setting(BOTSETTINGS, 'bot_token')
+game_name = ConfigLoader().load_config_setting(BOTSETTINGS, 'game_name')
+show_db_info = ConfigLoader().load_config_setting(DEBUGGING, 'show_db_info')
 
-# TODO : can we move these out of here? I like the idea of the main file literally just initiating the bot and nothing else
+client = commands.Bot(command_prefix=command_prefix, description=description)
+
 @client.event
 async def on_message(message):
     server = message.server
-    if (message.content.startswith('!owner')):
-        await client.send_message(message.channel, "shaLLow / TD");
-    else:
-        await client.process_commands(message)
+    await client.process_commands(message)
 
 @client.event
 async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-   # if (plugins.MusicHandler().get_enabled_status() == True):
-        # hard set original song
-   #     plugins.MusicHandler().hard_update_current_song()
-   #     print(plugins.MusicHandler().get_current_song())
-   #     if (plugins.MusicHandler().get_current_song() == 'Spotify'):
-   #         await client.change_presence(game=discord.Game(name='Idle'))
-   #     else:
-	#await client.change_presence(game=discord.Game(name=plugins.MusicHandler().get_current_song()))
-        # This starts the update_song as a background task that will continue to run until we kill it
-        #client.loop.create_task(plugins.MusicHandler().update_song(client))
-#    else
-    await client.change_presence(game=discord.Game(name="snoring.ninja"))
-
+    print('------')
+    print('Logged in as {0}; Client ID: {1}'.format(str(client.user.name), str(client.user.id)))
+    print('Command prefix is: {0}'.format(str(command_prefix)))
+    print('Setting game to: {0}'.format(game_name))
+    await client.change_presence(game=discord.Game(name=game_name))
     print('------')
 
 @client.event
 async def on_member_join(member):
     server = member.server
-    fmt = 'Welcome to {0.name}''s Discord, {1.mention}! Relax and have some fun! :wink:'
+    fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun! :wink:'
     await client.send_message(server, fmt.format(server, member))
-
-
 
 if __name__ == "__main__":
     # attempt to connect to the database first before trying anything else
     # try catch for obvious reasons
     print('Checking database before continuing...')
-    database.DatabaseHandler().get_conn_details()
+    database.DatabaseHandler().get_conn_details() if show_db_info == True else False
     try:
         database.DatabaseHandler().attemptConnection()
+        print('Connection successful.')
         for extension in startup_extensions:
             try:
                 client.load_extension(extension)
             except Exception as e:
                 exc = '{}: {}'.format(type(e).__name__, e)
                 print('Failed to load extension {}\n{}'.format(extension, exc))
-        client.run('Mjc3ODc0NTUzOTU3NTE1MjY2.C3kGWw.815k4zhNa2HO-CasYs3yCf1XvBI')
-
-    except:
+        client.run(bot_token)
+    except Exception as e:
         # TODO : log error for looking at later
-        print('Database connection failed; killing bot.')
+        print('Startup error encountered.')
+        print('Exception: {0}: {1}'.format(type(e).__name__, e))
         client.logout()
         sys.exit(0)
+

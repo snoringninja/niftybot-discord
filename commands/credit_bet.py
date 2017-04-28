@@ -129,7 +129,8 @@ class CreditBet():
 				display_name = ctx.message.author.name
 				output_string = ''
 				# This is pretty stupid...I should really redo so I only need one database select.
-				row = DatabaseHandler().selectAllOptions("""SELECT `displayName`, `credits`, `timesBet` FROM `users` ORDER BY `credits` DESC LIMIT 5""")
+				#row = DatabaseHandler().selectAllOptions("""SELECT `displayName`, `credits`, `timesBet` FROM `users` WHERE `credits` > 0 ORDER BY `credits` DESC LIMIT 5""")
+				row = DatabaseHandler().executeStoredProcedure("GetTop5",())
 				row2 = DatabaseHandler().selectAllOptionsDict("""SELECT `displayName`, `credits`, `timesBet` FROM `users` ORDER BY `credits` DESC LIMIT 5""")
 				names = {d['displayName'] for d in row2}
 				max_name_len = max(map(len, names))
@@ -160,7 +161,7 @@ class CreditBet():
 			member_credits = information[0][0]
 			lastUsedTime = information[0][1]
 			if member_credits >= 500:
-				await self.bot.say("{0.mention}, you are above the minumum threshhold for using this command (balance of {1}).".format(str(member), member_credits))
+				await self.bot.say("{0.mention}, you are above the minimum threshhold for using this command (balance of {1}).".format(str(member), member_credits))
 				return
 			else:
 				if lastUsedTime is not None:

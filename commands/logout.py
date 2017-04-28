@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import os, sys
 
 class logout():
 	def __init__(self, bot):
