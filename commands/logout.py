@@ -2,12 +2,12 @@ import discord
 from discord.ext import commands
 import os, sys
 
-from resources.config import BOTSETTINGS, load_config, ConfigLoader
+from resources.config import ConfigLoader
 
 class logout():
 	def __init__(self, bot):
 		self.bot = bot
-		self.owner_id = ConfigLoader().load_config_setting(BOTSETTINGS, 'owner_id')
+		self.owner_id = ConfigLoader().load_config_setting('botsettings', 'owner_id')
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def logout(self, ctx, member: discord.Member = None):

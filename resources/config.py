@@ -10,9 +10,9 @@ import yaml
 
 # TODO : I don't think I actually need this
 NIFTYBOT_CONFIG = 'NIFTYBOT_CONFIG'
-DATABASE = 'database'
-BOTSETTINGS = 'botsettings'
-DEBUGGING = 'debugging'
+#DATABASE = 'database'
+#BOTSETTINGS = 'botsettings'
+#DEBUGGING = 'debugging'
 
 def get_config_filename(default_filename):
 	if NIFTYBOT_CONFIG in os.environ:

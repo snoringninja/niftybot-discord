@@ -1,11 +1,10 @@
 # Lottery system
-# Resets monthly -> for our server, we use this as a way to give out monthly prizes
-# Only runs off executing stored procedures
+# Resets monthly -> for our server, we use this as a way to give out monthly prizes (need to automate this with cron)
+# Only runs off executing stored procedures...except, only in a few places...need to extend this to actually be SPs only.
 
 # @TODO : finish
-# @TODO : how do we want to handle spam? globally limit to only one bet per xxx seconds, or let users run wild...
-# @TODO : use ConfigLoader
 # @TODO : create a function in database that does our generic select one query? Same with credits...
+# @TODO : we need to log errors to a file to look at later
 
 import discord
 import logging
@@ -14,19 +13,17 @@ import random
 from datetime import datetime
 
 from resources.database import DatabaseHandler
+from resources.config import ConfigLoader
 
 class CreditBet():
 	def __init__(self, bot):
-		# TODO : import from config if we are in debug, and swap channel_id and server_id depending
 		self.bot = bot
 
-		self.channel_id = 277596190701387777 #276214890832592897
-		#277596190701387777
-
-		self.server_id = 171311472855613441 #224989457445552129
-		#171311472855613441
+		self.channel_id = ConfigLoader().load_config_setting('botsettings', 'channel_id')
+		self.server_id = ConfigLoader().load_config_setting('botsettings', 'server_id')
 
 	@commands.command(pass_context=True, no_pm=True)
+	@commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
 	async def bet(self, ctx, amount: int, member: discord.Member = None):
 		""" Bet if the member exists, otherwise insert them and tell them to reroll. """
 		try:
@@ -35,8 +32,8 @@ class CreditBet():
 				if (member is None and amount >= 10 and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
 					member = ctx.message.author
 					memberID = ctx.message.author.id
-					display_name = ctx.message.author.name
-					#print("credit_bet: User: {} / Amount: {}".format(member, amount))
+					display_name = ctx.message.author.display_name
+					#print("credit_bet: User: {} / Amount: {} / display_name: {}".format(member, amount, display_name))
 					#command_dict = DatabaseHandler().executeStoredProcedure("BuildCommandDictionary", (channel, ))
 					row = DatabaseHandler().fetchresult("""SELECT 1 FROM `users` WHERE `userID` = %s""", (memberID))
 					#print("Row: {}".format(row))
@@ -44,7 +41,7 @@ class CreditBet():
 						await self.bot.say("{0.mention}: please do &register to join the lotto.".format(member))
 						return
 					else:
-						print("Member found, checking remaining credits and generating 'random' numbers for roll.")
+						#print("Member found, checking remaining credits and generating 'random' numbers for roll.")
 						# @TODO : use the system to generate slightly better random numbers...entropy?
 						remCredits = DatabaseHandler().fetchresult("""SELECT `credits` FROM `users` WHERE `userID` = %s""", (memberID))
 						#print(remCredits)
@@ -52,8 +49,8 @@ class CreditBet():
 							await self.bot.say("Insufficient credits ({0})".format(remCredits[0]))
 							return
 						else:
-							botNumber = random.randint(0, 100)
-							userNumber = random.randint(0, 100)
+							botNumber = random.randint(1, 100)
+							userNumber = random.randint(1, 100)
 							if (botNumber > userNumber):
 								args = (str(member), amount, memberID, display_name)
 								DatabaseHandler().executeStoredProcedureCommit("RemoveUserCredits", args)
@@ -70,12 +67,13 @@ class CreditBet():
 								await self.bot.say("It was a tie, {0.mention}, with a roll of {1}! Your balance remains {2}!".format(member, userNumber, remCredits[0]))
 								#print("Appears a tie...bot number: {0}; user number: {1}".format(botNumber, userNumber))
 			else:
-				print("Error in credit_bet: Not an int value, but the bot should have caught that by default.")
+				print("Error in bet: Not an int value, but the bot should have caught that by default.")
 		except Exception as e:
-			print("ERROR! Function: credit_bet. Exception: {0}".format(e))
+			print("ERROR! Function: bet. Exception: {0}".format(e))
 			await self.bot.say("I failed, sorry...please let TD know (reference: betting error).")
 
 	@commands.command(pass_context=True, no_pm=True)
+	@commands.cooldown(rate=1, per=60, type=commands.BucketType.user)
 	async def balance(self, ctx, member: discord.Member = None):
 		""" Get balance for user."""
 		try:
@@ -84,7 +82,7 @@ class CreditBet():
 				member = ctx.message.author
 				memberID = ctx.message.author.id
 				row = DatabaseHandler().fetchresult("""SELECT 1 FROM `users` WHERE `userID` = %s""", (memberID))
-				print("Row: {}".format(row))
+				#print("Row: {}".format(row))
 				if row is None:
 					await self.bot.say("{0.mention}: please do &register to join the lotto.".format(member))
 					return
@@ -112,17 +110,17 @@ class CreditBet():
 						args = (str(member), 500, str(datetime.now()), memberID, display_name)
 						#print(args)
 						DatabaseHandler().executeStoredProcedureCommit("addMember", args)
-						await self.bot.say("{0.mention}, you have now been entered into the database! &bet AMOUNT to play! Goodluck!".format(member))
+						await self.bot.say("{0.mention}, you are now registered! &bet to play! Goodluck!".format(member))
 					except Exception as e:
 						print("ERROR! Function: register (inner try). Exception: {0}".format(e))
 				else:
-					await self.bot.say("{0.mention}: you're already registered. Please do &bet AMOUNT to play!".format(member))
+					await self.bot.say("{0.mention}: you're already registered. Please do &bet to play!".format(member))
 		except Exception as e:
 			print("ERROR! Function: register. Exception: {0}".format(e))
 			await self.bot.say("I failed, sorry...please let TD know (reference: register error).")
 
 	@commands.command(pass_context=True, no_pm=True)
-	@commands.cooldown(2, 60, commands.BucketType.user)
+	@commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
 	async def scores(self, ctx, member : discord.Member = None):
 		try:
 			if (member is None and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
@@ -130,29 +128,31 @@ class CreditBet():
 				memberID = ctx.message.author.id
 				display_name = ctx.message.author.name
 				output_string = ''
-				# This is pretty stupid...I should really redo so I only need one database select.
-				#row = DatabaseHandler().selectAllOptions("""SELECT `displayName`, `credits`, `timesBet` FROM `users` WHERE `credits` > 0 ORDER BY `credits` DESC LIMIT 5""")
-				row = DatabaseHandler().executeStoredProcedure("GetTop5",())
-				row2 = DatabaseHandler().selectAllOptionsDict("""SELECT `displayName`, `credits`, `timesBet` FROM `users` ORDER BY `credits` DESC LIMIT 5""")
-				names = {d['displayName'] for d in row2}
-				max_name_len = max(map(len, names))
-				max_name_len = 22 if max_name_len > 22 else max_name_len
-				spacer = max_name_len + 4
-				output_string = '```{0: <{1}}  Credits\n'.format('User', spacer)
-				output_string = output_string + '{0: <{1}}  -------\n'.format('----', spacer)
-				for x in range(len(row)):
-					# Add the name and credit amounts of the top 5 users. Truncate usernames at 22 spaces and add '..'
-					output_string = output_string + "{0: <{1}}  {2}\n".format(row[x][0][:22] + '..' if len(row[x][0]) > 22 else row[x][0], spacer, row[x][1])
-				output_string = output_string + "\n```"
-				await self.bot.say(output_string)
+				
+				row = DatabaseHandler().executeStoredProcedureDict("GetTop5",())
+				try:
+					names = {d['displayName'] for d in row}
+					max_name_len = max(map(len, names))
+					max_name_len = 22 if max_name_len > 22 else max_name_len
+					spacer = max_name_len + 4
+					output_string = '```{0: <{1}}  Credits\n'.format('User', spacer)
+					output_string = output_string + '{0: <{1}}  -------\n'.format('----', spacer)
+					for x in range(len(row)):
+						# Add the name and credit amounts of the top 5 users. Truncate usernames at 22 spaces and add '..'
+						output_string = output_string + "{0: <{1}}  {2}\n".format(row[x][0][:22] + '..' if len(row[x]['displayName']) > 22 else row[x]['displayName'], spacer, row[x]['credits'])
+					output_string = output_string + "\n```"
+					await self.bot.say(output_string)
+				except Exception as e:
+					print(e)
+					await self.bot.say("Error: appears no participants found. If this is a mistake, please let TD know.")
 		except Exception as e:
 			print("ERROR! Function: scores. Exception: {0}".format(e))
 			await self.bot.say("I failed, sorry...please let TD know (reference: scores error).")
 
 	@commands.command(pass_context=True, no_pm=True)
+	@commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
 	async def helpme(self, ctx, member : discord.Member = None):
-		""" 100 free credits every 24 hours. """
-		# @TODO : once a user hits the amount given for a register, don't allow them to use the command (alongside 24 hour cooldown)
+		""" 100 free credits every 24 hours, if below 500 credits. """
 		memberID = ctx.message.author.id
 		member = ctx.message.author
 		try:
@@ -163,7 +163,7 @@ class CreditBet():
 			member_credits = information[0][0]
 			lastUsedTime = information[0][1]
 			if member_credits >= 500:
-				await self.bot.say("{0.mention}, you are above the minimum threshhold for using this command (balance of {1}).".format(str(member), member_credits))
+				await self.bot.say("{0.mention}, you are above the maximum threshold to use this command (balance of {1}).".format(str(member), member_credits))
 				return
 			else:
 				if lastUsedTime is not None:
@@ -178,7 +178,7 @@ class CreditBet():
 					formatted_string = "{0}h:{1}m".format(total_hours * -1, final_minutes * -1)
 					args = (memberID, str(currentDate))
 					DatabaseHandler().executeStoredProcedureCommit("helpMe", args)
-					await self.bot.say("{0.mention}, you have been given an additional 100 credits! You were eligible {1} ago!".format(member, formatted_string))
+					await self.bot.say("{0.mention}, you have been given an additional 100 credits! Your 24 cooldown ended {1} ago!".format(member, formatted_string))
 					#print("Helped.")
 				else:
 					total_seconds = int(86400 - total_seconds)
@@ -192,7 +192,7 @@ class CreditBet():
 					#print(seconds_left)
 					#print(final_minutes)
 					formatted_string = "{0}h:{1}m".format(total_hours, final_minutes)
-					await self.bot.say("{0.mention}, you can only use this command every 24 hours ({1}) :middle_finger:".format(member, formatted_string))
+					await self.bot.say("{0.mention}, you can only use this command every 24 hours ({1}), and if below 500 credits :cry:".format(member, formatted_string))
 		except Exception as e:
 			print("Exception: {0}".format(e))
 

@@ -30,17 +30,17 @@ from discord.ext import commands
 import os
 import sys
 
-from resources.config import BOTSETTINGS, DEBUGGING, load_config, ConfigLoader
+from resources.config import ConfigLoader
 
 # TODO : this is just...well, ugly
-description = ConfigLoader().load_config_setting(BOTSETTINGS, 'description')
-command_prefix = ConfigLoader().load_config_setting(BOTSETTINGS, 'command_prefix')
-bot_token = ConfigLoader().load_config_setting(BOTSETTINGS, 'bot_token')
-game_name = ConfigLoader().load_config_setting(BOTSETTINGS, 'game_name')
-show_db_info = ConfigLoader().load_config_setting(DEBUGGING, 'show_db_info')
+description = ConfigLoader().load_config_setting('botsettings', 'description')
+command_prefix = ConfigLoader().load_config_setting('botsettings', 'command_prefix')
+bot_token = ConfigLoader().load_config_setting('botsettings', 'bot_token')
+game_name = ConfigLoader().load_config_setting('botsettings', 'game_name')
+show_db_info = ConfigLoader().load_config_setting('debugging', 'show_db_info')
 
 # TODO : Get listed plugins from settings; not listed = don't use
-extension_list = ConfigLoader().load_config_setting(BOTSETTINGS, 'enabled_plugins')
+extension_list = ConfigLoader().load_config_setting('botsettings', 'enabled_plugins')
 
 client = commands.Bot(command_prefix=command_prefix, description=description)
 
@@ -68,6 +68,7 @@ async def on_member_join(member):
 if __name__ == "__main__":
     # attempt to connect to the database first before trying anything else
     # try catch for obvious reasons
+    print('------')
     print('Checking database before continuing...')
     database.DatabaseHandler().get_conn_details() if show_db_info == True else False
     try:
