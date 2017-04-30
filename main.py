@@ -32,15 +32,15 @@ import sys
 
 from resources.config import BOTSETTINGS, DEBUGGING, load_config, ConfigLoader
 
-# TODO : load these dynamically based on yaml setting file...
-startup_extensions = ["credit_bet", "logout"]
-
 # TODO : this is just...well, ugly
 description = ConfigLoader().load_config_setting(BOTSETTINGS, 'description')
 command_prefix = ConfigLoader().load_config_setting(BOTSETTINGS, 'command_prefix')
 bot_token = ConfigLoader().load_config_setting(BOTSETTINGS, 'bot_token')
 game_name = ConfigLoader().load_config_setting(BOTSETTINGS, 'game_name')
 show_db_info = ConfigLoader().load_config_setting(DEBUGGING, 'show_db_info')
+
+# TODO : Get listed plugins from settings; not listed = don't use
+extension_list = ConfigLoader().load_config_setting(BOTSETTINGS, 'enabled_plugins')
 
 client = commands.Bot(command_prefix=command_prefix, description=description)
 
@@ -55,6 +55,7 @@ async def on_ready():
     print('Logged in as {0}; Client ID: {1}'.format(str(client.user.name), str(client.user.id)))
     print('Command prefix is: {0}'.format(str(command_prefix)))
     print('Setting game to: {0}'.format(game_name))
+    print('Loaded extensions: {0}'.format(extension_list))
     await client.change_presence(game=discord.Game(name=game_name))
     print('------')
 
@@ -72,6 +73,11 @@ if __name__ == "__main__":
     try:
         database.DatabaseHandler().attemptConnection()
         print('Connection successful.')
+
+        startup_extensions = []
+        for plugin in extension_list.split():
+            startup_extensions.append(plugin)
+
         for extension in startup_extensions:
             try:
                 client.load_extension(extension)

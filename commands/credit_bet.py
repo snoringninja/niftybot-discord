@@ -77,7 +77,7 @@ class CreditBet():
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def balance(self, ctx, member: discord.Member = None):
-		""" Get balannce."""
+		""" Get balance for user."""
 		try:
 			# Have to cast ctx.message.channel and ctx.message.server to strings
 			if (member is None and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
