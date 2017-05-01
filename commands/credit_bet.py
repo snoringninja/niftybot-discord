@@ -163,7 +163,7 @@ class CreditBet():
 			member_credits = information[0][0]
 			lastUsedTime = information[0][1]
 			if member_credits >= 500:
-				await self.bot.say("{0.mention}, you are above the maximum threshold to use this command (balance of {1}).".format(str(member), member_credits))
+				await self.bot.say("{0.mention}, you are above the maximum threshold to use this command (balance of {1}).".format(member, member_credits))
 				return
 			else:
 				if lastUsedTime is not None:
