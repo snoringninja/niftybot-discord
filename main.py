@@ -23,7 +23,9 @@ import plugins
 # TODO : config to enable / disable command files to be imported
 import commands
 
+# this needs to be cleaned up
 from resources import database
+from resources.error import error_logging
 
 from discord.ext import commands
 
@@ -71,6 +73,7 @@ if __name__ == "__main__":
     print('------')
     print('Checking database before continuing...')
     database.DatabaseHandler().get_conn_details() if show_db_info == True else False
+    error_logging().create_directory()
     try:
         database.DatabaseHandler().attemptConnection()
         print('Connection successful.')

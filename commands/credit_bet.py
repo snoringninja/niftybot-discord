@@ -11,9 +11,12 @@ import logging
 from discord.ext import commands
 import random
 from datetime import datetime
+import string
+import time
 
 from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
+from resources.error import error_logging
 
 class CreditBet():
 	def __init__(self, bot):
@@ -69,6 +72,11 @@ class CreditBet():
 			else:
 				print("Error in bet: Not an int value, but the bot should have caught that by default.")
 		except Exception as e:
+			file_suffix = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
+			file_suffix = file_suffix + '{}'.format(time.strftime("%Y%m%d-%H%M%S"))
+			file_name = "ERROR-LOG_{0}.log".format(file_suffix)
+			with open("errors/{0}".format(file_name), "w+") as f:
+				f.write(str(e))
 			print("ERROR! Function: bet. Exception: {0}".format(e))
 			await self.bot.say("I failed, sorry...please let TD know (reference: betting error).")
 
