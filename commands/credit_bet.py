@@ -13,6 +13,7 @@ import random
 from datetime import datetime
 import string
 import time
+import traceback
 
 from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
@@ -30,14 +31,15 @@ class CreditBet():
 	async def bet(self, ctx, amount: int, member: discord.Member = None):
 		""" Bet if the member exists, otherwise insert them and tell them to reroll. """
 		try:
+			member = 'UNKNOWN'
+			display_name = 'UNKNOWN'
+			member = ctx.message.author
+			memberID = ctx.message.author.id
+			display_name = ctx.message.author.display_name
 			if isinstance(amount, int):
 				# Have to cast ctx.message.channel.id and ctx.message.server.id to ints
-				if (member is None and amount >= 10 and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
-					member = ctx.message.author
-					memberID = ctx.message.author.id
-					display_name = ctx.message.author.display_name
+				if (member is not None and amount >= 10 and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
 					#print("credit_bet: User: {} / Amount: {} / display_name: {}".format(member, amount, display_name))
-					#command_dict = DatabaseHandler().executeStoredProcedure("BuildCommandDictionary", (channel, ))
 					row = DatabaseHandler().fetchresult("""SELECT 1 FROM `users` WHERE `userID` = %s""", (memberID))
 					#print("Row: {}".format(row))
 					if row is None:
@@ -69,14 +71,12 @@ class CreditBet():
 							else:
 								await self.bot.say("It was a tie, {0.mention}, with a roll of {1}! Your balance remains {2}!".format(member, userNumber, remCredits[0]))
 								#print("Appears a tie...bot number: {0}; user number: {1}".format(botNumber, userNumber))
+				else:
+					print("Exception in conditional IF statement.")
 			else:
 				print("Error in bet: Not an int value, but the bot should have caught that by default.")
 		except Exception as e:
-			file_suffix = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
-			file_suffix = file_suffix + '{}'.format(time.strftime("%Y%m%d-%H%M%S"))
-			file_name = "ERROR-LOG_{0}.log".format(file_suffix)
-			with open("errors/{0}".format(file_name), "w+") as f:
-				f.write(str(e))
+			error_logging().log_error(traceback.format_exc(), 'credit_bet: bet', str(member))
 			print("ERROR! Function: bet. Exception: {0}".format(e))
 			await self.bot.say("I failed, sorry...please let TD know (reference: betting error).")
 
