@@ -64,7 +64,7 @@ async def on_ready():
 @client.event
 async def on_member_join(member):
     server = member.server
-    fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun! :wink:'
+    fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun! :uni:'
     await client.send_message(server, fmt.format(server, member))
 
 if __name__ == "__main__":

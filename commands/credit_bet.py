@@ -5,6 +5,7 @@
 # @TODO : finish
 # @TODO : create a function in database that does our generic select one query? Same with credits...
 # @TODO : we need to log errors to a file to look at later
+# @TODO : error logging decorator
 
 import discord
 import logging
@@ -31,8 +32,6 @@ class CreditBet():
 	async def bet(self, ctx, amount: int, member: discord.Member = None):
 		""" Bet if the member exists, otherwise insert them and tell them to reroll. """
 		try:
-			member = 'UNKNOWN'
-			display_name = 'UNKNOWN'
 			member = ctx.message.author
 			memberID = ctx.message.author.id
 			display_name = ctx.message.author.display_name
