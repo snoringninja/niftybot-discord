@@ -14,7 +14,10 @@ from resources.resourcepath import *
 from resources.config import ConfigLoader
 
 class DatabaseHandler(object):
-	# TODO : comment this shit so we know what everything does
+	# @TODO : comment this shit so we know what everything does
+	# @TODO : pool the connections
+	# @TODO : probably pass a cursor into the functions
+
 	_db_connection = None
 	_db_cur = None
 

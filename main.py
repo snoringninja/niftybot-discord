@@ -32,6 +32,8 @@ from discord.ext import commands
 import os
 import sys
 
+from commands.utils import checks
+
 from resources.config import ConfigLoader
 
 # TODO : this is just...well, ugly

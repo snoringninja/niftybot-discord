@@ -4,8 +4,11 @@
 
 # @TODO : finish
 # @TODO : create a function in database that does our generic select one query? Same with credits...
-# @TODO : we need to log errors to a file to look at later
-# @TODO : error logging decorator
+# @TODO : we need to open and close connections per call, not use a maintained single connection
+# @TODO : refactor for consistency
+
+# @TODO : we need to log errors to a file to look at later - DONE?
+# @TODO : error logging decorator - above is implemented, but not as a decorator...
 
 import discord
 import logging
@@ -30,7 +33,7 @@ class CreditBet():
 	@commands.command(pass_context=True, no_pm=True)
 	@commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
 	async def bet(self, ctx, amount: int, member: discord.Member = None):
-		""" Bet if the member exists, otherwise insert them and tell them to reroll. """
+		""" Bet if the member exists, otherwise tell them to register. """
 		try:
 			member = ctx.message.author
 			memberID = ctx.message.author.id
@@ -97,6 +100,7 @@ class CreditBet():
 					remCredits = DatabaseHandler().fetchresult("""SELECT `credits` FROM `users` WHERE `userID` = %s""", (str(memberID)))
 					await self.bot.say("{0.mention}: your balance is {1}.".format(member, remCredits[0]))
 		except Exception as e:
+			error_logging().log_error(traceback.format_exc(), 'credit_bet: register', str(member))
 			print("ERROR! Function: balance. Exception: {0}".format(e))
 			await self.bot.say("I failed, sorry...please let TD know (reference: balance error).")
 
@@ -119,10 +123,12 @@ class CreditBet():
 						DatabaseHandler().executeStoredProcedureCommit("addMember", args)
 						await self.bot.say("{0.mention}, you are now registered! &bet to play! Goodluck!".format(member))
 					except Exception as e:
+						error_logging().log_error(traceback.format_exc(), 'credit_bet: register (inner)', str(member))
 						print("ERROR! Function: register (inner try). Exception: {0}".format(e))
 				else:
 					await self.bot.say("{0.mention}: you're already registered. Please do &bet to play!".format(member))
 		except Exception as e:
+			error_logging().log_error(traceback.format_exc(), 'credit_bet: register (outer)', str(member))
 			print("ERROR! Function: register. Exception: {0}".format(e))
 			await self.bot.say("I failed, sorry...please let TD know (reference: register error).")
 
@@ -150,9 +156,11 @@ class CreditBet():
 					output_string = output_string + "\n```"
 					await self.bot.say(output_string)
 				except Exception as e:
+					error_logging().log_error(traceback.format_exc(), 'credit_bet: scores (inner)', str(member))
 					print(e)
 					await self.bot.say("Error: appears no participants found. If this is a mistake, please let TD know.")
 		except Exception as e:
+			error_logging().log_error(traceback.format_exc(), 'credit_bet: scores (outer)', str(member))
 			print("ERROR! Function: scores. Exception: {0}".format(e))
 			await self.bot.say("I failed, sorry...please let TD know (reference: scores error).")
 
@@ -201,6 +209,7 @@ class CreditBet():
 					formatted_string = "{0}h:{1}m".format(total_hours, final_minutes)
 					await self.bot.say("{0.mention}, you can only use this command every 24 hours ({1}), and if below 500 credits :cry:".format(member, formatted_string))
 		except Exception as e:
+			error_logging().log_error(traceback.format_exc(), 'credit_bet: helpme', str(member))
 			print("Exception: {0}".format(e))
 
 def setup(bot):
