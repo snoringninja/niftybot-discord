@@ -51,10 +51,6 @@ client = commands.Bot(command_prefix=command_prefix, description=description)
 @client.event
 async def on_message(message):
     server = message.server
-    gen = server.emojis
-
-    for x in gen:
-        print(x)
     await client.process_commands(message)
 
 @client.event
