@@ -33,7 +33,7 @@ class CreditBet():
 	@commands.command(pass_context=True, no_pm=True)
 	@commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
 	async def bet(self, ctx, amount: int, member: discord.Member = None):
-		""" Bet if the member exists, otherwise tell them to register. """
+		""" Let's bet. """
 		try:
 			member = ctx.message.author
 			memberID = ctx.message.author.id
@@ -85,7 +85,7 @@ class CreditBet():
 	@commands.command(pass_context=True, no_pm=True)
 	@commands.cooldown(rate=1, per=60, type=commands.BucketType.user)
 	async def balance(self, ctx, member: discord.Member = None):
-		""" Get balance for user."""
+		""" Get user balance. """
 		try:
 			# Have to cast ctx.message.channel and ctx.message.server to strings
 			if (member is None and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
@@ -106,7 +106,7 @@ class CreditBet():
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def register(self, ctx, member: discord.Member = None):
-		""" Register member with the bot. """
+		""" Register for betting. """
 		try: 
 			# Have to cast ctx.message.channel and ctx.message.server to strings
 			if (member is None and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
@@ -135,6 +135,7 @@ class CreditBet():
 	@commands.command(pass_context=True, no_pm=True)
 	@commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
 	async def scores(self, ctx, member : discord.Member = None):
+		""" Display the top 5 with > 0 points. """
 		try:
 			if (member is None and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
 				member = ctx.message.author
@@ -167,7 +168,7 @@ class CreditBet():
 	@commands.command(pass_context=True, no_pm=True)
 	@commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
 	async def helpme(self, ctx, member : discord.Member = None):
-		""" 100 free credits every 24 hours, if below 500 credits. """
+		""" Free credits for those that qualify. """
 		memberID = ctx.message.author.id
 		member = ctx.message.author
 		try:

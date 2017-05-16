@@ -51,6 +51,10 @@ client = commands.Bot(command_prefix=command_prefix, description=description)
 @client.event
 async def on_message(message):
     server = message.server
+    gen = server.emojis
+
+    for x in gen:
+        print(x)
     await client.process_commands(message)
 
 @client.event
@@ -66,7 +70,7 @@ async def on_ready():
 @client.event
 async def on_member_join(member):
     server = member.server
-    fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun! :uni:'
+    fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun! <:uni:311535311555395584>'
     await client.send_message(server, fmt.format(server, member))
 
 if __name__ == "__main__":
@@ -79,6 +83,10 @@ if __name__ == "__main__":
     try:
         database.DatabaseHandler().attemptConnection()
         print('Connection successful.')
+
+        gen = client.get_all_emojis()
+        for x in gen:
+            print(x)
 
         startup_extensions = []
         for plugin in extension_list.split():

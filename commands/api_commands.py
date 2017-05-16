@@ -27,12 +27,12 @@ class ApiCommands():
 	@commands.command(pass_context=True, no_pm=False, name='api')
 	@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
 	async def addApiKey(self, ctx, apikey : str, member: discord.Member = None):
+		""" Add API key to bot. """
 		try:
+			member = ctx.message.author
+			memberID = ctx.message.author.id
+			display_name = ctx.message.author.display_name
 			if (ctx.message.channel.is_private == True):
-				member = ctx.message.author
-				memberID = ctx.message.author.id
-				display_name = ctx.message.author.display_name
-				print(memberID)
 				if member is not None:
 					row = DatabaseHandler().fetchresult("""SELECT 1 FROM `api` WHERE `discord_id` = %s""", (memberID))
 
@@ -73,8 +73,8 @@ class ApiCommands():
 				else:
 					return await self.bot.say("Some unknown error occured. Please try again.")
 			else:
-				print("Not confirmed.")
-			print(ctx.message.channel)
+				await self.bot.delete_message(ctx.message)
+				return await self.bot.say("{0.mention}: please private message me your API key.".format(member))
 		except Exception as e:
 			await self.bot.say("Error with the given API key. Please check it again.")
 			print(e)
@@ -303,7 +303,7 @@ class ApiCommands():
 	@commands.command(pass_context=True, no_pm=True)
 	@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
 	async def build(self, ctx, character_name: str, game_type: str, member: discord.Member = None):
-		print('Running build...')
+		""" Get PvE, WvW, PvP build info for supplied character. """
 		try:
 			member = ctx.message.author
 			memberID = ctx.message.author.id

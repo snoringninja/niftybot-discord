@@ -14,6 +14,7 @@ class logout():
 		userID = ctx.message.author.id
 
 		if int(userID) == self.owner_id:
+
 			await self.bot.say("Shutting down, bye!")
 			await self.bot.logout()
 		else:
