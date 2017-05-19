@@ -16,6 +16,7 @@ import urllib.error
 from resources.error import error_logging
 from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
+import traceback
 
 class ApiCommands():
 	def __init__(self, bot):
@@ -76,8 +77,8 @@ class ApiCommands():
 				await self.bot.delete_message(ctx.message)
 				return await self.bot.say("{0.mention}: please private message me your API key.".format(member))
 		except Exception as e:
+			error_logging().log_error(traceback.format_exc(), 'api_commands: addApiKey', str(member))
 			await self.bot.say("Error with the given API key. Please check it again.")
-			print(e)
 			return
 
 	def get_character_level(self, api_key, character_name):

@@ -20,6 +20,13 @@ class error_logging:
 			if exception.errno != errno.EEXIST:
 				raise
 
+	def generate_file(self):
+		file_suffix = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
+		file_suffix = file_suffix + '_{}'.format(time.strftime("%Y%m%d-%H%M%S"))
+		file_name = "ERROR-LOG_{0}.log".format(file_suffix)
+		file_name_and_path = "{0}/{1}".format(self.directory, file_name)
+		return file_name_and_path
+
 	def log_error(self, error_string, error_class, user):
 		print('Logging error.')
 		file_suffix = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
