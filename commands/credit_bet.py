@@ -23,6 +23,9 @@ from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
 from resources.error import error_logging
 
+from resources.error_logger import logger
+from resources.error_decorator import exception
+
 class CreditBet():
 	def __init__(self, bot):
 		self.bot = bot
@@ -134,6 +137,7 @@ class CreditBet():
 
 	@commands.command(pass_context=True, no_pm=True)
 	@commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
+	#@exception(logger)
 	async def scores(self, ctx, member : discord.Member = None):
 		""" Display the top 5 with > 0 points. """
 		try:
