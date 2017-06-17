@@ -13,6 +13,7 @@
 
 import discord
 import asyncio
+import random
 #import spotilib
 
 # Import the plugins folder
@@ -51,6 +52,10 @@ client = commands.Bot(command_prefix=command_prefix, description=description)
 @client.event
 async def on_message(message):
     server = message.server
+    #emoteArray = []
+    #for x in client.get_all_emojis():
+    #    emoteArray.append(x)
+    #print(random.choice(emoteArray))
     await client.process_commands(message)
 
 @client.event
@@ -66,7 +71,10 @@ async def on_ready():
 @client.event
 async def on_member_join(member):
     server = member.server
-    fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun! <:uni:311535311555395584>'
+    emoteArray = []
+    for x in client.get_all_emojis():
+        emoteArray.append(x)
+    fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun! {0}'.format(random.choice(emoteArray))
     await client.send_message(server, fmt.format(server, member))
 
 if __name__ == "__main__":
