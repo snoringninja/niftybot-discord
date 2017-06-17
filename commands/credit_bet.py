@@ -7,24 +7,19 @@
 # @TODO : we need to open and close connections per call, not use a maintained single connection
 # @TODO : refactor for consistency
 
-# @TODO : we need to log errors to a file to look at later - DONE?
-# @TODO : error logging decorator - above is implemented, but not as a decorator...
+# @TODO : test error logging
 
 import discord
 import logging
 from discord.ext import commands
 import random
 from datetime import datetime
-import string
 import time
 import traceback
 
 from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
 from resources.error import error_logging
-
-from resources.error_logger import logger
-from resources.error_decorator import exception
 
 class CreditBet():
 	def __init__(self, bot):
@@ -137,10 +132,10 @@ class CreditBet():
 
 	@commands.command(pass_context=True, no_pm=True)
 	@commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
-	#@exception(logger)
 	async def scores(self, ctx, member : discord.Member = None):
 		""" Display the top 5 with > 0 points. """
 		try:
+			print(x)
 			if (member is None and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
 				member = ctx.message.author
 				memberID = ctx.message.author.id
