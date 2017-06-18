@@ -16,7 +16,6 @@ import urllib.error
 from resources.error import error_logging
 from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
-import traceback
 
 class ApiCommands():
 	def __init__(self, bot):
