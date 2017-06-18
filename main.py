@@ -74,8 +74,8 @@ async def on_member_join(member):
     emoteArray = []
     for x in client.get_all_emojis():
         emoteArray.append(x)
-    fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun! {0}'.format(random.choice(emoteArray))
-    await client.send_message(server, fmt.format(server, member))
+    fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun! {3}'
+    await client.send_message(server, fmt.format(server, member, random.choice(emoteArray)))
 
 if __name__ == "__main__":
     # attempt to connect to the database first before trying anything else
@@ -109,4 +109,3 @@ if __name__ == "__main__":
         print('Exception: {0}: {1}'.format(type(e).__name__, e))
         client.logout()
         sys.exit(0)
-
