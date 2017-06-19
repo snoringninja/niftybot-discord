@@ -30,13 +30,13 @@ class RoleAssignor():
 				for role in map(int, self.role_list.split()):
 					role_list_split.append(role)
 
-				print(role_list_split)
-				print(requested_guild.name)
-				print(requested_guild.id)
+				#print(role_list_split)
+				#print(requested_guild.name)
+				#print(requested_guild.id)
 
 				# yes, we do this check somewhat twice
-				if requested_guild_id in role_list_split:
-					print("Yes.")
+				#if requested_guild_id in role_list_split:
+				#	print("Yes.")
 
 				if requested_guild_id in role_list_split:
 					try:
