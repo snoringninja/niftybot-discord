@@ -11,7 +11,7 @@ class RoleAssignor():
 	def __init__(self, bot):
 		self.bot = bot
 
-		self.channel_id = ConfigLoader().load_config_setting('botsettings', 'channel_id')
+		self.channel_id_list = ConfigLoader().load_config_setting('role_assignment', 'role_channel_list')
 		self.server_id = ConfigLoader().load_config_setting('botsettings', 'server_id')
 		self.role_list = ConfigLoader().load_config_setting('role_assignment', 'role_list')
 
@@ -23,42 +23,60 @@ class RoleAssignor():
 			member = ctx.message.author
 			requested_guild = discord.utils.get(ctx.message.server.roles, name=guild)
 
-			if requested_guild is not None:
-				requested_guild_id = int(requested_guild.id)
+			if member is not None:
+				channel_list = []
+				for role in map(int, self.channel_id_list.split()):
+					channel_list.append(role)
 
-				role_list_split = []
-				for role in map(int, self.role_list.split()):
-					role_list_split.append(role)
+				#print(channel_list)
 
-				#print(role_list_split)
-				#print(requested_guild.name)
-				#print(requested_guild.id)
+				if requested_guild is not None:
+					requested_guild_id = int(requested_guild.id)
 
-				# yes, we do this check somewhat twice
-				#if requested_guild_id in role_list_split:
-				#	print("Yes.")
+					role_list_split = []
+					for role in map(int, self.role_list.split()):
+						role_list_split.append(role)
 
-				if requested_guild_id in role_list_split:
-					try:
+					#print(role_list_split)
+					#print(requested_guild.name)
+					#print(requested_guild.id)
 
-						# loop through the roles the user has
-						for r in ctx.message.author.roles:
-							# must cast to int for this to work
-							if int(r.id) in role_list_split:
-								await self.bot.send_message(ctx.message.channel, "{0.mention}: You're already assigned to a guild. Please contact an alliance moderator or lord to reset the guild if incorrect.".format(ctx.message.author))
+					# yes, we do this check somewhat twice
+					#if requested_guild_id in role_list_split:
+					#	print("Yes.")
+
+					if int(ctx.message.channel.id) in channel_list:
+						if requested_guild_id in role_list_split:
+							try:
+
+								# loop through the roles the user has
+								for r in ctx.message.author.roles:
+									# must cast to int for this to work
+									if int(r.id) == requested_guild_id:
+										print("{0} was already in the requested guild.".format(member))
+										#await self.bot.send_message(ctx.message.channel, "{0.mention}: You're already assigned to a guild. Please contact an alliance moderator or lord to reset the guild if incorrect.".format(ctx.message.author))
+										await self.bot.send_message(ctx.message.channel, "{0.mention}: You're already assigned to this guild.".format(member))
+										return
+									
+								await self.bot.add_roles(ctx.message.author, requested_guild)
+								await self.bot.send_message(ctx.message.channel, "{0.mention}: You've been successfully added to {1}!".format(member, requested_guild.name))
 								return
-
-						await self.bot.add_roles(ctx.message.author, requested_guild)
-						await self.bot.send_message(ctx.message.channel, "{0.mention}: You've been successfully added to {1}".format(ctx.message.author, requested_guild.name))
-						return
-					except:
-						await self.bot.send_message(ctx.message.channel, "Error.")
-						error_logging().log_error(traceback.format_exc(), 'role_assignment: assign_role', str(ctx.message.author))
+							except:
+								await self.bot.send_message(ctx.message.channel, "Error.")
+								error_logging().log_error(traceback.format_exc(), 'role_assignment: assign_role', str(member))
+								return
+							finally:
+								print("Finally block executed.")
+						else:
+							await self.bot.send_message(ctx.message.channel, "{0.mention}: Requested guild not found.".format(member))
+							return
+					else:
+						print("Channel not in list.")
 						return
 				else:
-					await self.bot.send_message(ctx.message.channel, "{0.mention}: Requested guild not found.".format(ctx.message.author))
 					return
 			else:
+				print("Member was none.")
 				return
 		except Exception as e:
 			error_logging().log_error(traceback.format_exc(), 'assign_role: RoleAssignor', str(member))
