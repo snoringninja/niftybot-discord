@@ -9,6 +9,7 @@ TODO(s):
  * Clean cogs
  * Documentation
  * Convert the current MySQL to an SQLite database so that the database can ship with the bot
+ * Make use of pickle for file storage, etc.
 
 
 This bot is always in progress, and knowing me, I'll refactor it numerous times.  As of now, this does not include a setup script to handle installing [discord.py](https://github.com/Rapptz/discord.py) if you do not already have it.
