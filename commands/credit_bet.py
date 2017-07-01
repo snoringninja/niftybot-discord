@@ -135,7 +135,6 @@ class CreditBet():
 	async def scores(self, ctx, member : discord.Member = None):
 		""" Display the top 5 with > 0 points. """
 		try:
-			print(x)
 			if (member is None and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
 				member = ctx.message.author
 				memberID = ctx.message.author.id

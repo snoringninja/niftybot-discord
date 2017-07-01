@@ -74,6 +74,7 @@ async def on_member_join(member):
     emoteArray = []
     for x in client.get_all_emojis():
         emoteArray.append(x)
+    print(emoteArray)
     if not emoteArray:
         fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun!'.format(server, member)
     else:
