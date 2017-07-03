@@ -7,14 +7,12 @@
 # Above files not included
 # 
 
-# TODO : clean up everything, and by that I mean organize plugins into
-#        their own folder and import based on that...possibly just write something to import them all
-#        at once based on a config file
+# TODO : clean up everything
+# TODO : use pickle for setting storage per server instead of one single settings file
 
 import discord
 import asyncio
 import random
-#import spotilib
 
 # Import the plugins folder
 # TODO : config to enable / disable plugin files to be imported
@@ -43,6 +41,7 @@ command_prefix = ConfigLoader().load_config_setting('botsettings', 'command_pref
 bot_token = ConfigLoader().load_config_setting('botsettings', 'bot_token')
 game_name = ConfigLoader().load_config_setting('botsettings', 'game_name')
 show_db_info = ConfigLoader().load_config_setting('debugging', 'show_db_info')
+database_name = ConfigLoader().load_config_setting('database', 'sqlite')
 
 # TODO : Get listed plugins from settings; not listed = don't use
 extension_list = ConfigLoader().load_config_setting('botsettings', 'enabled_plugins')
@@ -65,6 +64,7 @@ async def on_ready():
     print('Command prefix is: {0}'.format(str(command_prefix)))
     print('Setting game to: {0}'.format(game_name))
     print('Loaded extensions: {0}'.format(extension_list))
+    print('Using database: {0}'.format(database_name))
     await client.change_presence(game=discord.Game(name=game_name))
     print('------')
 
@@ -75,6 +75,8 @@ async def on_member_join(member):
     for x in client.get_all_emojis():
         emoteArray.append(x)
     print(emoteArray)
+
+    # This is throwing errors and needs to be resolved
     if not emoteArray:
         fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun!'.format(server, member)
     else:
@@ -84,18 +86,17 @@ async def on_member_join(member):
 if __name__ == "__main__":
     # attempt to connect to the database first before trying anything else
     # try catch for obvious reasons
+    # TODO : move this to sqlite and quick check the DB exists before continuing instead of doing SELECT 1 to make sure it can be reached
     print('------')
     print('Checking database before continuing...')
-    database.DatabaseHandler().get_conn_details() if show_db_info == True else False
+    #database.DatabaseHandler().get_conn_details() if show_db_info == True else False
     error_logging().create_directory()
     try:
-        database.DatabaseHandler().attemptConnection()
+        #database.DatabaseHandler().attemptConnection()
+        database.DatabaseHandler().connected_to_sqlite()
         print('Connection successful.')
 
-        gen = client.get_all_emojis()
-        for x in gen:
-            print(x)
-
+        # @TODO : we need to load all plugins at launch, since per-server configs are going to control this
         startup_extensions = []
         for plugin in extension_list.split():
             startup_extensions.append(plugin)
@@ -110,6 +111,7 @@ if __name__ == "__main__":
     except Exception as e:
         # TODO : log error for looking at later
         print('Startup error encountered.')
+        print(e)
         print('Exception: {0}: {1}'.format(type(e).__name__, e))
         client.logout()
         sys.exit(0)

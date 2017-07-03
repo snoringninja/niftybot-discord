@@ -21,8 +21,8 @@ class ApiCommands():
 	def __init__(self, bot):
 		self.bot = bot
 
-		self.channel_id = ConfigLoader().load_config_setting('botsettings', 'channel_id')
-		self.server_id = ConfigLoader().load_config_setting('botsettings', 'server_id')
+		#self.channel_id = ConfigLoader().load_config_setting('botsettings', 'channel_id')
+		#self.server_id = ConfigLoader().load_config_setting('botsettings', 'server_id')
 
 	@commands.command(pass_context=True, no_pm=False, name='api')
 	@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
@@ -32,6 +32,7 @@ class ApiCommands():
 			member = ctx.message.author
 			memberID = ctx.message.author.id
 			display_name = ctx.message.author.display_name
+
 			if (ctx.message.channel.is_private == True):
 				if member is not None:
 					row = DatabaseHandler().fetchresult("""SELECT 1 FROM `api` WHERE `discord_id` = %s""", (memberID))
@@ -309,7 +310,15 @@ class ApiCommands():
 			memberID = ctx.message.author.id
 			display_name = ctx.message.author.display_name
 
-			if member is not None:
+			print(ctx.message.server.id)
+			server_id = str(ctx.message.server.id)
+
+			plugin_list = ConfigLoader().load_server_config_setting(server_id, 'server_settings', 'enabled_plugins')
+			print("Done! Time to print...")
+			print(plugin_list)
+
+			# to make this work, check if the plugin is in the list
+			if member is not None and 'api_commands' in plugin_list.split():
 				row = DatabaseHandler().fetchresult("""SELECT `api_key` FROM `api` WHERE `discord_id` = %s""", (memberID))
 
 				if row is not None:
@@ -339,6 +348,8 @@ class ApiCommands():
 						return
 				else:
 					return await self.bot.say("{0.mention}, please private message me your API key.".format(member))
+			else:
+				print("Attempted to use disabled plugin: api_commands")
 		except Exception as e:
 			print(e)
 			return

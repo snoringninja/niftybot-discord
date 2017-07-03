@@ -10,6 +10,7 @@ import os
 import sys
 
 import pymysql
+import sqlite3
 from resources.resourcepath import *
 from resources.config import ConfigLoader
 
@@ -35,6 +36,10 @@ class DatabaseHandler(object):
 		self._db_cur = self._db_connection.cursor()
 		self._db_curdict = self._db_connection.cursor(pymysql.cursors.DictCursor)
 		self._db_connection.ping()
+
+
+		self.path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../'))
+		self.sqlite_database = (os.path.join(self.path, ConfigLoader().load_config_setting('database', 'sqlite')))
 
 	def query(self, query, params):
 		return self._db_cur.execute(query, params)
@@ -94,3 +99,17 @@ class DatabaseHandler(object):
 		"""DEBUG COMMAND; REMOVE BEFORE RELEASE"""
 		print(self.host, self.user, self.password, self.database)
 		return
+
+	def connected_to_sqlite(self):
+		connected = False
+		print(self.sqlite_database)
+		try:
+			connection = sqlite3.connect(self.sqlite_database)
+			connected = True
+		except Exception as e:
+			print(e)
+		finally:
+			if connected == True:
+				connection.close()
+			print("Connection status: {0}".format(connected))
+			return
