@@ -64,7 +64,7 @@ async def on_ready():
     print('Command prefix is: {0}'.format(str(command_prefix)))
     print('Setting game to: {0}'.format(game_name))
     print('Loaded extensions: {0}'.format(extension_list))
-    print('Using database: {0}'.format(database_name))
+    print('Database name: {0}'.format(database_name))
     await client.change_presence(game=discord.Game(name=game_name))
     print('------')
 
