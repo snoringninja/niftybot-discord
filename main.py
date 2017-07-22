@@ -47,14 +47,16 @@ database_name = ConfigLoader().load_config_setting('database', 'sqlite')
 extension_list = ConfigLoader().load_config_setting('botsettings', 'enabled_plugins')
 
 client = commands.Bot(command_prefix=command_prefix, description=description)
+channel_id = ConfigLoader().load_config_setting('botsettings', 'channel_id')
 
 @client.event
 async def on_message(message):
-    server = message.server
+    #server = message.server
     #emoteArray = []
-    #for x in client.get_all_emojis():
+    #for x in message.server.emojis:
     #    emoteArray.append(x)
     #print(random.choice(emoteArray))
+    #print("Random choice: {0}".format(random.choice(emoteArray)))
     await client.process_commands(message)
 
 @client.event
@@ -72,16 +74,20 @@ async def on_ready():
 async def on_member_join(member):
     server = member.server
     emoteArray = []
-    for x in client.get_all_emojis():
+    for x in member.server.emojis:
         emoteArray.append(x)
+<<<<<<< HEAD
+    #print(emoteArray)
+=======
     print(emoteArray)
 
     # This is throwing errors and needs to be resolved
+>>>>>>> 55367437e6ee8fc2e42acfbab886a70be7e1c0a0
     if not emoteArray:
         fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun!'.format(server, member)
     else:
-        fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun! {3}'.format(server, member, random.choice(emoteArray))
-    await client.send_message(server, fmt)
+        fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun! {2}'.format(server, member, random.choice(emoteArray))
+    await client.send_message(channel_id, fmt)
 
 if __name__ == "__main__":
     # attempt to connect to the database first before trying anything else
