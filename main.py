@@ -96,7 +96,7 @@ if __name__ == "__main__":
         database.DatabaseHandler().connected_to_sqlite()
         print('Connection successful.')
 
-        # @TODO : we need to load all plugins at launch, since per-server configs are going to control this
+        # @TODO : we need to load all plugins at launch, since per-server configs are going to control plugin access
         startup_extensions = []
         for plugin in extension_list.split():
             startup_extensions.append(plugin)
