@@ -73,21 +73,7 @@ async def on_ready():
 @client.event
 async def on_member_join(member):
     server = member.server
-    emoteArray = []
-    for x in member.server.emojis:
-        emoteArray.append(x)
-<<<<<<< HEAD
-    #print(emoteArray)
-=======
-    print(emoteArray)
-
-    # This is throwing errors and needs to be resolved
->>>>>>> 55367437e6ee8fc2e42acfbab886a70be7e1c0a0
-    if not emoteArray:
-        fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun!'.format(server, member)
-    else:
-        fmt = 'Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun! {2}'.format(server, member, random.choice(emoteArray))
-    await client.send_message(channel_id, fmt)
+    await plugins.JoinLeaveHandler(client).welcomeUser(server.id, member, server)
 
 if __name__ == "__main__":
     # attempt to connect to the database first before trying anything else
