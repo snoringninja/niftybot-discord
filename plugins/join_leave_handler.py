@@ -24,3 +24,13 @@ class JoinLeaveHandler():
 		except Exception as e:
 			error_logging().log_error(traceback.format_exc(), 'join_leave_handler: welcomeUser', str(member))
 			return
+
+	async def goodbyeUser(self, server_id : str, member : str):
+		try:
+			part_channel = ConfigLoader().load_server_config_setting(server_id, 'join_part', 'leave_channel_id')
+			display_name = member.display_name
+
+			await self.bot.send_message(discord.Object(id=part_channel), "{0} ({1}) has left the server.".format(member, display_name))
+		except Exception as e:
+			error_logging().log_error(traceback.format_exc(), 'join_leave_handler: goodbyeUser', str(member))
+			return

@@ -1,9 +1,7 @@
 # Niftybot
 # @author - Ryan 'iBeNifty' Malacina
 # database.py
-# Functions: Handle the MySQL DB connection
-# Uses the Twisted IRC Library
-
+# Functions: Handle the SQLite stuff
 ############################################
 
 import os

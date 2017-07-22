@@ -75,6 +75,11 @@ async def on_member_join(member):
     server = member.server
     await plugins.JoinLeaveHandler(client).welcomeUser(server.id, member, server)
 
+@client.event
+async def on_member_remove(member):
+    server = member.server
+    await plugins.JoinLeaveHandler(client).goodbyeUser(server.id, member)
+
 if __name__ == "__main__":
     # attempt to connect to the database first before trying anything else
     # try catch for obvious reasons
