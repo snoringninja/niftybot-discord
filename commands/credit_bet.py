@@ -24,9 +24,8 @@ from resources.error import error_logging
 class CreditBet():
 	def __init__(self, bot):
 		self.bot = bot
-
-		self.channel_id = ConfigLoader().load_config_setting('botsettings', 'channel_id')
-		self.server_id = ConfigLoader().load_config_setting('botsettings', 'server_id')
+		#channel_id = ConfigLoader().load_config_setting('botsettings', 'channel_id')
+		#server_id = ConfigLoader().load_config_setting('botsettings', 'server_id')
 
 	@commands.command(pass_context=True, no_pm=True)
 	@commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
@@ -36,9 +35,16 @@ class CreditBet():
 			member = ctx.message.author
 			memberID = ctx.message.author.id
 			display_name = ctx.message.author.display_name
-			if isinstance(amount, int):
+			server_id = ctx.message.server.id
+
+			# Load some config settings
+			channel_id = ConfigLoader().load_server_config_setting(server_id, 'betting_game', 'bet_channel_id')
+			minimum_bet = ConfigLoader().load_server_config_setting(server_id, 'betting_game', 'minimum_bet')
+			plugin_list = ConfigLoader().load_server_config_setting(server_id, 'server_settings', 'enabled_plugins')
+
+			if isinstance(amount, int) and 'credit_bet' in plugin_list.split() and int(ctx.message.channel.id) == channel_id:
 				# Have to cast ctx.message.channel.id and ctx.message.server.id to ints
-				if (member is not None and amount >= 10 and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
+				if (member is not None and amount >= minimum_bet):
 					#print("credit_bet: User: {} / Amount: {} / display_name: {}".format(member, amount, display_name))
 					row = DatabaseHandler().fetchresult("""SELECT 1 FROM `users` WHERE `userID` = %s""", (memberID))
 					#print("Row: {}".format(row))
@@ -76,9 +82,9 @@ class CreditBet():
 			else:
 				print("Error in bet: Not an int value, but the bot should have caught that by default.")
 		except Exception as e:
-			error_logging().log_error(traceback.format_exc(), 'credit_bet: bet', str(member))
+			await error_logging().log_error(traceback.format_exc(), 'credit_bet: bet', str(member), self.bot)
 			print("ERROR! Function: bet. Exception: {0}".format(e))
-			await self.bot.say("I failed, sorry...please let TD know (reference: betting error).")
+			#await self.bot.say("I failed, sorry...please let TD know (reference: betting error).")
 
 	@commands.command(pass_context=True, no_pm=True)
 	@commands.cooldown(rate=1, per=60, type=commands.BucketType.user)
@@ -86,7 +92,7 @@ class CreditBet():
 		""" Get user balance. """
 		try:
 			# Have to cast ctx.message.channel and ctx.message.server to strings
-			if (member is None and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
+			if (member is None and int(ctx.message.channel.id) == channel_id and int(ctx.message.server.id) == server_id):
 				member = ctx.message.author
 				memberID = ctx.message.author.id
 				row = DatabaseHandler().fetchresult("""SELECT 1 FROM `users` WHERE `userID` = %s""", (memberID))
@@ -107,7 +113,7 @@ class CreditBet():
 		""" Register for betting. """
 		try: 
 			# Have to cast ctx.message.channel and ctx.message.server to strings
-			if (member is None and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
+			if (member is None and int(ctx.message.channel.id) == channel_id and int(ctx.message.server.id) == server_id):
 				member = ctx.message.author
 				memberID = ctx.message.author.id
 				display_name = ctx.message.author.name
@@ -135,7 +141,7 @@ class CreditBet():
 	async def scores(self, ctx, member : discord.Member = None):
 		""" Display the top 5 with > 0 points. """
 		try:
-			if (member is None and int(ctx.message.channel.id) == self.channel_id and int(ctx.message.server.id) == self.server_id):
+			if (member is None and int(ctx.message.channel.id) == channel_id and int(ctx.message.server.id) == server_id):
 				member = ctx.message.author
 				memberID = ctx.message.author.id
 				display_name = ctx.message.author.name

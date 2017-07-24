@@ -77,7 +77,7 @@ class ApiCommands():
 				await self.bot.delete_message(ctx.message)
 				return await self.bot.say("{0.mention}: please private message me your API key.".format(member))
 		except Exception as e:
-			error_logging().log_error(traceback.format_exc(), 'api_commands: addApiKey', str(member))
+			error_logging(self.bot).log_error(traceback.format_exc(), 'api_commands: addApiKey', str(member))
 			await self.bot.say("Error with the given API key. Please check it again.")
 			return
 

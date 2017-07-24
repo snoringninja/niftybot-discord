@@ -13,9 +13,8 @@ from resources.resourcepath import *
 from resources.config import ConfigLoader
 
 class DatabaseHandler(object):
-	# @TODO : comment this shit so we know what everything does
-	# @TODO : pool the connections
-	# @TODO : probably pass a cursor into the functions
+	# @TODO : remove all MySQL stuff and convert it all to SQLite
+	# @TODO : need a database generation script
 
 	_db_connection = None
 	_db_cur = None
