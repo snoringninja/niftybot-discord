@@ -8,7 +8,8 @@
 # 
 
 # TODO : clean up everything
-# TODO : use pickle for setting storage per server instead of one single settings file
+
+# Note : plugins are different than modules
 
 import discord
 import asyncio
@@ -35,30 +36,36 @@ from commands.utils import checks
 
 from resources.config import ConfigLoader
 
-# TODO : this is just...well, ugly
+# Not sure we still need this
 description = ConfigLoader().load_config_setting('botsettings', 'description')
+
+# Load the command prefix from the core yaml
 command_prefix = ConfigLoader().load_config_setting('botsettings', 'command_prefix')
+
+# Load the bot token from the core yaml
 bot_token = ConfigLoader().load_config_setting('botsettings', 'bot_token')
+
+# Set the game name from the core yaml
 game_name = ConfigLoader().load_config_setting('botsettings', 'game_name')
+
+# Probably remove this after the move from MySQL to SQLite
 show_db_info = ConfigLoader().load_config_setting('debugging', 'show_db_info')
+
+# load the database name from the core yaml
 database_name = ConfigLoader().load_config_setting('database', 'sqlite')
 
-# TODO : Get listed plugins from settings; not listed = don't use
+# Create the plugin list, which is built from the core yaml file
 extension_list = ConfigLoader().load_config_setting('botsettings', 'enabled_plugins')
 
 client = commands.Bot(command_prefix=command_prefix, description=description)
 channel_id = ConfigLoader().load_config_setting('botsettings', 'channel_id')
 
+# processes messages and checks if a command
 @client.event
 async def on_message(message):
-    #server = message.server
-    #emoteArray = []
-    #for x in message.server.emojis:
-    #    emoteArray.append(x)
-    #print(random.choice(emoteArray))
-    #print("Random choice: {0}".format(random.choice(emoteArray)))
     await client.process_commands(message)
 
+# discord.py on_ready -> print out a bunch of information when the bot launches
 @client.event
 async def on_ready():
     print('------')
@@ -70,6 +77,8 @@ async def on_ready():
     await client.change_presence(game=discord.Game(name=game_name))
     print('------')
 
+# discord.py on_member_join -> when a member joins a server, check if the server has a channel configured
+# and if they have the member_join plugin enabled
 @client.event
 async def on_member_join(member):
     server = member.server

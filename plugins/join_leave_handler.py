@@ -16,6 +16,9 @@ class JoinLeaveHandler():
 			welcome_channel = ConfigLoader().load_server_config_setting(server_id, 'join_part', 'welcome_channel_id')
 			display_name = member.display_name
 
+			welcome_enabled = ConfigLoader().load_server_config_setting(server_id, 'join_part', 'member_join')
+			print(welcome_enabled)
+
 			emoteArray = []
 			for x in member.server.emojis:
 				emoteArray.append(x)
