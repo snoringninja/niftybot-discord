@@ -58,7 +58,6 @@ database_name = ConfigLoader().load_config_setting('database', 'sqlite')
 extension_list = ConfigLoader().load_config_setting('botsettings', 'enabled_plugins')
 
 client = commands.Bot(command_prefix=command_prefix, description=description)
-channel_id = ConfigLoader().load_config_setting('botsettings', 'channel_id')
 
 # processes messages and checks if a command
 @client.event

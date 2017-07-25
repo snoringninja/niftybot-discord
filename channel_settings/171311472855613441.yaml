@@ -9,8 +9,8 @@ role_assignment:
  role_list: '325862715509964800'
  assignment_channel_id: 277596190701387777
 join_part:
- member_join: True
- member_part: False
+ member_join_enabled: True
+ member_part_enabled: False
  welcome_channel_id: 171311472855613441
  leave_channel_id: 302195990713204739
 betting_game:
