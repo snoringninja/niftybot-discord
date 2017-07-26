@@ -5,11 +5,10 @@ Basic useful feature list:
  * Nothing in particular, yet
 
 TODO(s):
- * Allow multiple servers and channels and ensure cogs work with this multi server / multi channel binding
+ * Allow multiple servers and channels and ensure cogs work with this multi server / multi channel binding (in progress)
  * Clean cogs
  * Documentation
- * Convert the current MySQL to an SQLite database so that the database can ship with the bot
- * Make use of pickle for file storage, etc.
+ * Convert the current MySQL to an SQLite database so that the database can ship with the bot (in progress)
 
 
 This bot is always in progress, and knowing me, I'll refactor it numerous times.  As of now, this does not include a setup script to handle installing [discord.py](https://github.com/Rapptz/discord.py) if you do not already have it.
