@@ -48,9 +48,6 @@ bot_token = ConfigLoader().load_config_setting('BotSettings', 'bot_token')
 # Set the game name from the core yaml
 game_name = ConfigLoader().load_config_setting('BotSettings', 'game_name')
 
-# Probably remove this after the move from MySQL to SQLite
-show_db_info = ConfigLoader().load_config_setting('Debugging', 'show_db_info')
-
 # load the database name from the core yaml
 database_name = ConfigLoader().load_config_setting('BotSettings', 'sqlite')
 
@@ -89,15 +86,10 @@ async def on_member_remove(member):
     await plugins.JoinLeaveHandler(client).goodbyeUser(server.id, member)
 
 if __name__ == "__main__":
-    # attempt to connect to the database first before trying anything else
-    # try catch for obvious reasons
-    # TODO : move this to sqlite and quick check the DB exists before continuing instead of doing SELECT 1 to make sure it can be reached
     print('------')
-    print('Checking database before continuing...')
-    #database.DatabaseHandler().get_conn_details() if show_db_info == True else False
+    print('Connecting...')
     error_logging().create_directory()
     try:
-        #database.DatabaseHandler().attemptConnection()
         database.DatabaseHandler().connected_to_sqlite()
         print('Connection successful.')
 
