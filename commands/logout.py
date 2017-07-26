@@ -7,7 +7,7 @@ from resources.config import ConfigLoader
 class logout():
 	def __init__(self, bot):
 		self.bot = bot
-		self.owner_id = ConfigLoader().load_config_setting('botsettings', 'owner_id')
+		self.owner_id = ConfigLoader().load_config_setting_int('BotSettings', 'owner_id')
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def logout(self, ctx, member: discord.Member = None):
@@ -18,6 +18,7 @@ class logout():
 			await self.bot.say("Shutting down, bye!")
 			await self.bot.logout()
 		else:
+			print(userID)
 			return
 
 def setup(bot):

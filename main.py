@@ -37,25 +37,25 @@ from commands.utils import checks
 from resources.config import ConfigLoader
 
 # Not sure we still need this
-description = ConfigLoader().load_config_setting('botsettings', 'description')
+description = ConfigLoader().load_config_setting('BotSettings', 'description')
 
 # Load the command prefix from the core yaml
-command_prefix = ConfigLoader().load_config_setting('botsettings', 'command_prefix')
+command_prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
 # Load the bot token from the core yaml
-bot_token = ConfigLoader().load_config_setting('botsettings', 'bot_token')
+bot_token = ConfigLoader().load_config_setting('BotSettings', 'bot_token')
 
 # Set the game name from the core yaml
-game_name = ConfigLoader().load_config_setting('botsettings', 'game_name')
+game_name = ConfigLoader().load_config_setting('BotSettings', 'game_name')
 
 # Probably remove this after the move from MySQL to SQLite
-show_db_info = ConfigLoader().load_config_setting('debugging', 'show_db_info')
+show_db_info = ConfigLoader().load_config_setting('Debugging', 'show_db_info')
 
 # load the database name from the core yaml
-database_name = ConfigLoader().load_config_setting('database', 'sqlite')
+database_name = ConfigLoader().load_config_setting('BotSettings', 'sqlite')
 
 # Create the plugin list, which is built from the core yaml file
-extension_list = ConfigLoader().load_config_setting('botsettings', 'enabled_plugins')
+extension_list = ConfigLoader().load_config_setting('BotSettings', 'enabled_plugins')
 
 client = commands.Bot(command_prefix=command_prefix, description=description)
 

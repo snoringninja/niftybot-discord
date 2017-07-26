@@ -11,9 +11,9 @@ class RoleAssignor():
 	def __init__(self, bot):
 		self.bot = bot
 
-		self.channel_id_list = ConfigLoader().load_config_setting('role_assignment', 'role_channel_list')
-		self.server_id = ConfigLoader().load_config_setting('botsettings', 'server_id')
-		self.role_list = ConfigLoader().load_config_setting('role_assignment', 'role_list')
+		self.channel_id_list = ConfigLoader().load_config_setting('RoleAssignment', 'role_channel_list')
+		self.server_id = ConfigLoader().load_config_setting('BotSettings', 'server_id')
+		self.role_list = ConfigLoader().load_config_setting('RoleAssignment', 'role_list')
 
 	@commands.command(pass_context=True, no_pm=False, name='guild')
 	@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)

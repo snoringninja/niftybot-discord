@@ -1,0 +1,22 @@
+# This is the configuration file for the bot; most of these settings SHOULD be self explanatory
+# Head's up, this is a YAML comment
+[BotSettings]
+owner_id: your_id
+server_id: server_id
+channel_id: channel_id
+bot_token: bot_token
+game_name: SetGameName
+command_prefix: !&
+description: Set Description
+sqlite: database_name
+# space seperated list
+enabled_plugins: credit_bet logout api_commands cog_admin role_assignment
+error_message: There was an error with the requested bot function. Please let the bot owner know to check the error log for more details.
+
+[RoleAssignment]
+# space seperated list...again, for one server only right now, not multiple
+role_list: '325862715509964800'
+role_channel_list: 'channel_ids'
+
+[Debugging]
+show_db_info: false

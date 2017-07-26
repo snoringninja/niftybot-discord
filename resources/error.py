@@ -9,7 +9,7 @@ from resources.config import ConfigLoader
 class error_logging:
 	def __init__(self):
 		self.directory = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'errors'))
-		self.error_message = ConfigLoader().load_config_setting('botsettings', 'error_message')
+		self.error_message = ConfigLoader().load_config_setting('BotSettings', 'error_message')
 
 	def create_directory(self):
 		"""Create an errors directory if needed."""
