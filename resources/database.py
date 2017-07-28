@@ -110,3 +110,41 @@ class DatabaseHandler(object):
 				connection.close()
 			print("Connection status: {0}".format(connected))
 			return
+
+	def selectOneResult(self, query):
+		try:
+			database = sqlite3.connect(self.sqlite_database)
+			cursor = database.cursor()
+			result = cursor.execute(query)
+		except Exception as ex:
+			print("Database selectOneResult error.")
+		finally:
+			try:
+				database.close()
+				return result.fetchone()
+			except Exception as e:
+				return
+
+	def selectOneResultParam(self, query, params):
+		try:
+			database = sqlite3.connect(self.sqlite_database)
+			cursor = database.cursor()
+			result = cursor.execute(query, params)
+			print(query)
+			print(params)
+		except Exception as ex:
+			print(ex)
+		finally:
+			try:
+				database.close()
+				return result.fetchone()
+			except Exception as e:
+				return
+
+	def test(self):
+		database = sqlite3.connect(self.sqlite_database)
+		cursor = database.cursor()
+		result = cursor.execute("SELECT username FROM credit_bet WHERE id=?", (2, ))
+		return result.fetchone()
+
+	#def insert_into_database(self, query):
