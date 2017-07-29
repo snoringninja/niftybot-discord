@@ -8,7 +8,7 @@ bot_token: bot_token
 game_name: SetGameName
 command_prefix: !&
 description: Set Description
-sqlite: database_name
+sqlite: niftybot.db
 # space seperated list
 enabled_plugins: credit_bet logout api_commands cog_admin role_assignment
 error_message: There was an error with the requested bot function. Please let the bot owner know to check the error log for more details.

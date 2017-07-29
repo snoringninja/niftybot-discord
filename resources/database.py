@@ -125,13 +125,12 @@ class DatabaseHandler(object):
 			except Exception as e:
 				return
 
-	def selectOneResultParam(self, query, params):
+	def selectOneResultParam(self, query):
 		try:
 			database = sqlite3.connect(self.sqlite_database)
 			cursor = database.cursor()
-			result = cursor.execute(query, params)
+			result = cursor.execute(query)
 			print(query)
-			print(params)
 		except Exception as ex:
 			print(ex)
 		finally:
@@ -144,7 +143,7 @@ class DatabaseHandler(object):
 	def test(self):
 		database = sqlite3.connect(self.sqlite_database)
 		cursor = database.cursor()
-		result = cursor.execute("SELECT username FROM credit_bet WHERE id=?", (2, ))
+		result = cursor.execute("SELECT username FROM credit_bet WHERE id={0}".format(2))
 		return result.fetchone()
 
 	#def insert_into_database(self, query):
