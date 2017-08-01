@@ -115,35 +115,46 @@ class DatabaseHandler(object):
 		try:
 			database = sqlite3.connect(self.sqlite_database)
 			cursor = database.cursor()
-			result = cursor.execute(query)
+			executed = cursor.execute(query)
+			result = executed.fetchone()
+			database.close()
 		except Exception as ex:
 			print("Database selectOneResult error.")
 		finally:
 			try:
-				database.close()
-				return result.fetchone()
+				return result
 			except Exception as e:
+				print(e)
 				return
 
-	def selectOneResultParam(self, query):
+	def selectOneResultParams(self, query):
 		try:
 			database = sqlite3.connect(self.sqlite_database)
 			cursor = database.cursor()
-			result = cursor.execute(query)
-			print(query)
+			executed = cursor.execute(query)
+			result = executed.fetchone()
+			database.close()
+		except Exception as ex:
+			print("Database selectOneResultParams error: {0}".format(ex))
+		finally:
+			try:
+				return result
+			except Exception as e:
+				print(e)
+				return
+
+	def insertIntoDatabase(self, query, params):
+		try:
+			database = sqlite3.connect(self.sqlite_database)
+			cursor = database.cursor()
+			result = cursor.execute(query, params)
+			database.commit()
+			new_row = result.fetchone()
+			database.close()
 		except Exception as ex:
 			print(ex)
 		finally:
 			try:
-				database.close()
-				return result.fetchone()
+				return new_row
 			except Exception as e:
 				return
-
-	def test(self):
-		database = sqlite3.connect(self.sqlite_database)
-		cursor = database.cursor()
-		result = cursor.execute("SELECT username FROM credit_bet WHERE id={0}".format(2))
-		return result.fetchone()
-
-	#def insert_into_database(self, query):

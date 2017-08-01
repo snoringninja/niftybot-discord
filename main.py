@@ -92,11 +92,6 @@ if __name__ == "__main__":
     try:
         database.DatabaseHandler().connected_to_sqlite()
         print('Connection successful.')
-        print('Testing select statement...')
-        res = database.DatabaseHandler().selectOneResultParam("SELECT username FROM credit_bet WHERE id=?", (2, ))
-        res2 = database.DatabaseHandler().test()
-        print(res)
-        print(res2)
 
         # @TODO : we need to load all plugins at launch, since per-server configs are going to control plugin access
         startup_extensions = []

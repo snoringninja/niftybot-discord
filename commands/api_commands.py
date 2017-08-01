@@ -37,7 +37,9 @@ class ApiCommands():
 
 			if (ctx.message.channel.is_private == True):
 				if member is not None:
-					row = DatabaseHandler().fetchresult("""SELECT 1 FROM `api` WHERE `discord_id` = %s""", (memberID))
+					row = DatabaseHandler().selectOneResultParams("SELECT 1 FROM api WHERE discord_id = {0}".format(str(memberID)))
+
+					print(row)
 
 					if row is None:
 						base_url = 'https://api.guildwars2.com/v2/tokeninfo?access_token='
@@ -67,9 +69,10 @@ class ApiCommands():
 							print(e)
 							return
 
-						args = (str(memberID), apikey)
+						#args = (str(memberID), apikey)
 						#print(args)
-						DatabaseHandler().executeStoredProcedureCommit("addApiKey", args)
+						query = """INSERT INTO api (discord_id, api_key) VALUES (?, ?)"""
+						DatabaseHandler().insertIntoDatabase(query, (str(memberID), apikey))
 						return await self.bot.say("{0.mention}, API key added.".format(member))
 					else:
 						return await self.bot.say("You already have an API key registered.")
@@ -79,8 +82,9 @@ class ApiCommands():
 				await self.bot.delete_message(ctx.message)
 				return await self.bot.say("{0.mention}: please private message me your API key.".format(member))
 		except Exception as e:
-			error_logging(self.bot).log_error(traceback.format_exc(), 'api_commands: addApiKey', str(member))
-			await self.bot.say("Error with the given API key. Please check it again.")
+			await error_logging().log_error(traceback.format_exc(), 'api_commands: addApiKey', str(member), self.bot)
+			#await self.bot.say("Error with the given API key. Please check it again.")
+			print("ERROR! Function: addApiKey. Exception: {0}".format(e))
 			return
 
 	def get_character_level(self, api_key, character_name):
