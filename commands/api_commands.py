@@ -17,6 +17,8 @@ from resources.error import error_logging
 from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
 
+# @TODO : rewrite, cutting down API calls and removing functions.  skills and traits stored in the sqlite db now, so can make far fewer api calls
+
 class ApiCommands():
 	def __init__(self, bot):
 		self.bot = bot
