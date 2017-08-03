@@ -71,15 +71,18 @@ async def on_ready():
     print('Loaded extensions: {0}'.format(extension_list))
     print('Database name: {0}'.format(database_name))
     await client.change_presence(game=discord.Game(name=game_name))
+    print('Good to go!')
     print('------')
 
 # discord.py on_member_join -> when a member joins a server, check if the server has a channel configured
-# and if they have the member_join plugin enabled
+# and if they have the member_join_enabled plugin enabled
 @client.event
 async def on_member_join(member):
     server = member.server
     await plugins.JoinLeaveHandler(client).welcomeUser(server.id, member, server)
 
+# discord.py on_member_remove -> when a member leaves a server, check if the server has a channel configured
+# and if they have the member_part_enabled plugin enabled
 @client.event
 async def on_member_remove(member):
     server = member.server
@@ -87,12 +90,8 @@ async def on_member_remove(member):
 
 if __name__ == "__main__":
     print('------')
-    print('Connecting...')
+    print('Preparing...')
     error_logging().create_directory()
-    try:
-        database.DatabaseHandler().connected_to_sqlite()
-        print('Connection successful.')
-
         # @TODO : we need to load all plugins at launch, since per-server configs are going to control plugin access
         startup_extensions = []
         for plugin in extension_list.split():
