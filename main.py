@@ -21,7 +21,7 @@ import plugins
 
 # Import the commands folder
 # TODO : config to enable / disable command files to be imported
-import commands
+import cogs
 
 # this needs to be cleaned up
 from resources import database
@@ -32,7 +32,7 @@ from discord.ext import commands
 import os
 import sys
 
-from commands.utils import checks
+from cogs.utils import checks
 
 from resources.config import ConfigLoader
 
@@ -89,16 +89,16 @@ async def on_member_remove(member):
     await plugins.JoinLeaveHandler(client).goodbyeUser(server.id, member)
 
 if __name__ == "__main__":
-    print('------')
     print('Preparing...')
     error_logging().create_directory()
-        # @TODO : we need to load all plugins at launch, since per-server configs are going to control plugin access
+    try:
         startup_extensions = []
         for plugin in extension_list.split():
             startup_extensions.append(plugin)
 
         for extension in startup_extensions:
             try:
+                print(extension)
                 client.load_extension(extension)
             except Exception as e:
                 exc = '{}: {}'.format(type(e).__name__, e)

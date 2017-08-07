@@ -23,9 +23,6 @@ class ApiCommands():
 	def __init__(self, bot):
 		self.bot = bot
 
-		#self.channel_id = ConfigLoader().load_config_setting('botsettings', 'channel_id')
-		#self.server_id = ConfigLoader().load_config_setting('botsettings', 'server_id')
-
 	@commands.command(pass_context=True, no_pm=False, name='api')
 	@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
 	async def addApiKey(self, ctx, apikey : str, member: discord.Member = None):
@@ -37,7 +34,7 @@ class ApiCommands():
 
 			if (ctx.message.channel.is_private == True):
 				if member is not None:
-					row = DatabaseHandler().selectOneResultParams("SELECT 1 FROM api WHERE discord_id = {0}".format(str(memberID)))
+					row = DatabaseHandler().fetch_results("SELECT 1 FROM api WHERE discord_id = {0}".format(str(memberID)))
 
 					print(row)
 
@@ -83,7 +80,6 @@ class ApiCommands():
 				return await self.bot.say("{0.mention}: please private message me your API key.".format(member))
 		except Exception as e:
 			await error_logging().log_error(traceback.format_exc(), 'api_commands: addApiKey', str(member), self.bot)
-			#await self.bot.say("Error with the given API key. Please check it again.")
 			print("ERROR! Function: addApiKey. Exception: {0}".format(e))
 			return
 
@@ -100,6 +96,8 @@ class ApiCommands():
 		response = response.read()
 		response = response.decode("utf-8")
 		data = json.loads(response)
+
+		print(response_url)
 
 		character_name = character_name.replace("%20", " ")
 
@@ -319,23 +317,23 @@ class ApiCommands():
 			print(ctx.message.server.id)
 			server_id = str(ctx.message.server.id)
 
-			plugin_list = ConfigLoader().load_server_config_setting(server_id, 'server_settings', 'enabled_plugins')
+			plugin_list = ConfigLoader().load_server_config_setting(server_id, 'ServerSettings', 'enabled_plugins')
 			print("Done! Time to print...")
 			print(plugin_list)
 
 			# to make this work, check if the plugin is in the list
 			if member is not None and 'api_commands' in plugin_list.split():
-				row = DatabaseHandler().fetchresult("""SELECT `api_key` FROM `api` WHERE `discord_id` = %s""", (memberID))
+				row = DatabaseHandler().fetch_results("""SELECT api_key FROM api WHERE discord_id = {0}""".format(memberID))
 
 				if row is not None:
 					try:
 						character_name = character_name.replace(" ", "%20")
 
-						returned_skill_ids = self.get_skill_ids(character_name, row[0], game_type)
+						#returned_skill_ids = self.get_skill_ids(character_name, row[0], game_type)
 						returned_char_info = self.get_character_level(row[0], character_name)
-						returned_skill_data = self.get_skill_data(returned_skill_ids)
-						returned_trait_ids = self.get_trait_ids(character_name, row[0], game_type)
-						returned_trait_data = self.get_trait_data(returned_trait_ids)
+						#returned_skill_data = self.get_skill_data(returned_skill_ids)
+						#returned_trait_ids = self.get_trait_ids(character_name, row[0], game_type)
+						#returned_trait_data = self.get_trait_data(returned_trait_ids)
 
 						return_string = ("{0.mention}: \n"
 										"```{1}```\n\n"

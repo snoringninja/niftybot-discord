@@ -24,8 +24,6 @@ from resources.error import error_logging
 class CreditBet():
 	def __init__(self, bot):
 		self.bot = bot
-		#channel_id = ConfigLoader().load_config_setting('botsettings', 'channel_id')
-		#server_id = ConfigLoader().load_config_setting('botsettings', 'server_id')
 
 	@commands.command(pass_context=True, no_pm=True)
 	@commands.cooldown(rate=1, per=3, type=commands.BucketType.user)

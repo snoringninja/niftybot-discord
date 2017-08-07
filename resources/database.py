@@ -111,7 +111,7 @@ class DatabaseHandler(object):
 			print("Connection status: {0}".format(connected))
 			return
 
-	def selectOneResult(self, query):
+	def fetch_results(self, query):
 		try:
 			database = sqlite3.connect(self.sqlite_database)
 			cursor = database.cursor()
@@ -127,21 +127,21 @@ class DatabaseHandler(object):
 				print(e)
 				return
 
-	def selectOneResultParams(self, query):
-		try:
-			database = sqlite3.connect(self.sqlite_database)
-			cursor = database.cursor()
-			executed = cursor.execute(query)
-			result = executed.fetchone()
-			database.close()
-		except Exception as ex:
-			print("Database selectOneResultParams error: {0}".format(ex))
-		finally:
-			try:
-				return result
-			except Exception as e:
-				print(e)
-				return
+	# def selectOneResultParams(self, query):
+	# 	try:
+	# 		database = sqlite3.connect(self.sqlite_database)
+	# 		cursor = database.cursor()
+	# 		executed = cursor.execute(query)
+	# 		result = executed.fetchone()
+	# 		database.close()
+	# 	except Exception as ex:
+	# 		print("Database selectOneResultParams error: {0}".format(ex))
+	# 	finally:
+	# 		try:
+	# 			return result
+	# 		except Exception as e:
+	# 			print(e)
+	# 			return
 
 	def insertIntoDatabase(self, query, params):
 		try:

@@ -1,11 +1,14 @@
 from discord.ext import commands
-from commands.utils import checks
+from cogs.utils import checks
 import discord
 import inspect
+import traceback
 
 # to expose to the eval command
 import datetime
 from collections import Counter
+
+import importlib
 
 class Admin:
     """Admin-only commands that make the bot dynamic."""
@@ -42,42 +45,14 @@ class Admin:
     async def _reload(self, *, module : str):
         """Reloads a module."""
         try:
+            print("Unloading...")
             self.bot.unload_extension(module)
+            print("Attempting reload...")
             self.bot.load_extension(module)
         except Exception as e:
-            await self.bot.say('\N{PISTOL}')
-            await self.bot.say('{}: {}'.format(type(e).__name__, e))
+            await self.bot.say("{0}".format(traceback.format_exc()))
         else:
             await self.bot.say('\N{OK HAND SIGN}')
-
-    @commands.command(pass_context=True, hidden=True)
-    @checks.is_owner()
-    async def debug(self, ctx, *, code : str):
-        """Evaluates code."""
-        code = code.strip('` ')
-        python = '```py\n{}\n```'
-        result = None
-
-        env = {
-            'bot': self.bot,
-            'ctx': ctx,
-            'message': ctx.message,
-            'server': ctx.message.server,
-            'channel': ctx.message.channel,
-            'author': ctx.message.author
-        }
-
-        env.update(globals())
-
-        try:
-            result = eval(code, env)
-            if inspect.isawaitable(result):
-                result = await result
-        except Exception as e:
-            await self.bot.say(python.format(type(e).__name__ + ': ' + str(e)))
-            return
-
-        await self.bot.say(python.format(result))
 
 def setup(bot):
     bot.add_cog(Admin(bot))
