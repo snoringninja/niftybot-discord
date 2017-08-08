@@ -32,8 +32,6 @@ from discord.ext import commands
 import os
 import sys
 
-from cogs.utils import checks
-
 from resources.config import ConfigLoader
 
 # Not sure we still need this
@@ -98,7 +96,6 @@ if __name__ == "__main__":
 
         for extension in startup_extensions:
             try:
-                print(extension)
                 client.load_extension(extension)
             except Exception as e:
                 exc = '{}: {}'.format(type(e).__name__, e)
