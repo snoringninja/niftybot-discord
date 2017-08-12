@@ -18,6 +18,7 @@ from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
 
 # @TODO : rewrite, cutting down API calls and removing functions.  skills and traits stored in the sqlite db now, so can make far fewer api calls
+# @TODO : keep original id building functions, but
 
 class ApiCommands():
 	def __init__(self, bot):
@@ -84,7 +85,7 @@ class ApiCommands():
 			return
 
 	def get_character_level(self, api_key, character_name):
-		#print("get_character_level")
+		# This function returns character information in the format (exmaple) "Name: Level 80 Charr Mesmer"
 		base_url = 'https://api.guildwars2.com/v2/characters/'
 		base_url2 = '/core?access_token='
 		header = {'User-Agent' : 'Mozlla/5.0'}
@@ -120,6 +121,8 @@ class ApiCommands():
 		response = response.decode("utf-8")
 		data = json.loads(response)
 
+		print(response_url)
+
 		skill_info = {}
 
 		#print(data)
@@ -139,36 +142,57 @@ class ApiCommands():
 		heal = ''
 		utilities = ''
 
-		for key, value in skill_dict.items():
-			if isinstance(value, list):
-				for x in value:
-					id_list = id_list + ',' + str(x)
-			else:
-				id_list = id_list + ',' + str(value)
+		# for key, value in skill_dict.items():
+		# 	if isinstance(value, list):
+		# 		for x in value:
+		# 			id_list = id_list + ',' + str(x)
+		# 	else:
+		# 		id_list = id_list + ',' + str(value)
 
-		id_list = id_list[1:]
+		# id_list = id_list[1:]
 
-		base_url_skills = 'https://api.guildwars2.com/v2/skills?ids='
-		response_url_skills = base_url_skills + str(id_list)
-		response_skills = urlopen(response_url_skills)
-		response_skills = response_skills.read()
-		response_skills = response_skills.decode("utf-8")
-		data_skills = json.loads(response_skills)
+		# base_url_skills = 'https://api.guildwars2.com/v2/skills?ids='
+		# response_url_skills = base_url_skills + str(id_list)
+		# response_skills = urlopen(response_url_skills)
+		# response_skills = response_skills.read()
+		# response_skills = response_skills.decode("utf-8")
+		# data_skills = json.loads(response_skills)
 
-		for x in range(5):
-			if data_skills[x]['slot'] == 'Elite':
-				elite = data_skills[x]['name']
-			elif data_skills[x]['slot'] == 'Heal':
-				heal = data_skills[x]['name']
-			elif data_skills[x]['slot'] == 'Utility':
-				utilities = utilities + ', ' + str(data_skills[x]['name'])
+		# load skills from database
+		# elite = DatabaseHandler().fetch_results("SELECT 1 FROM api WHERE discord_id = {0}".format(str(memberID)))
 
-		utilities = utilities[1:]
+		# for x in range(5):
+		# 	if data_skills[x]['slot'] == 'Elite':
+		# 		elite = data_skills[x]['name']
+		# 		#elite = DatabaseHandler().fetch_results("SELECT 1 FROM api WHERE discord_id = {0}".format(str(memberID)))
+		# 	elif data_skills[x]['slot'] == 'Heal':
+		# 		heal = data_skills[x]['name']
+		# 	elif data_skills[x]['slot'] == 'Utility':
+		# 		utilities = utilities + ', ' + str(data_skills[x]['name'])
+
+		elite_id = skill_dict['elite']
+		heal_id = skill_dict['heal']
+		utilities_list = skill_dict['utilities']
+
+		elite = DatabaseHandler().fetch_results("SELECT skill_name FROM gw2_skills WHERE skill_id = {0}".format(elite_id))
+		heal = DatabaseHandler().fetch_results("SELECT skill_name FROM gw2_skills WHERE skill_id = {0}".format(heal_id))
+
+		for x in range(3):
+			utility_id = utilities_list[x]
+			skill_name = DatabaseHandler().fetch_results("SELECT skill_name FROM gw2_skills WHERE skill_id = {0}".format(utility_id))
+			utilities = utilities + ', ' + skill_name[0]
+
+		# trim the leading ", "
+		utilities = utilities[2:]
+
+		print(elite[0])
+		print(heal[0])
+		print(utilities)
 
 		return_string = ("**__Skills__** \n\n"
 						"Heal: {0} \n"
 						"Utilities: {1} \n"
-						"Elite: {2}".format(heal, utilities, elite))
+						"Elite: {2}".format(heal[0], utilities, elite[0]))
 
 		return return_string
 
@@ -329,18 +353,24 @@ class ApiCommands():
 					try:
 						character_name = character_name.replace(" ", "%20")
 
-						#returned_skill_ids = self.get_skill_ids(character_name, row[0], game_type)
+						returned_skill_ids = self.get_skill_ids(character_name, row[0], game_type)
 						returned_char_info = self.get_character_level(row[0], character_name)
-						#returned_skill_data = self.get_skill_data(returned_skill_ids)
-						#returned_trait_ids = self.get_trait_ids(character_name, row[0], game_type)
+						returned_trait_ids = self.get_trait_ids(character_name, row[0], game_type)
+						returned_skill_data = self.get_skill_data(returned_skill_ids)
 						#returned_trait_data = self.get_trait_data(returned_trait_ids)
 
-						return_string = ("{0.mention}: \n"
-										"```{1}```\n\n"
-										"{2}\n\n"
-										"{3}".format(member, returned_char_info, returned_trait_data, returned_skill_data))
+						print(returned_char_info)
+						print(returned_skill_ids)
+						print(returned_trait_ids)
+						print(returned_skill_data)
 
-						return await self.bot.say(return_string)
+						#return_string = ("{0.mention}: \n"
+						#				"```{1}```\n\n"
+						#				"{2}\n\n"
+						#				"{3}".format(member, returned_char_info, returned_trait_data, returned_skill_data))
+
+						#return await self.bot.say(return_string)
+						return
 					except urllib.error.HTTPError as e:
 						if e.code == 400:
 							print("{0}".format(character_name))
