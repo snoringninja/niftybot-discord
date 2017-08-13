@@ -5,15 +5,9 @@
 
 ############################################
 
+# Imports for ConfigLoader
 import os
-
 import configparser
-
-# TODO : I don't think I actually need this
-#NIFTYBOT_CONFIG = 'NIFTYBOT_CONFIG'
-#DATABASE = 'database'
-#BOTSETTINGS = 'botsettings'
-#DEBUGGING = 'debugging'
 
 def get_config_filename(default_filename):
 	# if NIFTYBOT_CONFIG in os.environ:
@@ -70,7 +64,7 @@ class ConfigLoader():
 		parser = configparser.ConfigParser()
 		loaded_file = load_config('%s.ini' % (os.path.join(self.server_settings_path, str(filename))),)
 		self.parser.read(loaded_file)
-		return int(self.parser.get(section, var))
+		return self.parser.getint(section, var)
 
 	def load_server_config_setting_string(self, filename, section, var):
 		parser = configparser.ConfigParser()

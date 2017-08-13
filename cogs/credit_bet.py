@@ -21,6 +21,8 @@ from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
 from resources.error import error_logging
 
+from config_updater import ConfigUpdater
+
 class CreditBet():
 	def __init__(self, bot):
 		self.bot = bot
@@ -36,11 +38,22 @@ class CreditBet():
 			server_id = ctx.message.server.id
 
 			# Load some config settings
-			channel_id = ConfigLoader().load_server_config_setting(server_id, 'betting_game', 'bet_channel_id')
-			minimum_bet = ConfigLoader().load_server_config_setting(server_id, 'betting_game', 'minimum_bet')
-			plugin_list = ConfigLoader().load_server_config_setting(server_id, 'server_settings', 'enabled_plugins')
+			channel_id = ConfigLoader().load_server_config_setting(server_id, 'BettingGame', 'bet_channel_id')
+			
+			# if this fails it's not a boolean so we'll fix that but disable the plugin
+			try:
+				plugin_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'BettingGame', 'enabled')
+			except Exception as e:
+				await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
+				return await self.bot.say("The value for enabled must be a boolean. Disabling plugin until server owner can correct.")
 
-			if isinstance(amount, int) and 'credit_bet' in plugin_list.split() and int(ctx.message.channel.id) == channel_id:
+			try:
+				minimum_bet = ConfigLoader().load_server_config_setting_int(server_id, 'BettingGame', 'minimum_bet')
+			except Exception as e:
+				await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
+				return await self.bot.say("The value for minimum_bet must be an integer value. Disabling plugin until server owner can correct.")
+
+			if isinstance(amount, int):# and plugin_enabled == True and int(ctx.message.channel.id) == channel_id:
 				# Have to cast ctx.message.channel.id and ctx.message.server.id to ints
 				if (member is not None and amount >= minimum_bet):
 					#print("credit_bet: User: {} / Amount: {} / display_name: {}".format(member, amount, display_name))

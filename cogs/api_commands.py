@@ -341,49 +341,48 @@ class ApiCommands():
 			print(ctx.message.server.id)
 			server_id = str(ctx.message.server.id)
 
-			plugin_list = ConfigLoader().load_server_config_setting(server_id, 'ServerSettings', 'enabled_plugins')
-			print("Done! Time to print...")
-			print(plugin_list)
+			plugin_enabled = ConfigLoader().load_server_config_setting(server_id, 'ApiCommands', 'enabled')
 
-			# to make this work, check if the plugin is in the list
-			if member is not None and 'api_commands' in plugin_list.split():
-				row = DatabaseHandler().fetch_results("""SELECT api_key FROM api WHERE discord_id = {0}""".format(memberID))
+			if isinstance(plugin_enabled, bool):
+				# to make this work, check if the plugin is in the list
+				if member is not None and plugin_enabled == True:
+					row = DatabaseHandler().fetch_results("""SELECT api_key FROM api WHERE discord_id = {0}""".format(memberID))
 
-				if row is not None:
-					try:
-						character_name = character_name.replace(" ", "%20")
+					if row is not None:
+						try:
+							character_name = character_name.replace(" ", "%20")
 
-						returned_skill_ids = self.get_skill_ids(character_name, row[0], game_type)
-						returned_char_info = self.get_character_level(row[0], character_name)
-						returned_trait_ids = self.get_trait_ids(character_name, row[0], game_type)
-						returned_skill_data = self.get_skill_data(returned_skill_ids)
-						#returned_trait_data = self.get_trait_data(returned_trait_ids)
+							returned_skill_ids = self.get_skill_ids(character_name, row[0], game_type)
+							returned_char_info = self.get_character_level(row[0], character_name)
+							returned_trait_ids = self.get_trait_ids(character_name, row[0], game_type)
+							returned_skill_data = self.get_skill_data(returned_skill_ids)
+							#returned_trait_data = self.get_trait_data(returned_trait_ids)
 
-						print(returned_char_info)
-						print(returned_skill_ids)
-						print(returned_trait_ids)
-						print(returned_skill_data)
+							print(returned_char_info)
+							print(returned_skill_ids)
+							print(returned_trait_ids)
+							print(returned_skill_data)
 
-						#return_string = ("{0.mention}: \n"
-						#				"```{1}```\n\n"
-						#				"{2}\n\n"
-						#				"{3}".format(member, returned_char_info, returned_trait_data, returned_skill_data))
+							#return_string = ("{0.mention}: \n"
+							#				"```{1}```\n\n"
+							#				"{2}\n\n"
+							#				"{3}".format(member, returned_char_info, returned_trait_data, returned_skill_data))
 
-						#return await self.bot.say(return_string)
-						return
-					except urllib.error.HTTPError as e:
-						if e.code == 400:
-							print("{0}".format(character_name))
-							print("{0}".format(game_type))
-							print("{0}".format(e))
-							await self.bot.say("Character not found.")
-						else:
-							print("I done failed: {0}.".format(e))
-						return
+							#return await self.bot.say(return_string)
+							return
+						except urllib.error.HTTPError as e:
+							if e.code == 400:
+								print("{0}".format(character_name))
+								print("{0}".format(game_type))
+								print("{0}".format(e))
+								await self.bot.say("Character not found.")
+							else:
+								print("I done failed: {0}.".format(e))
+							return
+					else:
+						return await self.bot.say("{0.mention}, please private message me your API key.".format(member))
 				else:
-					return await self.bot.say("{0.mention}, please private message me your API key.".format(member))
-			else:
-				print("Attempted to use disabled plugin: api_commands")
+					print("Attempted to use disabled plugin: api_commands")
 		except Exception as e:
 			print(e)
 			return
