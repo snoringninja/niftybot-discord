@@ -13,89 +13,12 @@ from resources.resourcepath import *
 from resources.config import ConfigLoader
 
 class DatabaseHandler(object):
-	# @TODO : remove all MySQL stuff and convert it all to SQLite
 	# @TODO : need a database generation script
-
-	_db_connection = None
-	_db_cur = None
+	# @TODO : close connection
 
 	def __init__(self):
-		#self.host = ConfigLoader().load_config_setting('database', 'host')
-		#self.user = ConfigLoader().load_config_setting('database', 'username')
-		#self.password = ConfigLoader().load_config_setting('database', 'password')
-		#self.database = ConfigLoader().load_config_setting('database', 'database')
-
-		#self._db_connection = pymysql.connect(self.host, 
-		#self.user, 
-		#self.password, 
-		#self.database)
-
-		#self._db_cur = self._db_connection.cursor()
-		#self._db_curdict = self._db_connection.cursor(pymysql.cursors.DictCursor)
-		#self._db_connection.ping()
-
-
 		self.path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../'))
 		self.sqlite_database = (os.path.join(self.path, ConfigLoader().load_config_setting('BotSettings', 'sqlite')))
-
-	# def query(self, query, params):
-	# 	return self._db_cur.execute(query, params)
-
-	# def fetchresult(self, query, params):
-	# 	cursor = self._db_cur.execute(query, params)
-	# 	return self._db_cur.fetchone()
-
-	# def manipulateDB(self, query, params):
-	# 	self._db_cur.execute(query, params)
-	# 	return self._db_connection.commit()
-
-	# def selectOnly(self, query):
-	# 	return self._db_cur.execute(query)
-
-	# def selectAllOptions(self, query):
-	# 	self._db_cur.execute(query)
-	# 	return self._db_cur.fetchall()
-
-	# def selectAllOptionsParams(self, query, params):
-	# 	self._db_cur.execute(query, params)
-	# 	return self._db_cur.fetchall()
-
-	# def selectAllOptionsDict(self, query):
-	# 	#print(query)
-	# 	self._db_curdict.execute(query)
-	# 	return self._db_curdict.fetchall()
-
-	# def executeStoredProcedureCommit(self, query, params):
-	# 	#print(query)
-	# 	#print(params)
-	# 	self._db_cur.callproc(query, params)
-	# 	return self._db_connection.commit()
-
-	# def executeStoredProcedure(self, query, params):
-	# 	#print(query)
-	# 	#print(params)
-	# 	self._db_cur.callproc(query, params)
-	# 	return self._db_cur.fetchall()
-
-	# def executeStoredProcedureDict(self, query, params):
-	# 	#print(query)
-	# 	#print(params)
-	# 	self._db_curdict.callproc(query, params)
-	# 	return self._db_curdict.fetchall()
-
-	# def __del__(self):
-	# 	self._db_connection.close()
-
-	# def attemptConnection(self):
-	# 	if self._db_cur.execute("""SELECT 1 FROM `users`"""):
-	# 		return True
-	# 	else:
-	# 		return False
-
-	# def get_conn_details(self):
-	# 	"""DEBUG COMMAND; REMOVE BEFORE RELEASE"""
-	# 	print(self.host, self.user, self.password, self.database)
-	# 	return
 
 	def connected_to_sqlite(self):
 		connected = False
@@ -126,22 +49,6 @@ class DatabaseHandler(object):
 			except Exception as e:
 				print(e)
 				return
-
-	# def selectOneResultParams(self, query):
-	# 	try:
-	# 		database = sqlite3.connect(self.sqlite_database)
-	# 		cursor = database.cursor()
-	# 		executed = cursor.execute(query)
-	# 		result = executed.fetchone()
-	# 		database.close()
-	# 	except Exception as ex:
-	# 		print("Database selectOneResultParams error: {0}".format(ex))
-	# 	finally:
-	# 		try:
-	# 			return result
-	# 		except Exception as e:
-	# 			print(e)
-	# 			return
 
 	def insertIntoDatabase(self, query, params):
 		try:

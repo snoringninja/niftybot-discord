@@ -37,19 +37,19 @@ from resources.config import ConfigLoader
 # Not sure we still need this
 description = ConfigLoader().load_config_setting('BotSettings', 'description')
 
-# Load the command prefix from the core yaml
+# Load the command prefix from the core ini
 command_prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
-# Load the bot token from the core yaml
+# Load the bot token from the core ini
 bot_token = ConfigLoader().load_config_setting('BotSettings', 'bot_token')
 
-# Set the game name from the core yaml
+# Set the game name from the core ini
 game_name = ConfigLoader().load_config_setting('BotSettings', 'game_name')
 
-# load the database name from the core yaml
+# load the database name from the core ini
 database_name = ConfigLoader().load_config_setting('BotSettings', 'sqlite')
 
-# Create the plugin list, which is built from the core yaml file
+# Create the plugin list, which is built from the core ini file
 extension_list = ConfigLoader().load_config_setting('BotSettings', 'enabled_plugins')
 
 client = commands.Bot(command_prefix=command_prefix, description=description)
@@ -57,6 +57,8 @@ client = commands.Bot(command_prefix=command_prefix, description=description)
 # processes messages and checks if a command
 @client.event
 async def on_message(message):
+    # @TODO : discord developer ToS states we cannot store any information without user permission. As such, force users to do [prefix]accept to use bot commands.
+    # @Warning : if you add a logging cog, make sure you have user permission (unless the bot simply reposts to a hidden channel and does not store the information)
     await client.process_commands(message)
 
 # discord.py on_ready -> print out a bunch of information when the bot launches

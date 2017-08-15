@@ -1,5 +1,5 @@
 # Niftybot
-# @author - Ryan 'iBeNifty' Malacina
+# @author - Ryan Malacina (xNifty)
 # config.py
 # Functions: Set up everything from the config file we use, Load the required config file
 
@@ -14,13 +14,9 @@ import discord
 import traceback
 
 def get_config_filename(default_filename):
-	# if NIFTYBOT_CONFIG in os.environ:
-	# 	return os.environ[NIFTYBOT_CONFIG]
 	return default_filename
 
 def load_config(default_filename):
-	#with open(get_config_filename(default_filename)) as f:
-		#return yaml.load(f)
 	config = configparser.ConfigParser()
 	return config.read(default_filename)
 
@@ -86,10 +82,8 @@ class ConfigGenerator():
 	async def checkIfConfigExists(self, server_id):
 		try:
 			if not os.path.exists('%s.ini' % (os.path.join(self.server_settings_path, str(server_id)))):
-				#print("File did not exist.")
 				return False
 			else:
-				#print("File exists!")
 				return True
 		except Exception as e:
 			await error_logging().log_error(traceback.format_exc(), 'ConfigGenerator: checkIfConfigExists')
@@ -124,20 +118,3 @@ class ConfigGenerator():
 			await error_logging().log_error(traceback.format_exc(), 'ConfigGenerator: checkIfConfigExists')
 			print(e)
 			return await self.bot.say("Error generating configuration file: {0}".format(traceback.format_exc()))
-
-		# try:
-		# 	if parser.has_section(updateSection):
-		# 		if parser.has_option(updateSection, updateKey):
-		# 			parser.set(updateSection, updateKey, updateValue)
-		# 			with open('%s.ini' % (os.path.join(self.server_settings_path, str(filename))), 'w') as configfile:
-		# 				parser.write(configfile)
-		# 			if supress_message == False:
-		# 				return await self.bot.say("Configuration file updated successfully (or should have been).")
-		# 			else:
-		# 				return
-		# 		else:
-		# 			return await self.bot.say("Key '{0}' does not exist.".format(updateKey))
-		# 	else:
-		# 		return await self.bot.say("Section '{0}' does not exist.".format(updateSection))
-		# except Exception as e:
-		# 	print("updateConfig error: {0}".format(e))
