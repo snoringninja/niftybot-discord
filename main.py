@@ -55,18 +55,22 @@ extension_list = ConfigLoader().load_config_setting('BotSettings', 'enabled_plug
 
 client = commands.Bot(command_prefix=command_prefix, description=description)
 
+not_accepted_message = ConfigLoader().load_config_setting('BotSettings', 'not_accepted_message')
+
 # processes messages and checks if a command
 @client.event
 async def on_message(message):
     if message.content == '{0}accept'.format(command_prefix):
         await client.process_commands(message)
     else:
-        can_use = BotResources(client).checkAccepted(message.author.id, message.channel.id)
+        can_use = BotResources().checkAccepted(message.author.id, message.channel.id)
 
         if can_use:
             await client.process_commands(message)
         else:
-            return
+            # This is needed to prevent infinite looping message posting
+            if message.author.id != client.user.id:
+                await client.send_message(discord.Object(id=message.channel.id), not_accepted_message.format(command_prefix))
 
 # discord.py on_ready -> print out a bunch of information when the bot launches
 @client.event
