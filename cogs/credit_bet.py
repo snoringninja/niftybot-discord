@@ -22,6 +22,7 @@ from resources.config import ConfigLoader
 from resources.error import error_logging
 
 from config_updater import ConfigUpdater
+from resources.general_resources import BotResources
 
 class CreditBet():
 	def __init__(self, bot):
