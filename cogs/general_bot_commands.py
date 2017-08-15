@@ -23,7 +23,7 @@ class BotCommands:
 		memberID = ctx.message.author.id
 
 		try:
-			has_accepted = await BotResources(self.bot).checkAccepted(memberID, False)
+			has_accepted = BotResources(self.bot).checkAccepted(memberID, False)
 
 			if has_accepted == True:
 				return await self.bot.say("You've already accepted my terms of service.")

@@ -55,23 +55,17 @@ class ConfigUpdater:
 		memberID = ctx.message.author.id
 		display_name = ctx.message.author.display_name
 
-		can_use = await BotResources(self.bot).checkAccepted(memberID)
-
-		# Only allow the server owner to handle configuration
-		if can_use:
-			if memberID == ctx.message.server.owner_id or int(memberID) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
-				#print("Is the owner of the server.")
-				try:
-					filename = ctx.message.server.id
-					await self.updateConfigFile(filename, updateSection, updateKey, updateValue)
-				except Exception as e:
-					print("configUpdate error: {0}".format(e))
-					return await self.bot.say("Error applying requested config update: {0}".format(e))
-			else:
-				return await self.bot.say("Only the server owner can configure different plugins.")
-				#print("Is not the owner.")
+		if memberID == ctx.message.server.owner_id or int(memberID) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
+			#print("Is the owner of the server.")
+			try:
+				filename = ctx.message.server.id
+				await self.updateConfigFile(filename, updateSection, updateKey, updateValue)
+			except Exception as e:
+				print("configUpdate error: {0}".format(e))
+				return await self.bot.say("Error applying requested config update: {0}".format(e))
 		else:
-			return
+			return await self.bot.say("Only the server owner can configure different plugins.")
+			#print("Is not the owner.")
 
 def setup(bot):
 	"""This makes it so we can actually use it."""

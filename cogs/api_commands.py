@@ -34,59 +34,52 @@ class ApiCommands():
 			memberID = ctx.message.author.id
 			display_name = ctx.message.author.display_name
 
-			can_use = await BotResources(self.bot).checkAccepted(memberID)
+			if (ctx.message.channel.is_private == True):
+				if member is not None:
+					row = DatabaseHandler().fetch_results("SELECT 1 FROM api WHERE discord_id = {0}".format(str(memberID)))
 
-			print(can_use)
+					print(row)
 
-			if can_use:
-				if (ctx.message.channel.is_private == True):
-					if member is not None:
-						row = DatabaseHandler().fetch_results("SELECT 1 FROM api WHERE discord_id = {0}".format(str(memberID)))
+					if row is None:
+						base_url = 'https://api.guildwars2.com/v2/tokeninfo?access_token='
+						header = {'User-Agent' : 'Mozlla/5.0'}
 
-						print(row)
+						permissions = ['account', 'builds', 'characters']
 
-						if row is None:
-							base_url = 'https://api.guildwars2.com/v2/tokeninfo?access_token='
-							header = {'User-Agent' : 'Mozlla/5.0'}
+						response_url = base_url + str(apikey)
+						header = urllib.parse.urlencode(header)
+						header = header.encode("utf-8")
+						response = urlopen(response_url)
+						response = response.read()
+						response = response.decode("utf-8")
+						data = json.loads(response)
 
-							permissions = ['account', 'builds', 'characters']
+						granted_permissions = []
 
-							response_url = base_url + str(apikey)
-							header = urllib.parse.urlencode(header)
-							header = header.encode("utf-8")
-							response = urlopen(response_url)
-							response = response.read()
-							response = response.decode("utf-8")
-							data = json.loads(response)
+						for x in data['permissions']:
+							granted_permissions.append(x)
 
-							granted_permissions = []
+						try:
+							for permission in permissions:
+								if permission not in granted_permissions:
+									return await self.bot.say("Missing required API permission(s). Require account, builds, characters.")
+						except Exception as e:
+							print("Exception occured; exception:")
+							print(e)
+							return
 
-							for x in data['permissions']:
-								granted_permissions.append(x)
-
-							try:
-								for permission in permissions:
-									if permission not in granted_permissions:
-										return await self.bot.say("Missing required API permission(s). Require account, builds, characters.")
-							except Exception as e:
-								print("Exception occured; exception:")
-								print(e)
-								return
-
-							#args = (str(memberID), apikey)
-							#print(args)
-							query = """INSERT INTO api (discord_id, api_key) VALUES (?, ?)"""
-							DatabaseHandler().insertIntoDatabase(query, (str(memberID), apikey))
-							return await self.bot.say("{0.mention}, API key added.".format(member))
-						else:
-							return await self.bot.say("You already have an API key registered.")
+						#args = (str(memberID), apikey)
+						#print(args)
+						query = """INSERT INTO api (discord_id, api_key) VALUES (?, ?)"""
+						DatabaseHandler().insertIntoDatabase(query, (str(memberID), apikey))
+						return await self.bot.say("{0.mention}, API key added.".format(member))
 					else:
-						return await self.bot.say("Some unknown error occured. Please try again.")
+						return await self.bot.say("You already have an API key registered.")
 				else:
-					await self.bot.delete_message(ctx.message)
-					return await self.bot.say("{0.mention}: please private message me your API key.".format(member))
+					return await self.bot.say("Some unknown error occured. Please try again.")
 			else:
-				return
+				await self.bot.delete_message(ctx.message)
+				return await self.bot.say("{0.mention}: please private message me your API key.".format(member))
 		except Exception as e:
 			await error_logging().log_error(traceback.format_exc(), 'api_commands: addApiKey', str(member), self.bot)
 			print("ERROR! Function: addApiKey. Exception: {0}".format(e))

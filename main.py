@@ -58,12 +58,15 @@ client = commands.Bot(command_prefix=command_prefix, description=description)
 # processes messages and checks if a command
 @client.event
 async def on_message(message):
-    can_use = await BotResources(client).checkAccepted(message.author.id)
-
-    if can_use or message.content.startswith('{0}accept'.format(command_prefix)):
+    if message.content == '{0}accept'.format(command_prefix):
         await client.process_commands(message)
     else:
-        return
+        can_use = BotResources(client).checkAccepted(message.author.id, message.channel.id)
+
+        if can_use:
+            await client.process_commands(message)
+        else:
+            return
 
 # discord.py on_ready -> print out a bunch of information when the bot launches
 @client.event
