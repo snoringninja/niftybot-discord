@@ -38,8 +38,12 @@ class CreditBet():
 			server_id = ctx.message.server.id
 
 			# Load some config settings
-			channel_id = ConfigLoader().load_server_config_setting(server_id, 'BettingGame', 'bet_channel_id')
-			
+			try:
+				channel_id = ConfigLoader().load_server_config_setting(server_id, 'BettingGame', 'bet_channel_id')
+			except Exception as e:
+				await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
+				return await self.bot.say("The value for channel_id must be a int. Disabling plugin until server owner can correct.")
+
 			# if this fails it's not a boolean so we'll fix that but disable the plugin
 			try:
 				plugin_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'BettingGame', 'enabled')
@@ -53,7 +57,7 @@ class CreditBet():
 				await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 				return await self.bot.say("The value for minimum_bet must be an integer value. Disabling plugin until server owner can correct.")
 
-			if isinstance(amount, int):# and plugin_enabled == True and int(ctx.message.channel.id) == channel_id:
+			if isinstance(amount, int) and plugin_enabled == True and int(ctx.message.channel.id) == channel_id:
 				# Have to cast ctx.message.channel.id and ctx.message.server.id to ints
 				if (member is not None and amount >= minimum_bet):
 					#print("credit_bet: User: {} / Amount: {} / display_name: {}".format(member, amount, display_name))
@@ -94,6 +98,7 @@ class CreditBet():
 				print("Error in bet: Not an int value, but the bot should have caught that by default.")
 		except Exception as e:
 			await error_logging().log_error(traceback.format_exc(), 'credit_bet: bet', str(member), self.bot)
+			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 			print("ERROR! Function: bet. Exception: {0}".format(e))
 			#await self.bot.say("I failed, sorry...please let TD know (reference: betting error).")
 
@@ -116,6 +121,7 @@ class CreditBet():
 					await self.bot.say("{0.mention}: your balance is {1}.".format(member, remCredits[0]))
 		except Exception as e:
 			error_logging().log_error(traceback.format_exc(), 'credit_bet: register', str(member))
+			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 			print("ERROR! Function: balance. Exception: {0}".format(e))
 			await self.bot.say("I failed, sorry...please let TD know (reference: balance error).")
 
