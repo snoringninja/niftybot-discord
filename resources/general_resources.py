@@ -14,21 +14,31 @@ class BotResources:
 		self.bot = bot
 		self.prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
-	async def checkAccepted(self, user_id, show_not_accepted_warning = True):
+	async def checkAccepted(self, user_id, channel_id = None, show_not_accepted_warning = True):
 		try:
 			row = DatabaseHandler().fetch_results("SELECT 1 FROM accepted_users WHERE discord_id = {0}".format(str(user_id)))
+
+			print(row)
 
 			if row is not None:
 				return True
 			else:
 				if show_not_accepted_warning == True:
-					await self.bot.say(
-										"I'm sorry, you must accept the bot terms of service to use commands.\n\nI may log the following:" + 
-										"```Your public discord userID\n\nThe ID of the server you used in the command\n\nYour current display name\n\n" +
-										"Information provided to me for different functions, including but not limited to: GW2 Api Commands, Credit Betting\n\n```" +
-										"Please type {0}accept to accept these terms, which will expand to allow you to use commands in all servers.\n\n".format(self.prefix) +
-										"If this makes you uncomfortable, please check with server owners running me to find out what information they might be logging."
-									  )
+					if channel_id is None:
+						await self.bot.say(
+											"""I'm sorry, you must accept the bot terms of service to use commands.\n\nI may log the following:
+											```Your public discord userID\n\nThe ID of the server you used in the command\n\nYour current display name\n\n
+											Information provided to me for different functions, including but not limited to: GW2 Api Commands, Credit Betting\n\n```
+											Please type {0}accept to accept these terms, which will expand to allow you to use commands in all servers.\n\n
+											If this makes you uncomfortable, please check with server owners running me to find out what information they might be logging.""".format(self.prefix)
+										  )
+					else:
+						await self.bot.send_message(discord.Object(id=channel_id),"""I'm sorry, you must accept the bot terms of service to use commands.\n\nI may log the following:
+											```Your public discord userID\n\nThe ID of the server you used in the command\n\nYour current display name\n\n
+											Information provided to me for different functions, including but not limited to: GW2 Api Commands, Credit Betting\n\n```
+											Please type {0}accept to accept these terms, which will expand to allow you to use commands in all servers.\n\n
+											If this makes you uncomfortable, please check with server owners running me to find out what information they might be logging.""".format(self.prefix)
+										  )
 				return False
 		except Exception as e:
 			await error_logging().log_error(traceback.format_exc(), 'BotCommands: checkAccepted')

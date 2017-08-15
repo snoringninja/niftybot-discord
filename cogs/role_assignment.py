@@ -63,7 +63,7 @@ class RoleAssignor():
 								return
 							except:
 								await self.bot.send_message(ctx.message.channel, "Error.")
-								error_logging().log_error(traceback.format_exc(), 'role_assignment: assign_role', str(member))
+								await error_logging().log_error(traceback.format_exc(), 'role_assignment: assign_role', str(member))
 								return
 							finally:
 								print("Finally block executed.")
@@ -79,7 +79,7 @@ class RoleAssignor():
 				print("Member was none.")
 				return
 		except Exception as e:
-			error_logging().log_error(traceback.format_exc(), 'assign_role: RoleAssignor', str(member))
+			await error_logging().log_error(traceback.format_exc(), 'assign_role: RoleAssignor', str(member))
 			await self.bot.say("Error with the given API key. Please check it again.")
 			return
 

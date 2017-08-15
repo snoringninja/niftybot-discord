@@ -33,6 +33,7 @@ import os
 import sys
 
 from resources.config import ConfigLoader
+from resources.general_resources import BotResources
 
 # Not sure we still need this
 description = ConfigLoader().load_config_setting('BotSettings', 'description')
@@ -57,9 +58,12 @@ client = commands.Bot(command_prefix=command_prefix, description=description)
 # processes messages and checks if a command
 @client.event
 async def on_message(message):
-    # @TODO : discord developer ToS states we cannot store any information without user permission. As such, force users to do [prefix]accept to use bot commands.
-    # @Warning : if you add a logging cog, make sure you have user permission (unless the bot simply reposts to a hidden channel and does not store the information)
-    await client.process_commands(message)
+    can_use = await BotResources(client).checkAccepted(message.author.id)
+
+    if can_use or message.content.startswith('{0}accept'.format(command_prefix)):
+        await client.process_commands(message)
+    else:
+        return
 
 # discord.py on_ready -> print out a bunch of information when the bot launches
 @client.event
