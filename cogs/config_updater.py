@@ -6,6 +6,7 @@ import os
 import configparser
 
 from resources.general_resources import BotResources
+from resources.config import ConfigLoader
 
 
 class ConfigUpdater:
