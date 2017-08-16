@@ -21,10 +21,6 @@ class ConfigUpdater:
 	# Handle updating the config file for the server. supress_message is used when we update the config from a function when a command fails
 	# It defaults to False for when the config is updating from within the server
 	async def updateConfigFile(self, filename, updateSection, updateKey, updateValue, supress_message=False):
-		# ConfigLoader().load_server_config_setting(server_id, 'ServerSettings', 'enabled_plugins')
-		# parser.set('SETTINGS', 'value', '15')
-		# with open('example.ini', 'wb') as configfile:
-		# parser.write(configfile)
 
 		parser = configparser.ConfigParser()
 		loaded_file = self.load_config('%s.ini' % (os.path.join(self.server_settings_path, str(filename))),)
@@ -57,7 +53,6 @@ class ConfigUpdater:
 		display_name = ctx.message.author.display_name
 
 		if memberID == ctx.message.server.owner_id or int(memberID) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
-			#print("Is the owner of the server.")
 			try:
 				filename = ctx.message.server.id
 				await self.updateConfigFile(filename, updateSection, updateKey, updateValue)
@@ -66,7 +61,6 @@ class ConfigUpdater:
 				return await self.bot.say("Error applying requested config update: {0}".format(e))
 		else:
 			return await self.bot.say("Only the server owner can configure different plugins.")
-			#print("Is not the owner.")
 
 def setup(bot):
 	"""This makes it so we can actually use it."""

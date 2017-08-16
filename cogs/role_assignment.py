@@ -32,9 +32,6 @@ class RoleAssignor():
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'RoleAssignment', 'enabled', 'False', True)
 			return await self.bot.say("The value for enabled must be a boolean. Disabling plugin until server owner can correct.")
 
-		print(member)
-		print(plugin_enabled)
-
 		try:
 			member = ctx.message.author
 
@@ -79,18 +76,14 @@ class RoleAssignor():
 								await self.bot.send_message(ctx.message.channel, "Error.")
 								await error_logging().log_error(traceback.format_exc(), 'role_assignment: assign_role', str(member))
 								return
-							finally:
-								print("Finally block executed.")
 						else:
 							await self.bot.send_message(ctx.message.channel, "{0.mention}: Requested group not found.".format(member))
 							return
 					else:
-						print("Channel not in list.")
 						return
 				else:
 					return
 			else:
-				print("Member was none.")
 				return
 		except Exception as e:
 			await error_logging().log_error(traceback.format_exc(), 'role_assignment: RoleAssignor', str(member))
