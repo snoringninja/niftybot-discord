@@ -135,6 +135,6 @@ if __name__ == "__main__":
         print('Startup error encountered.')
         print(e)
         print('Exception: {0}: {1}'.format(type(e).__name__, e))
-        await error_logging().log_error(traceback.format_exc(), 'startup_error')
+        error_logging().log_error(traceback.format_exc(), 'startup_error')
         client.logout()
         sys.exit(0)
