@@ -70,17 +70,11 @@ async def on_message(message):
     invoked_prefix = discord.utils.find(view.skip_string, command_prefix)
     discord.utils.find(view.skip_string, command_prefix)
 
-    #print("Invoked: {0}".format(invoked_prefix))
-    #print(discord.utils.find(view.skip_string, command_prefix))
-
     if invoked_prefix is None:
         return
 
     invoker = view.get_word()
 
-    #print(invoker)
-    #print(client.commands)
-    
     if invoker in client.commands:
         if message.content == '{0}accept'.format(command_prefix):
             await client.process_commands(message)
@@ -141,5 +135,6 @@ if __name__ == "__main__":
         print('Startup error encountered.')
         print(e)
         print('Exception: {0}: {1}'.format(type(e).__name__, e))
+        await error_logging().log_error(traceback.format_exc(), 'startup_error')
         client.logout()
         sys.exit(0)
