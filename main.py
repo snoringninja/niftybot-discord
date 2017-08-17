@@ -29,11 +29,7 @@ from resources.error import error_logging
 
 from discord.ext import commands
 
-from discord.ext.commands.core import GroupMixin, Command, command
 from discord.ext.commands.view import StringView
-from discord.ext.commands.context import Context
-from discord.ext.commands.errors import CommandNotFound, CommandError
-from discord.ext.commands.formatter import HelpFormatter
 
 import os
 import sys
@@ -63,111 +59,40 @@ client = commands.Bot(command_prefix=command_prefix, description=description)
 
 not_accepted_message = ConfigLoader().load_config_setting('BotSettings', 'not_accepted_message')
 
-async def process_commands_custom(self, message):
-    """|coro|
-
-    This function processes the commands that have been registered
-    to the bot and other groups. Without this coroutine, none of the
-    commands will be triggered.
-
-    By default, this coroutine is called inside the :func:`on_message`
-    event. If you choose to override the :func:`on_message` event, then
-    you should invoke this coroutine as well.
-
-    Warning
-    --------
-    This function is necessary for :meth:`say`, :meth:`whisper`,
-    :meth:`type`, :meth:`reply`, and :meth:`upload` to work due to the
-    way they are written. It is also required for the :func:`on_command`
-    and :func:`on_command_completion` events.
-
-    Parameters
-    -----------
-    message : discord.Message
-    The message to process commands for.
-    """
-    _internal_channel = message.channel
-    _internal_author = message.author
-
-    print(message)
-    print(message.content)
-    view = StringView(message.content)
-
-    if self._skip_check(message.author, self.user):
-        print("Returning from self._skip_check")
-        return
-
-    prefix = command_prefix
-    invoked_prefix = prefix
-
-    print(view)
-    print(invoked_prefix)
-
-    if not isinstance(prefix, (tuple, list)):
-        if not view.skip_string(prefix):
-            print("Returning from view.skip_string")
-            return
-        else:
-            print(view.skip_string)
-            print(prefix)
-            print(discord.utils.find(view.skip_string, prefix))
-            invoked_prefix = discord.utils.find(view.skip_string, prefix)
-            print(invoked_prefix)
-    else:
-        print("Not isinstance")
-        return
-    if invoked_prefix is None:
-        print("Returning from invoked_prefix")
-        return
-
-
-    invoker = view.get_word()
-    tmp = {
-            'bot': self,
-            'invoked_with': invoker,
-            'message': message,
-            'view': view,
-            'prefix': invoked_prefix
-    }
-
-    ctx = Context(**tmp)
-    del tmp
-
-    if invoker in self.commands:
-        command = self.commands[invoker]
-        self.dispatch('command', command, ctx)       
-
-        try:
-            if message.content == '{0}accept'.format(command_prefix):
-                await command.invoke(ctx)
-            else:
-                can_use = BotResources().checkAccepted(message.author.id, message.channel.id)
-                if can_use:
-                    await command.invoke(ctx)
-        except CommandError as e:
-            ctx.command.dispatch_error(e, ctx)
-        else:
-            self.dispatch('command_completion', command, ctx)
-    elif invoker:
-        exc = CommandNotFound('Command "{}" is not found'.format(invoker))
-        self.dispatch('command_error', exc, ctx)
 
 # processes messages and checks if a command
 @client.event
 async def on_message(message):
-    print(client.user)
-    await process_commands_custom(client, message)
-    # if message.content == '{0}accept'.format(command_prefix):
-    #     await client.process_commands_custom(message)
-    # else:
-    #     can_use = BotResources().checkAccepted(message.author.id, message.channel.id)
+    view = StringView(message.content)
+    prefix = command_prefix
+    invoked_prefix = command_prefix
 
-    #     if can_use:
-    #         await client.process_commands(message)
-    #     else:
-    #         # This is needed to prevent infinite looping message posting
-    #         if message.author.id != client.user.id:
-    #             await client.send_message(discord.Object(id=message.channel.id), not_accepted_message.format(command_prefix))
+    invoked_prefix = discord.utils.find(view.skip_string, command_prefix)
+    discord.utils.find(view.skip_string, command_prefix)
+
+    #print("Invoked: {0}".format(invoked_prefix))
+    #print(discord.utils.find(view.skip_string, command_prefix))
+
+    if invoked_prefix is None:
+        return
+
+    invoker = view.get_word()
+
+    #print(invoker)
+    #print(client.commands)
+    
+    if invoker in client.commands:
+        if message.content == '{0}accept'.format(command_prefix):
+            await client.process_commands(message)
+        else:
+            can_use = BotResources().checkAccepted(message.author.id, message.channel.id)
+
+            if can_use:
+                await client.process_commands(message)
+            else:
+                # This is needed to prevent infinite looping message posting
+                if message.author.id != client.user.id:
+                    await client.send_message(discord.Object(id=message.channel.id), not_accepted_message.format(command_prefix))
 
 # discord.py on_ready -> print out a bunch of information when the bot launches
 @client.event
