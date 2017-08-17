@@ -40,7 +40,7 @@ class CreditBet():
 
 			# Load some config settings
 			try:
-				channel_id = ConfigLoader().load_server_config_setting(server_id, 'BettingGame', 'bet_channel_id')
+				channel_id = ConfigLoader().load_server_config_setting_int(server_id, 'BettingGame', 'bet_channel_id')
 			except Exception as e:
 				await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 				return await self.bot.say("The value for channel_id must be a int. Disabling plugin until server owner can correct.")
@@ -61,17 +61,12 @@ class CreditBet():
 			if isinstance(amount, int) and plugin_enabled == True and int(ctx.message.channel.id) == channel_id:
 				# Have to cast ctx.message.channel.id and ctx.message.server.id to ints
 				if (member is not None and amount >= minimum_bet):
-					#print("credit_bet: User: {} / Amount: {} / display_name: {}".format(member, amount, display_name))
-					row = DatabaseHandler().fetchresult("""SELECT 1 FROM `users` WHERE `userID` = %s""", (memberID))
-					#print("Row: {}".format(row))
+					row = DatabaseHandler().fetch_results("SELECT 1 FROM credit_bet WHERE userID = {0} and serverID = {1}".format(str(memberID), str(server_id)))
 					if row is None:
 						await self.bot.say("{0.mention}: please do &register to join the lotto.".format(member))
 						return
 					else:
-						#print("Member found, checking remaining credits and generating 'random' numbers for roll.")
-						# @TODO : use the system to generate slightly better random numbers...entropy?
-						remCredits = DatabaseHandler().fetchresult("""SELECT `credits` FROM `users` WHERE `userID` = %s""", (memberID))
-						#print(remCredits)
+						remCredits = DatabaseHandler().fetch_results("SELECT credits FROM credit_bet WHERE userID = {0} AND serverID = {1}".format(str(memberID), str(server_id)))
 						if (remCredits[0] < amount):
 							await self.bot.say("Insufficient credits ({0})".format(remCredits[0]))
 							return
@@ -80,13 +75,13 @@ class CreditBet():
 							userNumber = random.randint(1, 100)
 							if (botNumber > userNumber):
 								args = (str(member), amount, memberID, display_name)
-								DatabaseHandler().executeStoredProcedureCommit("RemoveUserCredits", args)
+								DatabaseHandler().update_database("UPDATE credit_bet SET credits = {0} WHERE userID = {1} AND serverID = {2}".format(amount, str(memberID), str(server_id)))
 								newBalance = remCredits[0] - amount
 								await self.bot.say("Sorry, {0.mention}, you lost with a roll of {1} against {2}! Your balance is now {3}!".format(member, userNumber, botNumber, newBalance))
 								#print("User lost. Bot number: {0}, User number: {1}".format(botNumber, userNumber))
 							elif (userNumber > botNumber):
 								args = (str(member), amount, memberID, display_name)
-								DatabaseHandler().executeStoredProcedureCommit("IncreaseUserCredits", args)
+								DatabaseHandler().update_database("UPDATE credit_bet SET credits = {0} WHERE userID = {1} AND serverID = {2}".format(amount, str(memberID), str(server_id)))
 								newBalance = remCredits[0] + amount
 								await self.bot.say("Congratulations, {0.mention}, you won with a roll of {1} against {2}! Your balance is now {3}!".format(member, userNumber, botNumber, newBalance))
 								#print("User won. Bot number: {0}, User number: {1}".format(botNumber, userNumber))
@@ -94,14 +89,13 @@ class CreditBet():
 								await self.bot.say("It was a tie, {0.mention}, with a roll of {1}! Your balance remains {2}!".format(member, userNumber, remCredits[0]))
 								#print("Appears a tie...bot number: {0}; user number: {1}".format(botNumber, userNumber))
 				else:
-					print("Exception in conditional IF statement.")
+					await self.bot.say("The minimum bet is {0}".format(minimum_bet))
 			else:
-				print("Error in bet: Not an int value, but the bot should have caught that by default.")
+				print("Error in the initial conditional IF statement (credit_bet).")
 		except Exception as e:
 			await error_logging().log_error(traceback.format_exc(), 'credit_bet: bet', str(member), self.bot)
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
-			print("ERROR! Function: bet. Exception: {0}".format(e))
-			#await self.bot.say("I failed, sorry...please let TD know (reference: betting error).")
+			return
 
 	@commands.command(pass_context=True, no_pm=True)
 	@commands.cooldown(rate=1, per=60, type=commands.BucketType.user)
@@ -112,46 +106,65 @@ class CreditBet():
 			if (member is None and int(ctx.message.channel.id) == channel_id and int(ctx.message.server.id) == server_id):
 				member = ctx.message.author
 				memberID = ctx.message.author.id
-				row = DatabaseHandler().fetchresult("""SELECT 1 FROM `users` WHERE `userID` = %s""", (memberID))
+				server_id = ctx.message.server.id
+				row = DatabaseHandler().fetch_results("SELECT 1 FROM credit_bet WHERE userID = {0} and serverID = {1}".format(str(memberID), str(server_id)))
 				#print("Row: {}".format(row))
 				if row is None:
 					await self.bot.say("{0.mention}: please do &register to join the lotto.".format(member))
 					return
 				else:
-					remCredits = DatabaseHandler().fetchresult("""SELECT `credits` FROM `users` WHERE `userID` = %s""", (str(memberID)))
+					remCredits = DatabaseHandler().fetch_results("SELECT credits FROM credit_bet WHERE userID = {0} AND serverID = {1}".format(str(memberID), str(server_id)))
 					await self.bot.say("{0.mention}: your balance is {1}.".format(member, remCredits[0]))
 		except Exception as e:
-			error_logging().log_error(traceback.format_exc(), 'credit_bet: register', str(member))
+			await error_logging().log_error(traceback.format_exc(), 'credit_bet: register', str(member))
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
-			print("ERROR! Function: balance. Exception: {0}".format(e))
 			await self.bot.say("I failed, sorry...please let TD know (reference: balance error).")
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def register(self, ctx, member: discord.Member = None):
 		""" Register for betting. """
+
+		member = ctx.message.author
+		memberID = ctx.message.author.id
+		display_name = ctx.message.author.name
+		server_id = ctx.message.server.id
+
+		# Load some config settings
+		try:
+			channel_id = ConfigLoader().load_server_config_setting_int(server_id, 'BettingGame', 'bet_channel_id')
+		except Exception as e:
+			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
+			return await self.bot.say("The value for channel_id must be a int. Disabling plugin until server owner can correct.")
+
+		# if this fails it's not a boolean so we'll fix that but disable the plugin
+		try:
+			plugin_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'BettingGame', 'enabled')
+		except Exception as e:
+			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
+			return await self.bot.say("The value for enabled must be a boolean. Disabling plugin until server owner can correct.")
+
 		try: 
 			# Have to cast ctx.message.channel and ctx.message.server to strings
-			if (member is None and int(ctx.message.channel.id) == channel_id and int(ctx.message.server.id) == server_id):
-				member = ctx.message.author
-				memberID = ctx.message.author.id
-				display_name = ctx.message.author.name
-				row = DatabaseHandler().fetchresult("""SELECT 1 FROM `users` WHERE `userID` = %s""", (memberID))
-				#print("Row: {}".format(row))
+			if (member is not None and int(ctx.message.channel.id) == channel_id and plugin_enabled == True):
+				row = DatabaseHandler().fetch_results("SELECT 1 FROM credit_bet WHERE userID = {0} and serverID = {1}".format(str(memberID), str(server_id)))
 				if row is None:
 					try:
 						#print(member)
-						args = (str(member), 500, str(datetime.now()), memberID, display_name)
-						#print(args)
-						DatabaseHandler().executeStoredProcedureCommit("addMember", args)
+						args = (str(server_id), str(member), memberID, display_name, 500, str(datetime.now()))
+						query = """INSERT INTO credit_bet (serverID, username, userID, displayName, credits, dateJoined, timesBet, lastClaimTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"""
+						DatabaseHandler().insertIntoDatabase(query, (str(server_id), str(member), memberID, display_name, 500, str(datetime.now()), 0, str(datetime.now())))
 						await self.bot.say("{0.mention}, you are now registered! &bet to play! Goodluck!".format(member))
 					except Exception as e:
-						error_logging().log_error(traceback.format_exc(), 'credit_bet: register (inner)', str(member))
-						print("ERROR! Function: register (inner try). Exception: {0}".format(e))
+						await error_logging().log_error(traceback.format_exc(), 'credit_bet: register (inner)', str(member))
 				else:
 					await self.bot.say("{0.mention}: you're already registered. Please do &bet to play!".format(member))
+			else:
+				print(member)
+				print(ctx.message.channel.id)
+				print(channel_id)
+				print(plugin_enabled)
 		except Exception as e:
-			error_logging().log_error(traceback.format_exc(), 'credit_bet: register (outer)', str(member))
-			print("ERROR! Function: register. Exception: {0}".format(e))
+			await error_logging().log_error(traceback.format_exc(), 'credit_bet: register (outer)', str(member))
 			await self.bot.say("I failed, sorry...please let TD know (reference: register error).")
 
 	@commands.command(pass_context=True, no_pm=True)

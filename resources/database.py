@@ -50,6 +50,16 @@ class DatabaseHandler(object):
 				print(e)
 				return
 
+	def update_database(self, query):
+		try:
+			database = sqlite3.connect(self.sqlite_database)
+			cursor = database.cursor()
+			executed = cursor.execute(query)
+			database.close()
+		except Exception as e:
+			print("update_database error: {0}.".format(e))
+			return
+
 	def insertIntoDatabase(self, query, params):
 		try:
 			database = sqlite3.connect(self.sqlite_database)
