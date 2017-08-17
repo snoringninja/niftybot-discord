@@ -1,20 +1,17 @@
-# Niftybot-Discord - Discord bot based on Discord.py
+# Niftybot-Discord - Discord bot built on Discord.py
 
 Basic useful feature list:
 
- * Nothing in particular, yet
+ * Eventually...
 
 TODO(s):
- * Allow multiple servers and channels and ensure cogs work with this multi server / multi channel binding (in progress)
  * Clean cogs
  * Documentation
- * Convert the current MySQL to an SQLite database so that the database can ship with the bot (in progress)
-
 
 This bot is always in progress, and knowing me, I'll refactor it numerous times.  As of now, this does not include a setup script to handle installing [discord.py](https://github.com/Rapptz/discord.py) if you do not already have it.
 
 The bot will be constantly undergoing changes as I decide new little cogs to add.
 
-* please note that the bot does not include any SQL setup scripts, so you'll need to do your best as of now to generate those yourself if you wish to use the credit_bet or other cogs that use a database for storage.
-
-* warning two: the way this bot is setup, it is not designed for multiple server use; I plan to change this in the future
+* The included niftybot.db has the tables needed to function
+* WARNING: there is no setup script currently included; sorry (and I don't remember each library used)
+* https://snoring.ninja/blog
