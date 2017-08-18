@@ -50,11 +50,28 @@ class DatabaseHandler(object):
 				print(e)
 				return
 
+	def fetch_all_results(self, query):
+		try:
+			database = sqlite3.connect(self.sqlite_database, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+			cursor = database.cursor()
+			executed = cursor.execute(query)
+			result = executed.fetchall()
+			database.close()
+		except Exception as ex:
+			print("Database selectOneResult error.")
+		finally:
+			try:
+				return result
+			except Exception as e:
+				print(e)
+				return	
+
 	def update_database(self, query):
 		try:
 			database = sqlite3.connect(self.sqlite_database)
 			cursor = database.cursor()
 			executed = cursor.execute(query)
+			database.commit()
 			database.close()
 		except Exception as e:
 			print("update_database error: {0}.".format(e))
