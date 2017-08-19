@@ -15,6 +15,7 @@ from resources.config import ConfigLoader
 class DatabaseHandler(object):
 	# @TODO : need a database generation script
 	# @TODO : close connection
+	# @TODO : NEED TO USE PARAMATIZED QUERIES EVERY TIME
 
 	def __init__(self):
 		self.path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../'))
@@ -68,7 +69,7 @@ class DatabaseHandler(object):
 
 	def update_database(self, query):
 		try:
-			database = sqlite3.connect(self.sqlite_database)
+			database = sqlite3.connect(self.sqlite_database, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
 			cursor = database.cursor()
 			executed = cursor.execute(query)
 			database.commit()
@@ -77,9 +78,20 @@ class DatabaseHandler(object):
 			print("update_database error: {0}.".format(e))
 			return
 
+	def update_database_with_args(self, query, args):
+		try:
+			database = sqlite3.connect(self.sqlite_database, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+			cursor = database.cursor()
+			executed = cursor.execute(query, args)
+			database.commit()
+			database.close()
+		except Exception as e:
+			print("update_database error: {0}.".format(e))
+			return
+
 	def insertIntoDatabase(self, query, params):
 		try:
-			database = sqlite3.connect(self.sqlite_database)
+			database = sqlite3.connect(self.sqlite_database, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
 			cursor = database.cursor()
 			result = cursor.execute(query, params)
 			database.commit()
