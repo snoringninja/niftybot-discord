@@ -55,9 +55,9 @@ database_name = ConfigLoader().load_config_setting('BotSettings', 'sqlite')
 # Create the plugin list, which is built from the core ini file
 extension_list = ConfigLoader().load_config_setting('BotSettings', 'enabled_plugins')
 
-client = commands.Bot(command_prefix=command_prefix, description=description)
-
 not_accepted_message = ConfigLoader().load_config_setting('BotSettings', 'not_accepted_message')
+
+client = commands.Bot(command_prefix=command_prefix, description=description)
 
 
 # processes messages and checks if a command
@@ -97,7 +97,7 @@ async def on_ready():
     print('Setting game to: {0}'.format(game_name))
     print('Loaded extensions: {0}'.format(extension_list))
     print('Database name: {0}'.format(database_name))
-    await client.change_presence(game=discord.Game(name=game_name))
+    await client.change_presence(game=discord.Game(type=0, name=game_name))
     print('Good to go!')
     print('------')
 
