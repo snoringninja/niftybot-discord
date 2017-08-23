@@ -71,7 +71,7 @@ class ConfigUpdater:
 
 		try:
 			if memberID == ctx.message.server.owner_id or int(memberID) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
-				return_string = "```"
+				return_string = "```Settings for {0}\n\n:".format(ctx.message.server.name)
 
 				parser = configparser.ConfigParser()
 				loaded_file = self.load_config('%s.ini' % (os.path.join(self.server_settings_path, str(serverID))),)
