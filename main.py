@@ -78,7 +78,7 @@ async def on_message(message):
     if invoker in client.commands:
         if message.content == '{0}accept'.format(command_prefix):
             await client.process_commands(message)
-        elif message.content.startswith("{0}guild").format(command_prefix): # This could get really, really ugly...
+        elif message.content.startswith("{0}guild".format(command_prefix)): # This could get really, really ugly...
             await client.process_commands(message)
         else:
             can_use = BotResources().checkAccepted(message.author.id, message.channel.id)
