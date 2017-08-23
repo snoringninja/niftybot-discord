@@ -4,10 +4,11 @@ import logging
 from discord.ext import commands
 import os
 import configparser
+import asyncio
 
 from resources.general_resources import BotResources
 from resources.config import ConfigLoader
-
+from resources.error import error_logging
 
 class ConfigUpdater:
 	def __init__(self, bot):
@@ -41,8 +42,7 @@ class ConfigUpdater:
 			else:
 				return await self.bot.say("Section '{0}' does not exist.".format(updateSection))
 		except Exception as e:
-			print("updateConfig error: {0}".format(e))
-
+			return await error_logging().log_error(traceback.format_exc(), 'ConfigUpdater: updateConfigFile', str(member), self.bot)
 
 	@commands.command(pass_context=True, no_pm=True, name='config')
 	@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
@@ -57,10 +57,43 @@ class ConfigUpdater:
 				filename = ctx.message.server.id
 				await self.updateConfigFile(filename, updateSection, updateKey, updateValue)
 			except Exception as e:
-				print("configUpdate error: {0}".format(e))
+				await error_logging().log_error(traceback.format_exc(), 'ConfigUpdater: configUpdate', str(member), self.bot)
 				return await self.bot.say("Error applying requested config update: {0}".format(e))
 		else:
 			return await self.bot.say("Only the server owner can configure different plugins.")
+
+	@commands.command(pass_context=True, no_pm=True, name='getconfig')
+	@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
+	async def getConfigInformation(self, ctx, member: discord.Member = None):
+		member = ctx.message.author
+		memberID = ctx.message.author.id
+		serverID = ctx.message.server.id
+
+		try:
+			if memberID == ctx.message.server.owner_id or int(memberID) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
+				return_string = "```"
+
+				parser = configparser.ConfigParser()
+				loaded_file = self.load_config('%s.ini' % (os.path.join(self.server_settings_path, str(serverID))),)
+				parser.read(loaded_file)
+
+				for section in parser.sections():
+					return_string = return_string + section + ":\n"
+					for name, value in parser.items(section):
+						return_string = return_string + "{0}: {1}".format(name, value) + "\n"
+					return_string = return_string + "\n"
+
+				return_string = return_string + "```"
+
+			await self.bot.send_message(member, return_string)
+			return await self.bot.delete_message(ctx.message)
+		except discord.Forbidden:
+			bot_message = await self.bot.say("I am unable to message you. You may have me blocked, or personal messages disabled.")
+			await asyncio.sleep(5)
+			await self.bot.delete_message(ctx.message)
+			return await self.bot.delete_message(bot_message)
+		except Exception as e:
+			return await error_logging().log_error(traceback.format_exc(), 'ConfigUpdater: getConfigInformation', str(member), self.bot)
 
 def setup(bot):
 	"""This makes it so we can actually use it."""

@@ -31,7 +31,7 @@ class JoinLeaveHandler():
 				print("Welcome message disabled.")
 				return
 		except Exception as e:
-			error_logging().log_error(traceback.format_exc(), 'join_leave_handler: welcomeUser', str(member))
+			await error_logging().log_error(traceback.format_exc(), 'join_leave_handler: welcomeUser', str(member))
 			return
 
 	async def goodbyeUser(self, server_id : str, member : str):
@@ -47,5 +47,5 @@ class JoinLeaveHandler():
 				print("Part message disabled.")
 				return
 		except Exception as e:
-			error_logging().log_error(traceback.format_exc(), 'join_leave_handler: goodbyeUser', str(member))
+			await error_logging().log_error(traceback.format_exc(), 'join_leave_handler: goodbyeUser', str(member))
 			return
