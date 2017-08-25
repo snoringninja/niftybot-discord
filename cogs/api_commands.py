@@ -79,66 +79,70 @@ class ApiCommands():
 				return await self.bot.say("{0.mention}: please private message me your API key.".format(member))
 		except Exception as e:
 			await error_logging().log_error(traceback.format_exc(), 'api_commands: addApiKey', str(member), self.bot)
-			print("ERROR! Function: addApiKey. Exception: {0}".format(e))
 			return
 
-	def get_character_level(self, api_key, character_name):
+	async def get_character_level(self, api_key, character_name):
 		# This function returns character information in the format (exmaple) "Name: Level 80 Charr Mesmer"
-		base_url = 'https://api.guildwars2.com/v2/characters/'
-		base_url2 = '/core?access_token='
-		header = {'User-Agent' : 'Mozlla/5.0'}
+		try:
+			base_url = 'https://api.guildwars2.com/v2/characters/'
+			base_url2 = '/core?access_token='
+			header = {'User-Agent' : 'Mozlla/5.0'}
 
-		response_url = base_url + str(character_name) + str(base_url2) + str(api_key)
-		header = urllib.parse.urlencode(header)
-		header = header.encode("utf-8")
-		response = urlopen(response_url)
-		response = response.read()
-		response = response.decode("utf-8")
-		data = json.loads(response)
+			response_url = base_url + str(character_name) + str(base_url2) + str(api_key)
+			header = urllib.parse.urlencode(header)
+			header = header.encode("utf-8")
+			response = urlopen(response_url)
+			response = response.read()
+			response = response.decode("utf-8")
+			data = json.loads(response)
 
-		print(response_url)
+			character_name = character_name.replace("%20", " ")
 
-		character_name = character_name.replace("%20", " ")
+			character_info = ''
+			character_info = '{0}: Level {1} {2} {3}'.format(character_name, data['level'], data['race'], data['profession'])
 
-		character_info = ''
-		character_info = '{0}: Level {1} {2} {3}'.format(character_name, data['level'], data['race'], data['profession'])
+			return character_info
+		except Exception as e:
+			await error_logging().log_error(traceback.format_exc(), 'api_commands: get_character_level', str(member), self.bot)
 
-		return character_info
-
-	def get_skill_ids(self, char_name, api_key, game_type):
+	async def get_skill_ids(self, char_name, api_key, game_type):
 		#print("get_skill_ids")
-		base_url = 'https://api.guildwars2.com/v2/characters/'
-		base_url2 = '/skills?access_token='
-		header = {'User-Agent' : 'Mozlla/5.0'}
+		try:
+			base_url = 'https://api.guildwars2.com/v2/characters/'
+			base_url2 = '/skills?access_token='
+			header = {'User-Agent' : 'Mozlla/5.0'}
 
-		response_url = base_url + str(char_name) + str(base_url2) + str(api_key)
-		header = urllib.parse.urlencode(header)
-		header = header.encode("utf-8")
-		response = urlopen(response_url)
-		response = response.read()
-		response = response.decode("utf-8")
-		data = json.loads(response)
+			response_url = base_url + str(char_name) + str(base_url2) + str(api_key)
+			header = urllib.parse.urlencode(header)
+			header = header.encode("utf-8")
+			response = urlopen(response_url)
+			response = response.read()
+			response = response.decode("utf-8")
+			data = json.loads(response)
 
-		print(response_url)
+			print(response_url)
 
-		skill_info = {}
+			skill_info = {}
 
 		#print(data)
 
-		for key, value in data['skills'][game_type].items():
-			if key != 'pets':
-				#print(key)
-				#print(value)
-				skill_info.update({key:value})
+			for key, value in data['skills'][game_type].items():
+				if key != 'pets':
+					#print(key)
+					#print(value)
+					skill_info.update({key:value})
 
-		return skill_info
+			return skill_info
+		except Exception as e:
+			await error_logging().log_error(traceback.format_exc(), 'api_commands: get_skill_ids', str(member), self.bot)
 
-	def get_skill_data(self, skill_dict):
+	async def get_skill_data(self, skill_dict):
 		#print("get_skill_data")
-		id_list = ''
-		elite = ''
-		heal = ''
-		utilities = ''
+		try:
+			id_list = ''
+			elite = ''
+			heal = ''
+			utilities = ''
 
 		# for key, value in skill_dict.items():
 		# 	if isinstance(value, list):
@@ -168,33 +172,33 @@ class ApiCommands():
 		# 	elif data_skills[x]['slot'] == 'Utility':
 		# 		utilities = utilities + ', ' + str(data_skills[x]['name'])
 
-		elite_id = skill_dict['elite']
-		heal_id = skill_dict['heal']
-		utilities_list = skill_dict['utilities']
+			elite_id = skill_dict['elite']
+			heal_id = skill_dict['heal']
+			utilities_list = skill_dict['utilities']
 
-		elite = DatabaseHandler().fetch_results("SELECT skill_name FROM gw2_skills WHERE skill_id = {0}".format(elite_id))
-		heal = DatabaseHandler().fetch_results("SELECT skill_name FROM gw2_skills WHERE skill_id = {0}".format(heal_id))
+			elite = DatabaseHandler().fetch_results("SELECT skill_name FROM gw2_skills WHERE skill_id = {0}".format(elite_id))
+			heal = DatabaseHandler().fetch_results("SELECT skill_name FROM gw2_skills WHERE skill_id = {0}".format(heal_id))
 
-		for x in range(3):
-			utility_id = utilities_list[x]
-			skill_name = DatabaseHandler().fetch_results("SELECT skill_name FROM gw2_skills WHERE skill_id = {0}".format(utility_id))
-			utilities = utilities + ', ' + skill_name[0]
+			for x in range(3):
+				utility_id = utilities_list[x]
+				skill_name = DatabaseHandler().fetch_results("SELECT skill_name FROM gw2_skills WHERE skill_id = {0}".format(utility_id))
+				utilities = utilities + ', ' + skill_name[0]
 
-		# trim the leading ", "
-		utilities = utilities[2:]
+			# trim the leading ", "
+			utilities = utilities[2:]
 
-		print(elite[0])
-		print(heal[0])
-		print(utilities)
-
-		return_string = ("**__Skills__** \n\n"
+			return_string = (
+						"**__Skills__** \n\n"
 						"Heal: {0} \n"
 						"Utilities: {1} \n"
-						"Elite: {2}".format(heal[0], utilities, elite[0]))
+						"Elite: {2}".format(heal[0], utilities, elite[0])
+					)
 
-		return return_string
+			return return_string
+		except Exception as e:
+			await error_logging().log_error(traceback.format_exc(), 'api_commands: get_skill_data', str(member), self.bot)
 
-	def get_trait_ids(self, char_name, api_key, game_type):
+	async def get_trait_ids(self, char_name, api_key, game_type):
 		#print("get_trait_ids")
 		base_url = 'https://api.guildwars2.com/v2/characters/'
 		base_url2 = '/specializations?access_token='
@@ -219,7 +223,7 @@ class ApiCommands():
 
 		return trait_info
 
-	def get_trait_data(self, trait_dict):
+	async def get_trait_data(self, trait_dict):
 		""" Except not really a dict. """
 		#print("get_trait_data")
 		trait_list = ''
@@ -339,27 +343,26 @@ class ApiCommands():
 			print(ctx.message.server.id)
 			server_id = str(ctx.message.server.id)
 
-			plugin_enabled = ConfigLoader().load_server_config_setting(server_id, 'ApiCommands', 'enabled')
+			plugin_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'ApiCommands', 'enabled')
 
-			if isinstance(plugin_enabled, bool):
-				# to make this work, check if the plugin is in the list
-				if member is not None and plugin_enabled == True:
-					row = DatabaseHandler().fetch_results("""SELECT api_key FROM api WHERE discord_id = {0}""".format(memberID))
+			# to make this work, check if the plugin is in the list
+			if member is not None and plugin_enabled == True:
+				row = DatabaseHandler().fetch_results("""SELECT api_key FROM api WHERE discord_id = {0}""".format(memberID))
 
-					if row is not None:
-						try:
-							character_name = character_name.replace(" ", "%20")
+				if row is not None:
+					try:
+						character_name = character_name.replace(" ", "%20")
 
-							returned_skill_ids = self.get_skill_ids(character_name, row[0], game_type)
-							returned_char_info = self.get_character_level(row[0], character_name)
-							returned_trait_ids = self.get_trait_ids(character_name, row[0], game_type)
-							returned_skill_data = self.get_skill_data(returned_skill_ids)
-							#returned_trait_data = self.get_trait_data(returned_trait_ids)
+						returned_skill_ids = await self.get_skill_ids(character_name, row[0], game_type)
+						returned_char_info = await self.get_character_level(row[0], character_name)
+						returned_trait_ids = await self.get_trait_ids(character_name, row[0], game_type)
+						returned_skill_data = await self.get_skill_data(returned_skill_ids)
+						#returned_trait_data = self.get_trait_data(returned_trait_ids)
 
-							print(returned_char_info)
-							print(returned_skill_ids)
-							print(returned_trait_ids)
-							print(returned_skill_data)
+						print(returned_char_info)
+						print(returned_skill_ids)
+						print(returned_trait_ids)
+						print(returned_skill_data)
 
 							#return_string = ("{0.mention}: \n"
 							#				"```{1}```\n\n"
@@ -367,20 +370,20 @@ class ApiCommands():
 							#				"{3}".format(member, returned_char_info, returned_trait_data, returned_skill_data))
 
 							#return await self.bot.say(return_string)
-							return
-						except urllib.error.HTTPError as e:
-							if e.code == 400:
-								print("{0}".format(character_name))
-								print("{0}".format(game_type))
-								print("{0}".format(e))
-								await self.bot.say("Character not found.")
-							else:
-								print("I done failed: {0}.".format(e))
-							return
-					else:
-						return await self.bot.say("{0.mention}, please private message me your API key.".format(member))
+						return
+					except urllib.error.HTTPError as e:
+						if e.code == 400:
+							print("{0}".format(character_name))
+							print("{0}".format(game_type))
+							print("{0}".format(e))
+							await self.bot.say("Character not found.")
+						else:
+							print("I done failed: {0}.".format(e))
+						return
 				else:
-					print("Attempted to use disabled plugin: api_commands")
+					return await self.bot.say("{0.mention}, please private message me your API key.".format(member))
+			else:
+				print("Attempted to use disabled plugin: api_commands")
 		except Exception as e:
 			print(e)
 			return
