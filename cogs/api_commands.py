@@ -18,9 +18,6 @@ from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
 from resources.general_resources import BotResources
 
-# @TODO : rewrite, cutting down API calls and removing functions.  skills and traits stored in the sqlite db now, so can make far fewer api calls
-# @TODO : keep original id building functions, but
-
 class ApiCommands():
 	def __init__(self, bot):
 		self.bot = bot
@@ -331,7 +328,7 @@ class ApiCommands():
 		return return_string
 
 	@commands.command(pass_context=True, no_pm=True)
-	@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
+	@commands.cooldown(rate=20, per=1, type=commands.BucketType.server)
 	async def build(self, ctx, character_name: str, game_type: str, member: discord.Member = None):
 		""" Get PvE, WvW, PvP build info for supplied character. """
 		try:
