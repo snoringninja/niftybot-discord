@@ -259,25 +259,25 @@ class ApiCommands():
 		#print(trait_list)
 		#print(trait_spec_list)
 
-		base_url_traits = 'https://api.guildwars2.com/v2/traits?ids='
-		response_url_traits = base_url_traits + str(trait_list)
-		response_traits = urlopen(response_url_traits)
-		response_traits = response_traits.read()
-		response_traits = response_traits.decode("utf-8")
-		data_traits = json.loads(response_traits)
+		#base_url_traits = 'https://api.guildwars2.com/v2/traits?ids='
+		#response_url_traits = base_url_traits + str(trait_list)
+		#response_traits = urlopen(response_url_traits)
+		#response_traits = response_traits.read()
+		#response_traits = response_traits.decode("utf-8")
+		#data_traits = json.loads(response_traits)
 
-		base_url_trait_spec = 'https://api.guildwars2.com/v2/specializations?ids='
-		response_url_traits_spec = base_url_trait_spec + str(trait_spec_list)
-		response_traits_spec = urlopen(response_url_traits_spec)
-		response_traits_spec = response_traits_spec.read()
-		response_traits_spec = response_traits_spec.decode("utf-8")
-		data_traits_spec = json.loads(response_traits_spec)
+		#base_url_trait_spec = 'https://api.guildwars2.com/v2/specializations?ids='
+		#response_url_traits_spec = base_url_trait_spec + str(trait_spec_list)
+		#response_traits_spec = urlopen(response_url_traits_spec)
+		#response_traits_spec = response_traits_spec.read()
+		#response_traits_spec = response_traits_spec.decode("utf-8")
+		#data_traits_spec = json.loads(response_traits_spec)
 
 		for x in range(3):
 			trait_id = 0
 			trait_name = ''
-			#print("Inner: {0}".format(x))
-			for key, value in data_traits_spec[x].items():
+			print("Inner: {0}".format(x))
+			for key, value in [x].items():
 				if key == 'id':
 					trait_id = value
 				elif key == 'name':
@@ -296,11 +296,11 @@ class ApiCommands():
 
 			trait_list_dict.append({trait_id:trait_name})
 
-		#print("We're here.")
+		print("We're here.")
 		for x in range(3):
 			for key, value in trait_spec_dict[x].items():
-				#print("Another loop: {0}".format(x))
-				#print(trait_spec_dict[x].items())
+				print("Another loop: {0}".format(x))
+				print(trait_spec_dict[x].items())
 				if x == 0:
 					trait_one = value
 				elif x == 1:
@@ -321,8 +321,8 @@ class ApiCommands():
 		trait_list_two = trait_list_two[2:]
 		trait_list_three = trait_list_three[2:]
 
-		#print("Spec info: {0}, {1}, {2}".format(trait_one, trait_two, trait_three))
-		#print("Trait info: {0}, {1}, {2}".format(trait_list_one, trait_list_two, trait_list_three))
+		print("Spec info: {0}, {1}, {2}".format(trait_one, trait_two, trait_three))
+		print("Trait info: {0}, {1}, {2}".format(trait_list_one, trait_list_two, trait_list_three))
 
 		return_string = ("**__Traits__** \n\n"
 						"{0}: {1} \n"
@@ -353,16 +353,17 @@ class ApiCommands():
 					try:
 						character_name = character_name.replace(" ", "%20")
 
-						returned_skill_ids = await self.get_skill_ids(character_name, row[0], game_type)
-						returned_char_info = await self.get_character_level(row[0], character_name)
+						#returned_skill_ids = await self.get_skill_ids(character_name, row[0], game_type)
+						#returned_char_info = await self.get_character_level(row[0], character_name)
 						returned_trait_ids = await self.get_trait_ids(character_name, row[0], game_type)
-						returned_skill_data = await self.get_skill_data(returned_skill_ids)
-						#returned_trait_data = self.get_trait_data(returned_trait_ids)
+						#returned_skill_data = await self.get_skill_data(returned_skill_ids)
+						returned_trait_data = await self.get_trait_data(returned_trait_ids)
 
-						print(returned_char_info)
-						print(returned_skill_ids)
+						#print(returned_char_info)
+						#print(returned_skill_ids)
 						print(returned_trait_ids)
-						print(returned_skill_data)
+						print(returned_trait_data)
+						#print(returned_skill_data)
 
 							#return_string = ("{0.mention}: \n"
 							#				"```{1}```\n\n"
