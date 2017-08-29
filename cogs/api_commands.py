@@ -241,23 +241,23 @@ class ApiCommands():
 		trait_three = ''
 		trait_list_three = ''
 
-		#print(trait_dict)
-		#print(trait_dict[5].items())
+		print(trait_dict)
+		print(trait_dict[5].items())
 
-		for x in range(len(trait_dict)):
-			#print(x)
-			for key, value in trait_dict[x].items():
-				if isinstance(value, list):
-					for x in value:
-						trait_list = trait_list + ',' + str(x)
-				else:
-					trait_spec_list = trait_spec_list + ',' + str(value)
+		# for x in range(len(trait_dict)):
+		# 	#print(x)
+		# 	for key, value in trait_dict[x].items():
+		# 		if isinstance(value, list):
+		# 			for x in value:
+		# 				trait_list = trait_list + ',' + str(x)
+		# 		else:
+		# 			trait_spec_list = trait_spec_list + ',' + str(value)
 
-		trait_list = trait_list[1:]
-		trait_spec_list = trait_spec_list[1:]
+		# trait_list = trait_list[1:]
+		# trait_spec_list = trait_spec_list[1:]
 
-		#print(trait_list)
-		#print(trait_spec_list)
+		# print(trait_list)
+		# print(trait_spec_list)
 
 		#base_url_traits = 'https://api.guildwars2.com/v2/traits?ids='
 		#response_url_traits = base_url_traits + str(trait_list)
@@ -277,12 +277,14 @@ class ApiCommands():
 			trait_id = 0
 			trait_name = ''
 			print("Inner: {0}".format(x))
-			for key, value in [x].items():
+			for key, value in trait_dict[x].items():
 				if key == 'id':
 					trait_id = value
 				elif key == 'name':
 					trait_name = value
 			trait_spec_dict.append({trait_id:trait_name})
+
+		print(trait_spec_dict)
 
 		for x in range(9):
 			trait_id = 0
