@@ -35,7 +35,7 @@ class ApiCommands():
 				if member is not None:
 					row = DatabaseHandler().fetch_results("SELECT 1 FROM api WHERE discord_id = {0}".format(str(memberID)))
 
-					print(row)
+					#print(row)
 
 					if row is None:
 						base_url = 'https://api.guildwars2.com/v2/tokeninfo?access_token='
@@ -120,7 +120,7 @@ class ApiCommands():
 			response = response.decode("utf-8")
 			data = json.loads(response)
 
-			print(response_url)
+			#print(response_url)
 
 			skill_info = {}
 
@@ -226,8 +226,8 @@ class ApiCommands():
 	async def get_trait_data(self, trait_dict):
 		""" Except not really a dict. """
 		#print("get_trait_data")
-		trait_list = ''
-		trait_spec_list = ''
+		trait_list = []
+		trait_spec_list = []
 
 		trait_list_dict = []
 		trait_spec_dict = []
@@ -241,23 +241,45 @@ class ApiCommands():
 		trait_three = ''
 		trait_list_three = ''
 
-		print(trait_dict)
-		print(trait_dict[5].items())
+		#print(trait_dict)
+		#print(trait_dict[5].items())
 
-		# for x in range(len(trait_dict)):
-		# 	#print(x)
-		# 	for key, value in trait_dict[x].items():
-		# 		if isinstance(value, list):
-		# 			for x in value:
-		# 				trait_list = trait_list + ',' + str(x)
-		# 		else:
-		# 			trait_spec_list = trait_spec_list + ',' + str(value)
+		for x in range(len(trait_dict)):
+			#print(x)
+			for key, value in trait_dict[x].items():
+				if isinstance(value, list):
+					for x in value:
+						#trait_list = trait_list + ',' + str(x)
+						trait_list.append(str(x))
+				else:
+					trait_spec_list.append(str(value))
+					#trait_spec_list = trait_spec_list + ',' + str(value)
 
 		# trait_list = trait_list[1:]
 		# trait_spec_list = trait_spec_list[1:]
 
-		# print(trait_list)
-		# print(trait_spec_list)
+		#print(trait_list)
+		#print(trait_spec_list)
+
+		trait_one = DatabaseHandler().fetch_results("SELECT spec_name FROM gw2_specs WHERE spec_id = {0}".format(int(trait_spec_list[0])))
+		trait_two = DatabaseHandler().fetch_results("SELECT spec_name FROM gw2_specs WHERE spec_id = {0}".format(int(trait_spec_list[1])))
+		trait_three = DatabaseHandler().fetch_results("SELECT spec_name FROM gw2_specs WHERE spec_id = {0}".format(int(trait_spec_list[2])))
+
+		for x in range(9):
+			spec_name = DatabaseHandler().fetch_results("SELECT trait_name FROM gw2_traits WHERE trait_id = {0}".format(int(trait_list[x])))
+			if x in range(3):
+				trait_list_one = trait_list_one + ', ' + spec_name[0]
+			elif x in range(3, 6):
+				trait_list_two = trait_list_two + ', ' + spec_name[0]
+			else:
+				trait_list_three = trait_list_three + ', ' + spec_name[0]
+
+		# print(trait_one[0])
+		# print(trait_two[0])
+		# print(trait_three[0])
+		# print(trait_list_one)
+		# print(trait_list_two)
+		# print(trait_list_three)
 
 		#base_url_traits = 'https://api.guildwars2.com/v2/traits?ids='
 		#response_url_traits = base_url_traits + str(trait_list)
@@ -273,68 +295,68 @@ class ApiCommands():
 		#response_traits_spec = response_traits_spec.decode("utf-8")
 		#data_traits_spec = json.loads(response_traits_spec)
 
-		for x in range(3):
-			trait_id = 0
-			trait_name = ''
-			print("Inner: {0}".format(x))
-			for key, value in trait_dict[x].items():
-				if key == 'id':
-					trait_id = value
-				elif key == 'name':
-					trait_name = value
-			trait_spec_dict.append({trait_id:trait_name})
+		# for x in range(3):
+		# 	trait_id = 0
+		# 	trait_name = ''
+		# 	print("Inner: {0}".format(x))
+		# 	for key, value in trait_dict[x].items():
+		# 		if key == 'id':
+		# 			trait_id = value
+		# 		elif key == 'name':
+		# 			trait_name = value
+		# 	trait_spec_dict.append({trait_id:trait_name})
 
-		print(trait_spec_dict)
+		# print(trait_spec_dict)
 
-		for x in range(9):
-			trait_id = 0
-			trait_name = ''
+		# for x in range(9):
+		# 	trait_id = 0
+		# 	trait_name = ''
 
-			for key, value in data_traits[x].items():
-				if key == 'id':
-					trait_id = value
-				elif key == 'name':
-					trait_name = value
+		# 	for key, value in data_traits[x].items():
+		# 		if key == 'id':
+		# 			trait_id = value
+		# 		elif key == 'name':
+		# 			trait_name = value
 
-			trait_list_dict.append({trait_id:trait_name})
+		# 	trait_list_dict.append({trait_id:trait_name})
 
-		print("We're here.")
-		for x in range(3):
-			for key, value in trait_spec_dict[x].items():
-				print("Another loop: {0}".format(x))
-				print(trait_spec_dict[x].items())
-				if x == 0:
-					trait_one = value
-				elif x == 1:
-					trait_two = value
-				elif x == 2:
-					trait_three = value
+		# print("We're here.")
+		# for x in range(3):
+		# 	for key, value in trait_spec_dict[x].items():
+		# 		print("Another loop: {0}".format(x))
+		# 		print(trait_spec_dict[x].items())
+		# 		if x == 0:
+		# 			trait_one = value
+		# 		elif x == 1:
+		# 			trait_two = value
+		# 		elif x == 2:
+		# 			trait_three = value
 
-		for x in range(9):
-			for key, value in trait_list_dict[x].items():
-				if (x == 0 or x == 1 or x == 2):
-					trait_list_one = trait_list_one + ', ' + value
-				if (x == 3 or x == 4 or x == 5):
-					trait_list_two = trait_list_two + ', ' + value
-				if (x == 6 or x == 7 or x == 8):
-					trait_list_three = trait_list_three + ', ' + value
+		# for x in range(9):
+		# 	for key, value in trait_list_dict[x].items():
+		# 		if (x == 0 or x == 1 or x == 2):
+		# 			trait_list_one = trait_list_one + ', ' + value
+		# 		if (x == 3 or x == 4 or x == 5):
+		# 			trait_list_two = trait_list_two + ', ' + value
+		# 		if (x == 6 or x == 7 or x == 8):
+		# 			trait_list_three = trait_list_three + ', ' + value
 
 		trait_list_one = trait_list_one[2:]
 		trait_list_two = trait_list_two[2:]
 		trait_list_three = trait_list_three[2:]
 
-		print("Spec info: {0}, {1}, {2}".format(trait_one, trait_two, trait_three))
-		print("Trait info: {0}, {1}, {2}".format(trait_list_one, trait_list_two, trait_list_three))
+		#print("Spec info: {0}, {1}, {2}".format(trait_one[0], trait_two[0], trait_three[0]))
+		#print("Trait info: {0}, {1}, {2}".format(trait_list_one, trait_list_two, trait_list_three))
 
 		return_string = ("**__Traits__** \n\n"
 						"{0}: {1} \n"
 						"{2}: {3} \n"
-						"{4}: {5}".format(trait_one, trait_list_one, trait_two, trait_list_two, trait_three, trait_list_three))
+						"{4}: {5}".format(trait_one[0], trait_list_one, trait_two[0], trait_list_two, trait_three[0], trait_list_three))
 
 		return return_string
 
 	@commands.command(pass_context=True, no_pm=True)
-	@commands.cooldown(rate=20, per=1, type=commands.BucketType.server)
+	@commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
 	async def build(self, ctx, character_name: str, game_type: str, member: discord.Member = None):
 		""" Get PvE, WvW, PvP build info for supplied character. """
 		try:
@@ -342,7 +364,7 @@ class ApiCommands():
 			memberID = ctx.message.author.id
 			display_name = ctx.message.author.display_name
 
-			print(ctx.message.server.id)
+			#print(ctx.message.server.id)
 			server_id = str(ctx.message.server.id)
 
 			plugin_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'ApiCommands', 'enabled')
@@ -355,25 +377,24 @@ class ApiCommands():
 					try:
 						character_name = character_name.replace(" ", "%20")
 
-						#returned_skill_ids = await self.get_skill_ids(character_name, row[0], game_type)
-						#returned_char_info = await self.get_character_level(row[0], character_name)
+						returned_skill_ids = await self.get_skill_ids(character_name, row[0], game_type)
+						returned_char_info = await self.get_character_level(row[0], character_name)
 						returned_trait_ids = await self.get_trait_ids(character_name, row[0], game_type)
-						#returned_skill_data = await self.get_skill_data(returned_skill_ids)
+						returned_skill_data = await self.get_skill_data(returned_skill_ids)
 						returned_trait_data = await self.get_trait_data(returned_trait_ids)
 
 						#print(returned_char_info)
 						#print(returned_skill_ids)
-						print(returned_trait_ids)
-						print(returned_trait_data)
+						#print(returned_trait_ids)
+						#print(returned_trait_data)
 						#print(returned_skill_data)
 
-							#return_string = ("{0.mention}: \n"
-							#				"```{1}```\n\n"
-							#				"{2}\n\n"
-							#				"{3}".format(member, returned_char_info, returned_trait_data, returned_skill_data))
+						return_string = ("{0.mention}: \n"
+										"```{1}```\n\n"
+										"{2}\n\n"
+										"{3}".format(member, returned_char_info, returned_trait_data, returned_skill_data))
 
-							#return await self.bot.say(return_string)
-						return
+						return await self.bot.say(return_string)
 					except urllib.error.HTTPError as e:
 						if e.code == 400:
 							print("{0}".format(character_name))
