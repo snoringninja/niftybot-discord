@@ -409,8 +409,7 @@ class ApiCommands():
 			else:
 				print("Attempted to use disabled plugin: api_commands")
 		except Exception as e:
-			print(e)
-			return
+			return await error_logging().log_error(traceback.format_exc(), 'api_commands: build', str(member), self.bot)
 
 
 def setup(bot):
