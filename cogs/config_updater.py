@@ -21,7 +21,7 @@ class ConfigUpdater:
 
 	# Handle updating the config file for the server. supress_message is used when we update the config from a function when a command fails
 	# It defaults to False for when the config is updating from within the server
-	async def updateConfigFile(self, filename, updateSection, updateKey, updateValue, supress_message=False):
+	async def updateConfigFile(self, filename, updateSection, updateKey, updateValue, message, supress_message=False):
 
 		parser = configparser.ConfigParser()
 		loaded_file = self.load_config('%s.ini' % (os.path.join(self.server_settings_path, str(filename))),)
@@ -34,7 +34,10 @@ class ConfigUpdater:
 					with open('%s.ini' % (os.path.join(self.server_settings_path, str(filename))), 'w') as configfile:
 						parser.write(configfile)
 					if supress_message == False:
-						return await self.bot.say("Configuration file updated successfully (or should have been).")
+						bot_message = await self.bot.say("Configuration file updated.")
+						await asyncio.sleep(5)
+						await self.bot.delete_message(message)
+						return await self.bot.delete_message(bot_message)
 					else:
 						return
 				else:
@@ -47,7 +50,7 @@ class ConfigUpdater:
 	@commands.command(pass_context=True, no_pm=True, name='config')
 	@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
 	async def configUpdate(self, ctx, updateSection: str, updateKey: str, updateValue: str, member: discord.Member = None):
-		
+
 		member = ctx.message.author
 		memberID = ctx.message.author.id
 		display_name = ctx.message.author.display_name
@@ -55,7 +58,7 @@ class ConfigUpdater:
 		if memberID == ctx.message.server.owner_id or int(memberID) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
 			try:
 				filename = ctx.message.server.id
-				await self.updateConfigFile(filename, updateSection, updateKey, updateValue)
+				await self.updateConfigFile(filename, updateSection, updateKey, updateValue, ctx.message)
 			except Exception as e:
 				await error_logging().log_error(traceback.format_exc(), 'ConfigUpdater: configUpdate', str(member), self.bot)
 				return await self.bot.say("Error applying requested config update: {0}".format(e))
