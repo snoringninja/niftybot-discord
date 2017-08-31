@@ -96,7 +96,7 @@ class ConfigGenerator():
 		# Create each section that we need by default; future cogs may need to handle writing code to modify the config to add sections
 
 		# ServerSettings config['testing'] = {'test': '45', 'test2': 'yes'}
-		parser['ServerSettings'] = {'owner_id': owner_id, 'server_id': server_id}
+		parser['ServerSettings'] = {'owner_id': owner_id, 'server_id': server_id, 'not_accepted_channel_id': 'NOT_SET'}
 
 		# RoleAssignment
 		parser['RoleAssignment'] = {'enabled': False, 'role_list': 'NOT_SET', 'assignment_channel_id': 'NOT_SET'}
@@ -109,6 +109,7 @@ class ConfigGenerator():
 
 		# ApiCommands
 		parser['ApiCommands'] = {'enabled': False, 'api_channel_id': 'NOT_SET'}
+
 
 		try:
 			with open('%s.ini' % (os.path.join(self.server_settings_path, str(server_id))), 'w') as configfile:

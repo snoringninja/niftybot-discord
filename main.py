@@ -76,19 +76,34 @@ async def on_message(message):
     invoker = view.get_word()
 
     if invoker in client.commands:
+        # @TODO : bot config update for override commands to make this cleaner
         if message.content == '{0}accept'.format(command_prefix):
             await client.process_commands(message)
         elif message.content.startswith("{0}guild".format(command_prefix)): # This could get really, really ugly...
             await client.process_commands(message)
         else:
             can_use = BotResources().checkAccepted(message.author.id, message.channel.id)
+            message_channel_valid = BotResources().get_tos_channel_id(message.server.id)
+
+            print(message_channel_valid)
 
             if can_use:
                 await client.process_commands(message)
+            elif not can_use and message_channel_valid:
+                if message.author.id != client.user.id:
+                    try:
+                        message_channel_id = ConfigLoader().load_server_config_setting_int(message.server.id, 'ServerSettings', 'not_accepted_channel_id')
+                        bot_message = await client.send_message(discord.Object(id=message_channel_id), not_accepted_message.format(message.author, command_prefix))
+                        await asyncio.sleep(20)
+                        await client.delete_message(bot_message)
+                    except Exception as e:
+                        bot_message = await client.send_message(discord.Object(id=message.channel.id), not_accepted_message.format(message.author, command_prefix))
+                        await asyncio.sleep(20)
+                        await client.delete_message(bot_message)
             else:
                 # This is needed to prevent infinite looping message posting
                 if message.author.id != client.user.id:
-                    await client.send_message(discord.Object(id=message.channel.id), not_accepted_message.format(command_prefix))
+                    await client.send_message(discord.Object(id=message.channel.id), not_accepted_message.format(message.author, command_prefix))
 
 # discord.py on_ready -> print out a bunch of information when the bot launches
 @client.event
