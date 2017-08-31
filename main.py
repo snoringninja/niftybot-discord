@@ -85,8 +85,6 @@ async def on_message(message):
             can_use = BotResources().checkAccepted(message.author.id, message.channel.id)
             message_channel_valid = BotResources().get_tos_channel_id(message.server.id)
 
-            print(message_channel_valid)
-
             if can_use:
                 await client.process_commands(message)
             elif not can_use and message_channel_valid:
@@ -139,6 +137,8 @@ if __name__ == "__main__":
         startup_extensions = []
         for plugin in extension_list.split():
             startup_extensions.append(plugin)
+
+        client.remove_command("help")
 
         for extension in startup_extensions:
             try:

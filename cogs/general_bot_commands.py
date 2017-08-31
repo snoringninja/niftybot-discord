@@ -50,6 +50,14 @@ class BotCommands:
 		except Exception as e:
 			await error_logging().log_error(traceback.format_exc(), 'BotCommands: changeUsername')
 
+	@commands.command(pass_context=True, no_pm=True, name="help")
+	@commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
+	async def get_help(self, ctx, member: discord.Member = None):
+		member = ctx.message.author
+		memberID = ctx.message.author.id
+
+		return await self.bot.say("{0.mention}: Please see https://github.com/xNifty/niftybot-discord/wiki for now.".format(member))
+
 def setup(bot):
 	"""This makes it so we can actually use it."""
 	bot.add_cog(BotCommands(bot))
