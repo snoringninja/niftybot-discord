@@ -203,10 +203,10 @@ class CreditBet():
 		try:
 			if (member is not None and int(ctx.message.channel.id) == channel_id and plugin_enabled == True):
 				output_string = ''
-				
+
 				try:
 					row = DatabaseHandler().fetch_all_results("SELECT displayName, credits, timesBet FROM credit_bet WHERE serverID = {0} ORDER BY credits DESC LIMIT 5".format(str(server_id)))
-					names = {[d][0] for d in row}
+					names = {d[0] for d in row}
 					max_name_len = max(map(len, names))
 					max_name_len = 22 if max_name_len > 22 else max_name_len
 					spacer = max_name_len + 4
