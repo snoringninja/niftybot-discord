@@ -56,7 +56,7 @@ class BotCommands:
 		member = ctx.message.author
 		memberID = ctx.message.author.id
 
-		return await self.bot.say("{0.mention}: Please see https://github.com/xNifty/niftybot-discord/wiki for now.".format(member))
+		return await self.bot.say("{0.mention}: Please see https://xnifty.github.io for now.".format(member))
 
 def setup(bot):
 	"""This makes it so we can actually use it."""
