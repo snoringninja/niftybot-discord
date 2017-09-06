@@ -89,7 +89,7 @@ class DatabaseHandler(object):
 			print("update_database error: {0}.".format(e))
 			return
 
-	def insertIntoDatabase(self, query, params):
+	def insert_into_database(self, query, params):
 		try:
 			database = sqlite3.connect(self.sqlite_database, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
 			cursor = database.cursor()

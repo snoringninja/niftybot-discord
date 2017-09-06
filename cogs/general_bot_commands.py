@@ -18,7 +18,7 @@ class BotCommands:
 
 	@commands.command(pass_context=True, no_pm=False, name='accept')
 	@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
-	async def addAcceptedUser(self, ctx, member: discord.Member = None):
+	async def add_accepted_user(self, ctx, member: discord.Member = None):
 		member = ctx.message.author
 		memberID = ctx.message.author.id
 
@@ -30,16 +30,16 @@ class BotCommands:
 			else:
 				try:
 					query = """INSERT INTO accepted_users (discord_id) VALUES (?)"""
-					DatabaseHandler().insertIntoDatabase(query, (str(memberID), ))
+					DatabaseHandler().insert_into_database(query, (str(memberID), ))
 					return await self.bot.say("{0.mention}: thanks for accepting. You may now use commands.".format(member))
 				except Exception as e:
-					await error_logging().log_error(traceback.format_exc(), 'BotCommands: addAcceptedUser')
+					await error_logging().log_error(traceback.format_exc(), 'BotCommands: add_accepted_user')
 		except Exception as e:
-			await error_logging().log_error(traceback.format_exc(), 'BotCommands: addAcceptedUser')
+			await error_logging().log_error(traceback.format_exc(), 'BotCommands: add_accepted_user')
 
 	@commands.command(pass_context=True, no_pm=True, name='nick')
 	@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
-	async def changeUsername(self, ctx, username: str, member: discord.Member = None):
+	async def change_username(self, ctx, username: str, member: discord.Member = None):
 		member = ctx.message.author
 		memberID = ctx.message.author.id
 
@@ -48,7 +48,7 @@ class BotCommands:
 				await self.bot.change_nickname(ctx.message.server.me, username)
 				return await self.bot.say("Changed my username!")
 		except Exception as e:
-			await error_logging().log_error(traceback.format_exc(), 'BotCommands: changeUsername')
+			await error_logging().log_error(traceback.format_exc(), 'BotCommands: change_username')
 
 	@commands.command(pass_context=True, no_pm=True, name="help")
 	@commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
