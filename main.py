@@ -149,15 +149,8 @@ def main():
         error_logging().log_error_without_await(traceback.format_exc(), 'AttributeError at startup')
     except Exception as e:
         if e.errno == errno.ECONNRESET:
-            try:
-                p = psutil.Process(os.getpid())
-                for handler in p.get_open_files() + p.connections():
-                    os.close(handler.fd)
-            except Exception as e:
-                error_logging().log_error_without_await(traceback.format_exc(), 'conn_reset_error')
-
-            python = sys.executable
-            os.execl(python, python, *sys.argv)
+            print("Encountered connection reset.")
+            error_logging().log_error_without_await(traceback.format_exc(), 'conn_reset_error')
         else:
             print('Startup error encountered.')
             print(e)
@@ -176,16 +169,5 @@ if __name__ == "__main__":
     except AttributeError as ar:
         error_logging().log_error_without_await(traceback.format_exc(), 'AttributeError at startup')
     except Exception as e:
-        if e.errno == errno.ECONNRESET:
-            try:
-                p = psutil.Process(os.getpid())
-                for handler in p.get_open_files() + p.connections():
-                    os.close(handler.fd)
-            except Exception as e:
-                error_logging().log_error_without_await(traceback.format_exc(), 'conn_reset_error')
-
-            python = sys.executable
-            os.execl(python, python, *sys.argv)
-        else:
-            error_logging().log_error_without_await(traceback.format_exc(), 'main_try_block_exception')
-            print(e)
+        error_logging().log_error_without_await(traceback.format_exc(), 'main_try_block_exception')
+        print(e)

@@ -24,28 +24,12 @@ class Restart():
 
         if int(userID) == self.owner_id:
 
-            await self.bot.say("Attempting restart...")
+            await self.bot.say("Restarting!")
+            await self.bot.logout()
             await self.restart_process()
-            await self.bot.say("...success?")
-        else:
-            print(userID)
-            return
 
     async def restart_process(self):
-        try:
-            p = psutil.Process(os.getpid())
-            for handler in p.get_open_files() + p.connections():
-                os.close(handler.fd)
-        except Exception as e:
-            await error_logging().log_error(traceback.format_exc(), 'conn_reset_error')
-            await self.bot.logout()
-            sys.exit("Failed on restart.")
-            return
-
-        python = sys.executable
-        os.execl(python, python, *sys.argv)
-
-        return
+        os.execv(sys.executable, ['python'] + sys.argv)
 
 def setup(bot):
     """This makes it so we can actually use it."""
