@@ -145,6 +145,8 @@ def main():
                 exc = '{}: {}'.format(type(e).__name__, e)
                 print('Failed to load extension {}\n{}'.format(extension, exc))
         client.run(bot_token)
+    except AttributeError as ar:
+        print(ar)
     except Exception as e:
         if e.errno == errno.ECONNRESET:
             try:
