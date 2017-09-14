@@ -174,7 +174,7 @@ if __name__ == "__main__":
         client.logout()
         sys.exit(0)
     except AttributeError as ar:
-        error_logging().log_error(traceback.format_exc(), 'AttributeError at startup')
+        await error_logging().log_error(traceback.format_exc(), 'AttributeError at startup')
     except Exception as e:
         if e.errno == errno.ECONNRESET:
             try:
@@ -182,10 +182,10 @@ if __name__ == "__main__":
                 for handler in p.get_open_files() + p.connections():
                     os.close(handler.fd)
             except Exception as e:
-                error_logging().log_error(traceback.format_exc(), 'conn_reset_error')
+                await error_logging().log_error(traceback.format_exc(), 'conn_reset_error')
 
             python = sys.executable
             os.execl(python, python, *sys.argv)
         else:
-            error_logging().log_error(traceback.format_exc(), 'main_try_block_exception')
+            await error_logging().log_error(traceback.format_exc(), 'main_try_block_exception')
             print(e)
