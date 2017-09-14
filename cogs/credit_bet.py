@@ -162,7 +162,7 @@ class CreditBet():
 						#print(member)
 						args = (str(server_id), str(member), memberID, display_name, 500, str(datetime.now()))
 						query = """INSERT INTO credit_bet (serverID, username, userID, displayName, credits, dateJoined, timesBet, lastClaimTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"""
-						DatabaseHandler().insertIntoDatabase(query, (str(server_id), str(member), memberID, display_name, 500, str(datetime.now()), 0, str(datetime.now())))
+						DatabaseHandler().insert_into_database(query, (str(server_id), str(member), memberID, display_name, 500, str(datetime.now()), 0, str(datetime.now())))
 						await self.bot.say("{0.mention}, you are now registered! &bet to play! Goodluck!".format(member))
 					except Exception as e:
 						await error_logging().log_error(traceback.format_exc(), 'credit_bet: register (inner)', str(member))

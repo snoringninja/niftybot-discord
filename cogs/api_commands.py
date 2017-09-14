@@ -68,7 +68,7 @@ class ApiCommands():
 						#args = (str(memberID), apikey)
 						#print(args)
 						query = """INSERT INTO api (discord_id, api_key) VALUES (?, ?)"""
-						DatabaseHandler().insertIntoDatabase(query, (str(memberID), apikey))
+						DatabaseHandler().insert_into_database(query, (str(memberID), apikey))
 						return await self.bot.say("{0.mention}, API key added.".format(member))
 					else:
 						return await self.bot.say("You already have an API key registered.")
