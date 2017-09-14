@@ -4,16 +4,16 @@
 # @author Ryan Malacina
 # @SnoringNinja - https://snoring.ninja
 # Built on discord.py
-# Above files not included
-# 
-
-# TODO : clean up everything
-
-# Note : plugins are different than modules
 
 import discord
 import asyncio
 import random
+import errno
+import os
+import sys
+import traceback
+
+from socket import error as SocketError
 
 # Import the plugins folder
 # TODO : config to enable / disable plugin files to be imported
@@ -30,9 +30,6 @@ from resources.error import error_logging
 from discord.ext import commands
 
 from discord.ext.commands.view import StringView
-
-import os
-import sys
 
 from resources.config import ConfigLoader
 from resources.general_resources import BotResources
@@ -149,20 +146,42 @@ def main():
                 print('Failed to load extension {}\n{}'.format(extension, exc))
         client.run(bot_token)
     except Exception as e:
-        # TODO : log error for looking at later
-        print('Startup error encountered.')
-        print(e)
-        print('Exception: {0}: {1}'.format(type(e).__name__, e))
-        error_logging().log_error(traceback.format_exc(), 'startup_error')
-        client.logout()
-        sys.exit(0)
+        if e.errno == errno.ECONNRESET:
+            try:
+                p = psutil.Process(os.getpid())
+                for handler in p.get_open_files() + p.connections():
+                    os.close(handler.fd)
+            except Exception as e:
+                error_logging().log_error(traceback.format_exc(), 'conn_reset_error')
+
+            python = sys.executable
+            os.execl(python, python, *sys.argv)
+        else:
+            print('Startup error encountered.')
+            print(e)
+            print('Exception: {0}: {1}'.format(type(e).__name__, e))
+            error_logging().log_error(traceback.format_exc(), 'startup_error')
+            client.logout()
+            sys.exit(0)
 
 if __name__ == "__main__":
-	try:
-		main()
-	except (KeyboardInterrupt, SystemExit):
-		print("Process ended by user.")
-		client.logout()
-		sys.exit(0)
-	except Exception as e:
-		print(e)
+    try:
+        main()
+    except (KeyboardInterrupt, SystemExit):
+        print("Process ended by user.")
+        client.logout()
+        sys.exit(0)
+    except Exception as e:
+        if e.errno == errno.ECONNRESET:
+            try:
+                p = psutil.Process(os.getpid())
+                for handler in p.get_open_files() + p.connections():
+                    os.close(handler.fd)
+            except Exception as e:
+                error_logging().log_error(traceback.format_exc(), 'conn_reset_error')
+
+            python = sys.executable
+            os.execl(python, python, *sys.argv)
+        else:
+            error_logging().log_error(traceback.format_exc(), 'main_try_block_exception')
+            print(e)
