@@ -146,7 +146,7 @@ def main():
                 print('Failed to load extension {}\n{}'.format(extension, exc))
         client.run(bot_token)
     except AttributeError as ar:
-        print(ar)
+        error_logging().log_error(traceback.format_exc(), 'AttributeError at startup')
     except Exception as e:
         if e.errno == errno.ECONNRESET:
             try:
