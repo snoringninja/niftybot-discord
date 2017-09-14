@@ -12,7 +12,7 @@ class error_logging:
         self.error_message = ConfigLoader().load_config_setting('BotSettings', 'error_message')
 
     def create_directory(self):
-    """Create an errors directory if needed."""
+        """Create an errors directory if needed."""
         #print "DIRECTORY: %s" % (self.directory,)
         try:
             os.mkdir(self.directory)

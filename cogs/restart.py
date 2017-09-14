@@ -38,8 +38,9 @@ class Restart():
                 os.close(handler.fd)
         except Exception as e:
             await error_logging().log_error(traceback.format_exc(), 'conn_reset_error')
-            await self.bot.logou()
+            await self.bot.logout()
             sys.exit("Failed on restart.")
+            return
 
         python = sys.executable
         os.execl(python, python, *sys.argv)
