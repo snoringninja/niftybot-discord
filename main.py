@@ -146,7 +146,7 @@ def main():
                 print('Failed to load extension {}\n{}'.format(extension, exc))
         client.run(bot_token)
     except AttributeError as ar:
-        error_logging().log_error(traceback.format_exc(), 'AttributeError at startup')
+        error_logging().log_error_without_await(traceback.format_exc(), 'AttributeError at startup')
     except Exception as e:
         if e.errno == errno.ECONNRESET:
             try:
@@ -154,7 +154,7 @@ def main():
                 for handler in p.get_open_files() + p.connections():
                     os.close(handler.fd)
             except Exception as e:
-                error_logging().log_error(traceback.format_exc(), 'conn_reset_error')
+                error_logging().log_error_without_await(traceback.format_exc(), 'conn_reset_error')
 
             python = sys.executable
             os.execl(python, python, *sys.argv)
@@ -162,7 +162,7 @@ def main():
             print('Startup error encountered.')
             print(e)
             print('Exception: {0}: {1}'.format(type(e).__name__, e))
-            error_logging().log_error(traceback.format_exc(), 'startup_error')
+            error_logging().log_error_without_await(traceback.format_exc(), 'startup_error')
             client.logout()
             sys.exit(0)
 
@@ -174,7 +174,7 @@ if __name__ == "__main__":
         client.logout()
         sys.exit(0)
     except AttributeError as ar:
-        await error_logging().log_error(traceback.format_exc(), 'AttributeError at startup')
+        error_logging().log_error_without_await(traceback.format_exc(), 'AttributeError at startup')
     except Exception as e:
         if e.errno == errno.ECONNRESET:
             try:
@@ -182,10 +182,10 @@ if __name__ == "__main__":
                 for handler in p.get_open_files() + p.connections():
                     os.close(handler.fd)
             except Exception as e:
-                await error_logging().log_error(traceback.format_exc(), 'conn_reset_error')
+                error_logging().log_error_without_await(traceback.format_exc(), 'conn_reset_error')
 
             python = sys.executable
             os.execl(python, python, *sys.argv)
         else:
-            await error_logging().log_error(traceback.format_exc(), 'main_try_block_exception')
+            error_logging().log_error_without_await(traceback.format_exc(), 'main_try_block_exception')
             print(e)
