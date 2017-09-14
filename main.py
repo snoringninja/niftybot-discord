@@ -173,6 +173,8 @@ if __name__ == "__main__":
         print("Process ended by user.")
         client.logout()
         sys.exit(0)
+    except AttributeError as ar:
+        error_logging().log_error(traceback.format_exc(), 'AttributeError at startup')
     except Exception as e:
         if e.errno == errno.ECONNRESET:
             try:
