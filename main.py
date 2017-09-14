@@ -130,7 +130,8 @@ async def on_member_remove(member):
     server = member.server
     await plugins.JoinLeaveHandler(client).goodbyeUser(server.id, member)
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
+def main():
     print('Preparing...')
     error_logging().create_directory()
     try:
@@ -155,3 +156,13 @@ if __name__ == "__main__":
         error_logging().log_error(traceback.format_exc(), 'startup_error')
         client.logout()
         sys.exit(0)
+
+if __name__ == "__main__":
+	try:
+		main()
+	except (KeyboardInterrupt, SystemExit):
+		print("Process ended by user.")
+		client.logout()
+		sys.exit(0)
+	except Exception as e:
+		print(e)
