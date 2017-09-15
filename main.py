@@ -13,8 +13,6 @@ import os
 import sys
 import traceback
 
-from socket import error as SocketError
-
 # Import the plugins folder
 # TODO : config to enable / disable plugin files to be imported
 import plugins
