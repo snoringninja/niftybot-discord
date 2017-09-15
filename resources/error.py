@@ -47,7 +47,7 @@ class error_logging:
         file_suffix = file_suffix + '_{}'.format(time.strftime("%Y%m%d-%H%M%S"))
         file_name = "ERROR-LOG_{0}.log".format(file_suffix)
         with open("{0}/{1}".format(self.directory, file_name), "w+") as f:
-            f.write("ERROR IN {0}, reported at {2}!\n\nException:\n {3}".format(str(error_class), str(datetime.datetime.now().time()), str(error_string)))
+            f.write("ERROR IN {0}, reported at {1}!\n\nException:\n {2}".format(str(error_class), str(datetime.datetime.now().time()), str(error_string)))
 
         print("Error log generated.")
         return
