@@ -147,6 +147,8 @@ def main():
         client.run(bot_token)
     except AttributeError as ar:
         error_logging().log_error_without_await(traceback.format_exc(), 'AttributeError at startup')
+    except TypeError as tr:
+        error_logging().log_error_without_await(traceback.format_exc(), 'TypeError at startup')
     except Exception as e:
         if e.errno == errno.ECONNRESET:
             print("Encountered connection reset.")
@@ -168,6 +170,8 @@ if __name__ == "__main__":
         sys.exit(0)
     except AttributeError as ar:
         error_logging().log_error_without_await(traceback.format_exc(), 'AttributeError at startup')
+    except TypeError as tr:
+        error_logging().log_error_without_await(traceback.format_exc(), 'TypeError at startup')
     except Exception as e:
         error_logging().log_error_without_await(traceback.format_exc(), 'main_try_block_exception')
         print(e)
