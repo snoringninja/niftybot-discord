@@ -5,7 +5,6 @@ import errno
 import os
 import sys
 import traceback
-import psutil
 
 from discord.ext import commands
 

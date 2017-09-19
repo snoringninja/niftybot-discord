@@ -7,7 +7,6 @@
 import os
 import sys
 
-import pymysql
 import sqlite3
 from resources.resourcepath import *
 from resources.config import ConfigLoader
