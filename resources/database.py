@@ -42,7 +42,8 @@ class DatabaseHandler(object):
 			result = executed.fetchone()
 			database.close()
 		except Exception as ex:
-			print("Database selectOneResult error.")
+			print(ex)
+			print("Database fetch_results error.")
 		finally:
 			try:
 				return result
@@ -58,7 +59,8 @@ class DatabaseHandler(object):
 			result = executed.fetchall()
 			database.close()
 		except Exception as ex:
-			print("Database selectOneResult error.")
+			print(ex)
+			print("Database fetch_all_results error.")
 		finally:
 			try:
 				return result
