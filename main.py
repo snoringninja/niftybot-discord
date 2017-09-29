@@ -77,7 +77,7 @@ async def on_message(message):
         elif message.content.startswith("{0}guild".format(command_prefix)): # This could get really, really ugly...
             await client.process_commands(message)
         else:
-            can_use = BotResources().checkAccepted(message.author.id, message.channel.id)
+            can_use = BotResources().check_accepted(message.author.id, message.channel.id)
             message_channel_valid = BotResources().get_tos_channel_id(message.server.id)
 
             if can_use:

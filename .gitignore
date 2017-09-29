@@ -7,3 +7,4 @@ niftybot.ini
 channel_settings/
 *.db
 niftybot.db
+.vscode/
