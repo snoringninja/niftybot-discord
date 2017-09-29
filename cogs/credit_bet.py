@@ -1,13 +1,7 @@
-# Lottery system
-# Resets monthly -> for our server, we use this as a way to give out monthly prizes (need to automate this with cron)
-# Only runs off executing stored procedures...except, only in a few places...need to extend this to actually be SPs only.
+# Lottery system type cog
 
-# @TODO : finish
-# @TODO : create a function in database that does our generic select one query? Same with credits...
-# @TODO : we need to open and close connections per call, not use a maintained single connection
 # @TODO : refactor for consistency
-
-# @TODO : test error logging
+# @TODO : document this class completely
 
 import discord
 import logging
