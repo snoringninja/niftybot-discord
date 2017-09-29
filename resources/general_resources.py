@@ -22,7 +22,7 @@ class BotResources:
 			else:
 				return False
 		except Exception as e:
-			error_logging().log_error(traceback.format_exc(), 'BotCommands: checkAccepted')
+			error_logging().log_error_without_await(traceback.format_exc(), 'BotCommands: checkAccepted')
 			return False
 
 	def get_tos_channel_id(self, server_id):
@@ -32,8 +32,8 @@ class BotResources:
 				channel_id = ConfigLoader().load_server_config_setting_int(server_id, 'ServerSettings', 'not_accepted_channel_id')
 				return True
 			except Exception as e:
-				error_logging().log_error(traceback.format_exc(), 'BotCommands: get_tos_channel_id')
+				error_logging().log_error_without_await(traceback.format_exc(), 'BotCommands: get_tos_channel_id')
 				return False
 		except Exception as e:
-			error_logging().log_error(traceback.format_exc(), 'BotCommands: get_tos_channel_id')
+			error_logging().log_error_without_await(traceback.format_exc(), 'BotCommands: get_tos_channel_id')
 			return False
