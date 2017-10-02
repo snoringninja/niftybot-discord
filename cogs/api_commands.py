@@ -14,7 +14,7 @@ import traceback
 import discord
 from discord.ext import commands
 
-from resources.error import error_logging
+from resources.error import ErrorLogging
 from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
 
@@ -82,7 +82,7 @@ class ApiCommands():
                     .format(member)
                 )
         except Exception:
-            await error_logging().log_error(
+            await ErrorLogging().log_error(
                 traceback.format_exc(),
                 'api_commands: addApiKey',
                 str(member),
@@ -118,7 +118,7 @@ class ApiCommands():
 
             return character_info
         except Exception:
-            await error_logging().log_error(
+            await ErrorLogging().log_error(
                 traceback.format_exc(),
                 'api_commands: get_character_level',
                 "",
@@ -149,7 +149,7 @@ class ApiCommands():
 
             return skill_info
         except Exception:
-            await error_logging().log_error(
+            await ErrorLogging().log_error(
                 traceback.format_exc(),
                 'api_commands: get_skill_ids',
                 "",
@@ -192,7 +192,7 @@ class ApiCommands():
 
             return return_string
         except Exception:
-            await error_logging().log_error(
+            await ErrorLogging().log_error(
                 traceback.format_exc(),
                 'api_commands: get_skill_data',
                 "",
@@ -348,7 +348,7 @@ class ApiCommands():
             else:
                 print("Attempted to use disabled plugin: api_commands")
         except Exception:
-            return await error_logging().log_error(
+            return await ErrorLogging().log_error(
                 traceback.format_exc(),
                 'api_commands: build',
                 str(member),

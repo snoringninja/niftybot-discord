@@ -9,7 +9,7 @@ This is a collection of moderation based functions.
 import configparser
 import asyncio
 
-from resources.error import error_logging
+from resources.error import ErrorLogging
 from resources.config import ConfigLoader
 from cogs.config_updater import ConfigUpdater
 
@@ -26,6 +26,7 @@ class Moderation():
         to please use @here instead
         """
         server_id = message.server.id
+        print("Called")
         try:
             plugin_enabled = ConfigLoader().load_server_config_setting_boolean(
                 server_id,

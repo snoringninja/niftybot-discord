@@ -23,7 +23,7 @@ import cogs
 
 # this needs to be cleaned up
 from resources import database
-from resources.error import error_logging
+from resources.error import ErrorLogging
 
 from discord.ext import commands
 
@@ -76,8 +76,10 @@ async def on_message(message):
             await client.process_commands(message)
         elif message.content.startswith("{0}guild".format(command_prefix)): # This could get really, really ugly...
             await client.process_commands(message)
+        elif message.content.startswith("@everyone"):
+            await plugins.Moderation().purge_everyone_message(message)
         else:
-            can_use = BotResources().check_accepted(message.author.id, message.channel.id)
+            can_use = BotResources().check_accepted(message.author.id)
             message_channel_valid = BotResources().get_tos_channel_id(message.server.id)
 
             if can_use:
@@ -116,19 +118,19 @@ async def on_ready():
 @client.event
 async def on_member_join(member):
     server = member.server
-    await plugins.JoinLeaveHandler(client).welcomeUser(server.id, member, server)
+    await plugins.join_leave_handler(client).welcomeUser(server.id, member, server)
 
 # discord.py on_member_remove -> when a member leaves a server, check if the server has a channel configured
 # and if they have the member_part_enabled plugin enabled
 @client.event
 async def on_member_remove(member):
     server = member.server
-    await plugins.JoinLeaveHandler(client).goodbyeUser(server.id, member)
+    await plugins.join_leave_handler(client).goodbyeUser(server.id, member)
 
 #if __name__ == "__main__":
 def main():
     print('Preparing...')
-    error_logging().create_directory()
+    ErrorLogging().create_directory()
     try:
         startup_extensions = []
         for plugin in extension_list.split():
@@ -144,18 +146,18 @@ def main():
                 print('Failed to load extension {}\n{}'.format(extension, exc))
         client.run(bot_token)
     except AttributeError as ar:
-        error_logging().log_error_without_await(traceback.format_exc(), 'AttributeError in main()')
+        ErrorLogging().log_error_without_await(traceback.format_exc(), 'AttributeError in main()')
     except TypeError as tr:
-        error_logging().log_error_without_await(traceback.format_exc(), 'TypeError in main()')
+        ErrorLogging().log_error_without_await(traceback.format_exc(), 'TypeError in main()')
     except Exception as e:
         if e.errno == errno.ECONNRESET:
             print("Encountered connection reset.")
-            error_logging().log_error_without_await(traceback.format_exc(), 'conn_reset_error')
+            ErrorLogging().log_error_without_await(traceback.format_exc(), 'conn_reset_error')
         else:
             print('Startup error encountered.')
             print(e)
             print('Exception: {0}: {1}'.format(type(e).__name__, e))
-            error_logging().log_error_without_await(traceback.format_exc(), 'startup error in main()')
+            ErrorLogging().log_error_without_await(traceback.format_exc(), 'startup error in main()')
             client.logout()
             sys.exit(0)
 
@@ -167,9 +169,9 @@ if __name__ == "__main__":
         client.logout()
         sys.exit(0)
     except AttributeError as ar:
-        error_logging().log_error_without_await(traceback.format_exc(), 'AttributeError at __name__')
+        ErrorLogging().log_error_without_await(traceback.format_exc(), 'AttributeError at __name__')
     except TypeError as tr:
-        error_logging().log_error_without_await(traceback.format_exc(), 'TypeError at __name__')
+        ErrorLogging().log_error_without_await(traceback.format_exc(), 'TypeError at __name__')
     except Exception as e:
-        error_logging().log_error_without_await(traceback.format_exc(), 'main_try_block_exception')
+        ErrorLogging().log_error_without_await(traceback.format_exc(), 'main_try_block_exception')
         print(e)

@@ -8,7 +8,7 @@ This class serves to be a location for some general use bot functions.
 import traceback
 from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
-from resources.error import error_logging
+from resources.error import ErrorLogging
 
 
 class BotResources:
@@ -28,7 +28,7 @@ class BotResources:
             else:
                 return False
         except Exception:
-            error_logging().log_error_without_await(
+            ErrorLogging().log_error_without_await(
                 traceback.format_exc(),
                 'BotCommands: check_accepted'
             )
@@ -45,13 +45,13 @@ class BotResources:
                 )
                 return True
             except Exception:
-                error_logging().log_error_without_await(
+                ErrorLogging().log_error_without_await(
                     traceback.format_exc(),
                     'BotCommands: get_tos_channel_id'
                 )
                 return False
         except Exception:
-            error_logging().log_error_without_await(
+            ErrorLogging().log_error_without_await(
                 traceback.format_exc(),
                 'BotCommands: get_tos_channel_id'
             )

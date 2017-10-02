@@ -12,7 +12,7 @@ import random
 import discord
 
 from resources.config import ConfigLoader
-from resources.error import error_logging
+from resources.error import ErrorLogging
 
 class JoinLeaveHandler():
     """
@@ -56,7 +56,7 @@ class JoinLeaveHandler():
             else:
                 return
         except Exception:
-            await error_logging().log_error(
+            await ErrorLogging().log_error(
                 traceback.format_exc(),
                 'join_leave_handler: welcome_user',
                 str(member)
@@ -88,7 +88,7 @@ class JoinLeaveHandler():
             else:
                 return
         except Exception:
-            await error_logging().log_error(
+            await ErrorLogging().log_error(
                 traceback.format_exc(),
                 'join_leave_handler: goodbye_user',
                 str(member)

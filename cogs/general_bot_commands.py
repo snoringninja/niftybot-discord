@@ -8,7 +8,7 @@ import traceback
 
 from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
-from resources.error import error_logging
+from resources.error import ErrorLogging
 from resources.general_resources import BotResources
 
 class BotCommands:
@@ -33,9 +33,9 @@ class BotCommands:
 					DatabaseHandler().insert_into_database(query, (str(memberID), ))
 					return await self.bot.say("{0.mention}: thanks for accepting. You may now use commands.".format(member))
 				except Exception as e:
-					await error_logging().log_error(traceback.format_exc(), 'BotCommands: add_accepted_user')
+					await ErrorLogging().log_error(traceback.format_exc(), 'BotCommands: add_accepted_user')
 		except Exception as e:
-			await error_logging().log_error(traceback.format_exc(), 'BotCommands: add_accepted_user')
+			await ErrorLogging().log_error(traceback.format_exc(), 'BotCommands: add_accepted_user')
 
 	@commands.command(pass_context=True, no_pm=True, name='nick')
 	@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
@@ -48,7 +48,7 @@ class BotCommands:
 				await self.bot.change_nickname(ctx.message.server.me, username)
 				return await self.bot.say("Changed my username!")
 		except Exception as e:
-			await error_logging().log_error(traceback.format_exc(), 'BotCommands: change_username')
+			await ErrorLogging().log_error(traceback.format_exc(), 'BotCommands: change_username')
 
 	@commands.command(pass_context=True, no_pm=True, name="help")
 	@commands.cooldown(rate=1, per=30, type=commands.BucketType.server)

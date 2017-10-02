@@ -8,7 +8,7 @@ import traceback
 
 from discord.ext import commands
 
-from resources.error import error_logging
+from resources.error import ErrorLogging
 from resources.config import ConfigLoader
 from resources.general_resources import BotResources
 

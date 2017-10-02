@@ -13,7 +13,7 @@ import traceback
 
 from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
-from resources.error import error_logging
+from resources.error import ErrorLogging
 
 from config_updater import ConfigUpdater
 from resources.general_resources import BotResources
@@ -82,7 +82,7 @@ class CreditBet():
 			else:
 				print("Error in the initial conditional IF statement (credit_bet).")
 		except Exception as e:
-			await error_logging().log_error(traceback.format_exc(), 'credit_bet: bet', str(member), self.bot)
+			await ErrorLogging().log_error(traceback.format_exc(), 'credit_bet: bet', str(member), self.bot)
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 			return
 
@@ -120,7 +120,7 @@ class CreditBet():
 					remCredits = DatabaseHandler().fetch_results("SELECT credits FROM credit_bet WHERE userID = {0} AND serverID = {1}".format(str(memberID), str(server_id)))
 					await self.bot.say("{0.mention}: your balance is {1}.".format(member, remCredits[0]))
 		except Exception as e:
-			await error_logging().log_error(traceback.format_exc(), 'credit_bet: register', str(member))
+			await ErrorLogging().log_error(traceback.format_exc(), 'credit_bet: register', str(member))
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 			await self.bot.say("I failed, sorry...please let TD know (reference: balance error).")
 
@@ -159,7 +159,7 @@ class CreditBet():
 						DatabaseHandler().insert_into_database(query, (str(server_id), str(member), memberID, display_name, 500, str(datetime.now()), 0, str(datetime.now())))
 						await self.bot.say("{0.mention}, you are now registered! &bet to play! Goodluck!".format(member))
 					except Exception as e:
-						await error_logging().log_error(traceback.format_exc(), 'credit_bet: register (inner)', str(member))
+						await ErrorLogging().log_error(traceback.format_exc(), 'credit_bet: register (inner)', str(member))
 				else:
 					await self.bot.say("{0.mention}: you're already registered. Please do &bet to play!".format(member))
 			else:
@@ -168,7 +168,7 @@ class CreditBet():
 				print(channel_id)
 				print(plugin_enabled)
 		except Exception as e:
-			await error_logging().log_error(traceback.format_exc(), 'credit_bet: register (outer)', str(member))
+			await ErrorLogging().log_error(traceback.format_exc(), 'credit_bet: register (outer)', str(member))
 			await self.bot.say("I failed, sorry...please let TD know (reference: register error).")
 
 	@commands.command(pass_context=True, no_pm=True)
@@ -212,10 +212,10 @@ class CreditBet():
 					output_string = output_string + "\n```"
 					await self.bot.say(output_string)
 				except Exception as e:
-					await error_logging().log_error(traceback.format_exc(), 'credit_bet: scores (inner)', str(member))
+					await ErrorLogging().log_error(traceback.format_exc(), 'credit_bet: scores (inner)', str(member))
 					return
 		except Exception as e:
-			await error_logging().log_error(traceback.format_exc(), 'credit_bet: scores (outer)', str(member))
+			await ErrorLogging().log_error(traceback.format_exc(), 'credit_bet: scores (outer)', str(member))
 			return
 
 	@commands.command(pass_context=True, no_pm=True)
@@ -278,7 +278,7 @@ class CreditBet():
 						await self.bot.say("{0.mention}, you can only use this command every 24 hours ({1}), and if below 500 credits :cry:".format(member, formatted_string))
 						return
 			except Exception as e:
-				await error_logging().log_error(traceback.format_exc(), 'credit_bet: helpme', str(member))
+				await ErrorLogging().log_error(traceback.format_exc(), 'credit_bet: helpme', str(member))
 				return
 
 def setup(bot):

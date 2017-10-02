@@ -1,16 +1,14 @@
-# Niftybot
-# @author - Ryan Malacina (xNifty)
-# config.py
-# Functions: Set up everything from the config file we use, Load the required config file
+"""
+config.py
+@author - Ryan Malacina (xNifty)
 
-############################################
+Functions: Set up everything from the config file we use, Load the required config file
+"""
 
 # Imports for ConfigLoader
 import os
 import configparser
 import traceback
-
-from resources.error import error_logging
 
 def get_config_filename(default_filename):
     """Return the filename; probably not needed at this point."""
@@ -117,6 +115,10 @@ class ConfigLoader():
         self.parser.read(loaded_file)
         return str(self.parser.get(section, var))
 
+# We have to import this error since this is a combined file as
+# of now. Eventually move ConfigGenerator to its own file
+from resources.error import ErrorLogging
+
 class ConfigGenerator():
     """ConfigGenerator"""
     def __init__(self, bot):
@@ -135,10 +137,9 @@ class ConfigGenerator():
                     self.server_settings_path,
                     str(server_id)))):
                 return False
-            else:
-                return True
+            return True
         except Exception:
-            await error_logging().log_error(
+            await ErrorLogging().log_error(
                 traceback.format_exc(),
                 'ConfigGenerator: checkIfConfigExists'
             )
@@ -198,7 +199,7 @@ class ConfigGenerator():
                     "Configuration file generated. You will need to \
                     configure the file to your required settings.")
         except Exception:
-            await error_logging().log_error(
+            await ErrorLogging().log_error(
                 traceback.format_exc(),
                 'ConfigGenerator: checkIfConfigExists'
             )

@@ -11,7 +11,7 @@ import traceback
 import os
 
 from discord.ext import commands
-from resources.error import error_logging
+from resources.error import ErrorLogging
 from resources.config import ConfigGenerator
 from resources.config import ConfigLoader
 
@@ -37,12 +37,12 @@ class GenerateConfig():
         try:
             if member_id == ctx.message.server.owner_id or \
             int(member_id) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
-                file_exists = await ConfigGenerator(self.bot).checkIfConfigExists(
+                file_exists = await ConfigGenerator(self.bot).check_if_config_exists(
                     ctx.message.server.id
                 )
 
                 if not file_exists:
-                    await ConfigGenerator(self.bot).generateDefaultConfigFile(
+                    await ConfigGenerator(self.bot).generate_default_config_file(
                         ctx.message.server.id,
                         member_id
                     )
@@ -51,7 +51,7 @@ class GenerateConfig():
             else:
                 return
         except Exception:
-            await error_logging().log_error(
+            await ErrorLogging().log_error(
                 traceback.format_exc(),
                 'GenerateConfig: generateConfig'
             )
