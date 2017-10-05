@@ -61,6 +61,7 @@ class ConfigLoader():
                     str(default_filename))
             ),
         )
+        # honestly, this throws an error in the editor but works fine
         return config.read()
 
     def load_server_config_setting(self, filename, section, var):

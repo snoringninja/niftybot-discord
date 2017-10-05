@@ -58,12 +58,15 @@ client = commands.Bot(command_prefix=command_prefix, description=description)
 # processes messages and checks if a command
 @client.event
 async def on_message(message):
+    """discord.py on_message"""
     view = StringView(message.content)
-    prefix = command_prefix
     invoked_prefix = command_prefix
 
     invoked_prefix = discord.utils.find(view.skip_string, command_prefix)
     discord.utils.find(view.skip_string, command_prefix)
+
+    if "@everyone" in message.content:
+        await plugins.Moderation(client).purge_everyone_message(message)
 
     if invoked_prefix is None:
         return
@@ -76,13 +79,9 @@ async def on_message(message):
             await client.process_commands(message)
         elif message.content.startswith("{0}guild".format(command_prefix)): # This could get really, really ugly...
             await client.process_commands(message)
-        elif message.content.startswith("@everyone"):
-            print("Called")
-            await plugins.Moderation().purge_everyone_message(message)
         else:
             can_use = BotResources().check_accepted(message.author.id)
             message_channel_valid = BotResources().get_tos_channel_id(message.server.id)
-
             if can_use:
                 await client.process_commands(message)
             elif not can_use and message_channel_valid:
