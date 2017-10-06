@@ -85,17 +85,17 @@ async def on_message(message):
                 if message.author.id != client.user.id:
                     try:
                         message_channel_id = ConfigLoader().load_server_int_setting(message.server.id, 'ServerSettings', 'not_accepted_channel_id')
-                        bot_message = await client.send_message(discord.Object(id=message_channel_id), not_accepted_message.format(message.author, command_prefix))
+                        bot_message = await client.send_message(discord.Object(id=message_channel_id), not_accepted_message.format(message.author, COMMAND_PREFIX))
                         await asyncio.sleep(20)
                         await client.delete_message(bot_message)
                     except Exception as e:
-                        bot_message = await client.send_message(discord.Object(id=message.channel.id), not_accepted_message.format(message.author, command_prefix))
+                        bot_message = await client.send_message(discord.Object(id=message.channel.id), not_accepted_message.format(message.author, COMMAND_PREFIX))
                         await asyncio.sleep(20)
                         await client.delete_message(bot_message)
             else:
                 # This is needed to prevent infinite looping message posting
                 if message.author.id != client.user.id:
-                    await client.send_message(discord.Object(id=message.channel.id), not_accepted_message.format(message.author, command_prefix))
+                    await client.send_message(discord.Object(id=message.channel.id), not_accepted_message.format(message.author, COMMAND_PREFIX))
 
 # discord.py on_ready -> print out a bunch of information when the bot launches
 @client.event
