@@ -291,7 +291,7 @@ class ApiCommands():
 
             server_id = str(ctx.message.server.id)
 
-            plugin_enabled = ConfigLoader().load_server_config_setting_boolean(
+            plugin_enabled = ConfigLoader().load_server_boolean_setting(
                 server_id, 'ApiCommands', 'enabled')
 
             # to make this work, check if the plugin is in the list

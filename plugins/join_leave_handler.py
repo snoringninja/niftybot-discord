@@ -24,7 +24,7 @@ class JoinLeaveHandler():
 
     async def welcome_user(self, server_id: str, member: str, server: str):
         """Welcome a user to the discord server if enabled"""
-        welcome_enabled = ConfigLoader().load_server_config_setting_boolean(
+        welcome_enabled = ConfigLoader().load_server_boolean_setting(
             server_id,
             'JoinPart',
             'member_join_enabled'
@@ -65,7 +65,7 @@ class JoinLeaveHandler():
 
     async def goodbye_user(self, server_id: str, member: str):
         """Send a message when a user leaves the server."""
-        part_enabled = ConfigLoader().load_server_config_setting_boolean(
+        part_enabled = ConfigLoader().load_server_boolean_setting(
             server_id,
             'JoinPart',
             'member_part_enabled'

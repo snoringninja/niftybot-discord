@@ -76,20 +76,23 @@ class ConfigLoader():
         self.parser.read(loaded_file)
         return self.parser.get(section, var)
 
-    def load_server_config_setting_boolean(self, filename, section, var):
+    def load_server_boolean_setting(self, filename, section, var):
         """Load a boolean server config setting."""
-        loaded_file = load_config(
-            '%s.ini' % (
-                os.path.join(
-                    self.server_settings_path,
-                    str(filename)
-                )
-            ),
-        )
-        self.parser.read(loaded_file)
-        return self.parser.getboolean(section, var)
+        try:
+            loaded_file = load_config(
+                '%s.ini' % (
+                    os.path.join(
+                        self.server_settings_path,
+                        str(filename)
+                    )
+                ),
+            )
+            self.parser.read(loaded_file)
+            return self.parser.getboolean(section, var)
+        except configparser.NoSectionError:
+            print("Boolean section did not exist for server.")
 
-    def load_server_config_setting_int(self, filename, section, var):
+    def load_server_int_setting(self, filename, section, var):
         """Load an int server config setting."""
         loaded_file = load_config(
             '%s.ini' % (

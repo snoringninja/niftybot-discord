@@ -27,7 +27,7 @@ class RoleAssignor():
 
 		# if this fails it's not a boolean so we'll fix that but disable the plugin
 		try:
-			plugin_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'RoleAssignment', 'enabled')
+			plugin_enabled = ConfigLoader().load_server_boolean_setting(server_id, 'RoleAssignment', 'enabled')
 		except Exception as e:
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'RoleAssignment', 'enabled', 'False', True)
 			return await self.bot.say("The value for enabled must be a boolean. Disabling plugin until server owner can correct.")

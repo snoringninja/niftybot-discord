@@ -38,7 +38,7 @@ class BotResources:
         """Check if a channel is set for the ToS Message"""
         try:
             try:
-                ConfigLoader().load_server_config_setting_int(
+                ConfigLoader().load_server_int_setting(
                     server_id,
                     'ServerSettings',
                     'not_accepted_channel_id'

@@ -1,42 +1,37 @@
 # -*- coding: utf-8 -*-
+"""
+main.py
+@author Ryan Malacina
+@SnoringNinja - https://snoring.ninja
 
-# main.py
-# @author Ryan Malacina
-# @SnoringNinja - https://snoring.ninja
-# Built on discord.py
+Built on discord.py
+"""
 
-import discord
 import asyncio
-import random
 import errno
-import os
 import sys
 import traceback
+import discord
 
 # Import the plugins folder
-# TODO : config to enable / disable plugin files to be imported
-import plugins
-
-# Import the commands folder
-# TODO : config to enable / disable command files to be imported
-import cogs
-
-# this needs to be cleaned up
-from resources import database
-from resources.error import ErrorLogging
+# @TODO : config to enable / disable plugin files to be imported
+from plugins.moderation import Moderation
+from plugins.join_leave_handler import JoinLeaveHandler
 
 from discord.ext import commands
-
 from discord.ext.commands.view import StringView
+
+# this needs to be cleaned up
+from resources.error import ErrorLogging
 
 from resources.config import ConfigLoader
 from resources.general_resources import BotResources
 
 # Not sure we still need this
-description = ConfigLoader().load_config_setting('BotSettings', 'description')
+DESCRIPTION = ConfigLoader().load_config_setting('BotSettings', 'description')
 
 # Load the command prefix from the core ini
-command_prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
+COMMAND_PREFIX = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
 # Load the bot token from the core ini
 bot_token = ConfigLoader().load_config_setting('BotSettings', 'bot_token')
@@ -52,21 +47,23 @@ extension_list = ConfigLoader().load_config_setting('BotSettings', 'enabled_plug
 
 not_accepted_message = ConfigLoader().load_config_setting('BotSettings', 'not_accepted_message')
 
-client = commands.Bot(command_prefix=command_prefix, description=description)
+client = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
 
-
-# processes messages and checks if a command
 @client.event
 async def on_message(message):
-    """discord.py on_message"""
+    """
+    discord.py on_message
+    
+    processes messages and checks if a command
+    """
     view = StringView(message.content)
-    invoked_prefix = command_prefix
+    invoked_prefix = COMMAND_PREFIX
 
-    invoked_prefix = discord.utils.find(view.skip_string, command_prefix)
-    discord.utils.find(view.skip_string, command_prefix)
+    invoked_prefix = discord.utils.find(view.skip_string, COMMAND_PREFIX)
+    discord.utils.find(view.skip_string, COMMAND_PREFIX)
 
     if "@everyone" in message.content:
-        await plugins.Moderation(client).purge_everyone_message(message)
+        await Moderation(client).purge_everyone_message(message)
 
     if invoked_prefix is None:
         return
@@ -75,9 +72,9 @@ async def on_message(message):
 
     if invoker in client.commands:
         # @TODO : bot config update for override commands to make this cleaner
-        if message.content == '{0}accept'.format(command_prefix):
+        if message.content == '{0}accept'.format(COMMAND_PREFIX):
             await client.process_commands(message)
-        elif message.content.startswith("{0}guild".format(command_prefix)): # This could get really, really ugly...
+        elif message.content.startswith("{0}guild".format(COMMAND_PREFIX)): # This could get really, really ugly...
             await client.process_commands(message)
         else:
             can_use = BotResources().check_accepted(message.author.id)
@@ -87,7 +84,7 @@ async def on_message(message):
             elif not can_use and message_channel_valid:
                 if message.author.id != client.user.id:
                     try:
-                        message_channel_id = ConfigLoader().load_server_config_setting_int(message.server.id, 'ServerSettings', 'not_accepted_channel_id')
+                        message_channel_id = ConfigLoader().load_server_int_setting(message.server.id, 'ServerSettings', 'not_accepted_channel_id')
                         bot_message = await client.send_message(discord.Object(id=message_channel_id), not_accepted_message.format(message.author, command_prefix))
                         await asyncio.sleep(20)
                         await client.delete_message(bot_message)
@@ -105,7 +102,7 @@ async def on_message(message):
 async def on_ready():
     print('------')
     print('Logged in as {0}; Client ID: {1}'.format(str(client.user.name), str(client.user.id)))
-    print('Command prefix is: {0}'.format(str(command_prefix)))
+    print('Command prefix is: {0}'.format(str(COMMAND_PREFIX)))
     print('Setting game to: {0}'.format(game_name))
     print('Loaded extensions: {0}'.format(extension_list))
     print('Database name: {0}'.format(database_name))
@@ -113,22 +110,33 @@ async def on_ready():
     print('Good to go!')
     print('------')
 
-# discord.py on_member_join -> when a member joins a server, check if the server has a channel configured
-# and if they have the member_join_enabled plugin enabled
 @client.event
 async def on_member_join(member):
-    server = member.server
-    await plugins.join_leave_handler(client).welcomeUser(server.id, member, server)
+    """
+    discord.py on_member_join
 
-# discord.py on_member_remove -> when a member leaves a server, check if the server has a channel configured
-# and if they have the member_part_enabled plugin enabled
+    when a member joins a server, check if the server has a channel configured
+    and if they have the member_join_enabled plugin enabled
+    """
+    server = member.server
+    await JoinLeaveHandler(client).welcome_user(server.id, member, server)
+
 @client.event
 async def on_member_remove(member):
+    """
+    discord.py on_member_remove
+    
+    when a member leaves a server, check if the server has a channel configured
+    and if they have the member_part_enabled plugin enabled
+    """
     server = member.server
-    await plugins.join_leave_handler(client).goodbyeUser(server.id, member)
+    await JoinLeaveHandler(client).goodbye_user(server.id, member)
 
-#if __name__ == "__main__":
 def main():
+    """
+    main section of the bot
+
+    """
     print('Preparing...')
     ErrorLogging().create_directory()
     try:
@@ -145,19 +153,22 @@ def main():
                 exc = '{}: {}'.format(type(e).__name__, e)
                 print('Failed to load extension {}\n{}'.format(extension, exc))
         client.run(bot_token)
-    except AttributeError as ar:
+    except AttributeError:
         ErrorLogging().log_error_without_await(traceback.format_exc(), 'AttributeError in main()')
-    except TypeError as tr:
+    except TypeError:
         ErrorLogging().log_error_without_await(traceback.format_exc(), 'TypeError in main()')
-    except Exception as e:
-        if e.errno == errno.ECONNRESET:
+    except Exception:
+        if errno.ECONNRESET:
             print("Encountered connection reset.")
             ErrorLogging().log_error_without_await(traceback.format_exc(), 'conn_reset_error')
         else:
             print('Startup error encountered.')
             print(e)
             print('Exception: {0}: {1}'.format(type(e).__name__, e))
-            ErrorLogging().log_error_without_await(traceback.format_exc(), 'startup error in main()')
+            ErrorLogging().log_error_without_await(
+                traceback.format_exc(),
+                'startup error in main()'
+            )
             client.logout()
             sys.exit(0)
 
@@ -168,10 +179,9 @@ if __name__ == "__main__":
         print("Process ended by user.")
         client.logout()
         sys.exit(0)
-    except AttributeError as ar:
+    except AttributeError:
         ErrorLogging().log_error_without_await(traceback.format_exc(), 'AttributeError at __name__')
-    except TypeError as tr:
+    except TypeError:
         ErrorLogging().log_error_without_await(traceback.format_exc(), 'TypeError at __name__')
-    except Exception as e:
+    except Exception:
         ErrorLogging().log_error_without_await(traceback.format_exc(), 'main_try_block_exception')
-        print(e)

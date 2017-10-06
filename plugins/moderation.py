@@ -32,12 +32,12 @@ class Moderation():
             channel_id = message.channel.id
             member = message.author
             try:
-                plugin_enabled = ConfigLoader().load_server_config_setting_boolean(
+                plugin_enabled = ConfigLoader().load_server_boolean_setting(
                     server_id,
                     'Moderator',
                     'enabled'
                 )
-                purge_everyone = ConfigLoader().load_server_config_setting_boolean(
+                purge_everyone = ConfigLoader().load_server_boolean_setting(
                     server_id,
                     "Moderator",
                     "purge_everyone"

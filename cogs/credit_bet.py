@@ -34,20 +34,20 @@ class CreditBet():
 
 			# Load some config settings
 			try:
-				channel_id = ConfigLoader().load_server_config_setting_int(server_id, 'BettingGame', 'bet_channel_id')
+				channel_id = ConfigLoader().load_server_int_setting(server_id, 'BettingGame', 'bet_channel_id')
 			except Exception as e:
 				await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 				return await self.bot.say("The value for channel_id must be a int. Disabling plugin until server owner can correct.")
 
 			# if this fails it's not a boolean so we'll fix that but disable the plugin
 			try:
-				plugin_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'BettingGame', 'enabled')
+				plugin_enabled = ConfigLoader().load_server_boolean_setting(server_id, 'BettingGame', 'enabled')
 			except Exception as e:
 				await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 				return await self.bot.say("The value for enabled must be a boolean. Disabling plugin until server owner can correct.")
 
 			try:
-				minimum_bet = ConfigLoader().load_server_config_setting_int(server_id, 'BettingGame', 'minimum_bet')
+				minimum_bet = ConfigLoader().load_server_int_setting(server_id, 'BettingGame', 'minimum_bet')
 			except Exception as e:
 				await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 				return await self.bot.say("The value for minimum_bet must be an integer value. Disabling plugin until server owner can correct.")
@@ -96,14 +96,14 @@ class CreditBet():
 
 		# Load some config settings
 		try:
-			channel_id = ConfigLoader().load_server_config_setting_int(server_id, 'BettingGame', 'bet_channel_id')
+			channel_id = ConfigLoader().load_server_int_setting(server_id, 'BettingGame', 'bet_channel_id')
 		except Exception as e:
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 			return await self.bot.say("The value for channel_id must be a int. Disabling plugin until server owner can correct.")
 
 		# if this fails it's not a boolean so we'll fix that but disable the plugin
 		try:
-			plugin_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'BettingGame', 'enabled')
+			plugin_enabled = ConfigLoader().load_server_boolean_setting(server_id, 'BettingGame', 'enabled')
 		except Exception as e:
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 			return await self.bot.say("The value for enabled must be a boolean. Disabling plugin until server owner can correct.")
@@ -135,14 +135,14 @@ class CreditBet():
 
 		# Load some config settings
 		try:
-			channel_id = ConfigLoader().load_server_config_setting_int(server_id, 'BettingGame', 'bet_channel_id')
+			channel_id = ConfigLoader().load_server_int_setting(server_id, 'BettingGame', 'bet_channel_id')
 		except Exception as e:
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 			return await self.bot.say("The value for channel_id must be a int. Disabling plugin until server owner can correct.")
 
 		# if this fails it's not a boolean so we'll fix that but disable the plugin
 		try:
-			plugin_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'BettingGame', 'enabled')
+			plugin_enabled = ConfigLoader().load_server_boolean_setting(server_id, 'BettingGame', 'enabled')
 		except Exception as e:
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 			return await self.bot.say("The value for enabled must be a boolean. Disabling plugin until server owner can correct.")
@@ -182,14 +182,14 @@ class CreditBet():
 
 		# Load some config settings
 		try:
-			channel_id = ConfigLoader().load_server_config_setting_int(server_id, 'BettingGame', 'bet_channel_id')
+			channel_id = ConfigLoader().load_server_int_setting(server_id, 'BettingGame', 'bet_channel_id')
 		except Exception as e:
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 			return await self.bot.say("The value for channel_id must be a int. Disabling plugin until server owner can correct.")
 
 		# if this fails it's not a boolean so we'll fix that but disable the plugin
 		try:
-			plugin_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'BettingGame', 'enabled')
+			plugin_enabled = ConfigLoader().load_server_boolean_setting(server_id, 'BettingGame', 'enabled')
 		except Exception as e:
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 			return await self.bot.say("The value for enabled must be a boolean. Disabling plugin until server owner can correct.")
@@ -229,14 +229,14 @@ class CreditBet():
 
 		# Load some config settings
 		try:
-			channel_id = ConfigLoader().load_server_config_setting_int(server_id, 'BettingGame', 'bet_channel_id')
+			channel_id = ConfigLoader().load_server_int_setting(server_id, 'BettingGame', 'bet_channel_id')
 		except Exception as e:
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 			return await self.bot.say("The value for channel_id must be a int. Disabling plugin until server owner can correct.")
 
 		# if this fails it's not a boolean so we'll fix that but disable the plugin
 		try:
-			plugin_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'BettingGame', 'enabled')
+			plugin_enabled = ConfigLoader().load_server_boolean_setting(server_id, 'BettingGame', 'enabled')
 		except Exception as e:
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'BettingGame', 'enabled', 'False', True)
 			return await self.bot.say("The value for enabled must be a boolean. Disabling plugin until server owner can correct.")
