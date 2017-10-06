@@ -12,10 +12,10 @@ import os
 
 from discord.ext import commands
 from resources.error import ErrorLogging
-from resources.config import ConfigGenerator
+from resources.configgenerator import ConfigGenerator
 from resources.config import ConfigLoader
 
-class GenerateConfig():
+class ConfigCommands():
     """GenerateConfig controls the generate_config command"""
     def __init__(self, bot):
         self.bot = bot
@@ -58,4 +58,4 @@ class GenerateConfig():
 
 def setup(bot):
     """This makes it so we can actually use it."""
-    bot.add_cog(GenerateConfig(bot))
+    bot.add_cog(ConfigCommands(bot))
