@@ -16,6 +16,7 @@ from resources.config import ConfigLoader
 from cogs.config_updater import ConfigUpdater
 
 class Moderation():
+    # pylint: disable=too-few-public-methods
     """Collection of moderator plugins."""
     def __init__(self, bot):
         self.bot = bot
