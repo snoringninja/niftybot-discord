@@ -61,7 +61,7 @@ class BotCommands:
 
     @commands.command(pass_context=True, no_pm=True, name='nick')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
-    async def change_username(self, ctx, username: str, member: discord.Member=None):
+    async def change_username(self, ctx, username: str):
         """
         Change the bot username.
         """
