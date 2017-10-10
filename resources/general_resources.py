@@ -9,6 +9,7 @@ import traceback
 from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
 from resources.error import ErrorLogging
+from resources.decorators import error_logger
 
 
 class BotResources:
@@ -34,6 +35,7 @@ class BotResources:
             )
             return False
 
+    @error_logger
     def get_tos_channel_id(self, server_id):
         """Check if a channel is set for the ToS Message"""
         try:

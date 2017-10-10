@@ -5,6 +5,7 @@ from discord.ext import commands
 import os
 import configparser
 import asyncio
+import traceback
 
 from resources.general_resources import BotResources
 from resources.config import ConfigLoader

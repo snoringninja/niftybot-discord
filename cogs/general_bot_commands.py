@@ -8,6 +8,7 @@ place in other classes.
 """
 
 import traceback
+import asyncio
 
 import discord
 from discord.ext import commands
@@ -16,6 +17,7 @@ from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
 from resources.error import ErrorLogging
 from resources.general_resources import BotResources
+from resources.decorators import error_logger
 
 class BotCommands:
     """
@@ -26,6 +28,7 @@ class BotCommands:
         self.bot = bot
         self.prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
+    @error_logger
     @commands.command(pass_context=True, no_pm=False, name='accept')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
     async def add_accepted_user(self, ctx, member: discord.Member=None):
@@ -65,7 +68,6 @@ class BotCommands:
         """
         Change the bot username.
         """
-        member = ctx.message.author
         member_id = ctx.message.author.id
 
         try:
