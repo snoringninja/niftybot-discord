@@ -28,7 +28,6 @@ class BotCommands:
         self.bot = bot
         self.prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
-    @error_logger
     @commands.command(pass_context=True, no_pm=False, name='accept')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
     async def add_accepted_user(self, ctx, member: discord.Member=None):
@@ -41,8 +40,9 @@ class BotCommands:
         member_id = ctx.message.author.id
 
         try:
+            print("Member ID: {0}".format(member_id))
             has_accepted = BotResources().check_accepted(member_id)
-
+            print(has_accepted)
             if has_accepted:
                 return await self.bot.say("You've already accepted my terms of service.")
             else:

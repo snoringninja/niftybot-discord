@@ -21,6 +21,7 @@ from resources.error import ErrorLogging
 
 from resources.config import ConfigLoader
 from resources.general_resources import BotResources
+from resources.decorators import error_logger
 
 import discord
 from discord.ext.commands.view import StringView

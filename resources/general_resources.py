@@ -17,25 +17,20 @@ class BotResources:
     def __init__(self):
         self.prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
+    @error_logger
     def check_accepted(self, user_id):
         """Check if a user has accepted the Terms of Service."""
-        try:
-            row = DatabaseHandler().fetch_results(
-                "SELECT 1 FROM accepted_users WHERE discord_id = {0}".format(str(user_id))
-            )
+        print("User ID: {}".format(user_id))
+        row = DatabaseHandler().fetch_results(
+            "SELECT 1 FROM accepted_users WHERE discord_id = {0}".format(str(user_id))
+        )
 
-            if row is not None:
-                return True
-            else:
-                return False
-        except Exception:
-            ErrorLogging().log_error_without_await(
-                traceback.format_exc(),
-                'BotCommands: check_accepted'
-            )
-            return False
+        print(row)
 
-    @error_logger
+        if row is not None:
+            return True
+        return False
+
     def get_tos_channel_id(self, server_id):
         """Check if a channel is set for the ToS Message"""
         try:
