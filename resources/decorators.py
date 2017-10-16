@@ -17,10 +17,9 @@ def error_logger(function):
         error_logger wrapper
         """
         try:
-            result = function(*args, **kwargs)
-            return result
+            return function(*args, **kwargs)
         except Exception as err:
-            print("There was an error.  The reported error is: {0}"
-                  .format(err)
-                 )
+            return print("There was an error.  The reported error is: {0}"
+                         .format(err)
+                        )
     return wrapper

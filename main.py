@@ -49,6 +49,7 @@ NOT_ACCEPTED_MESSAGE = ConfigLoader().load_config_setting('BotSettings', 'not_ac
 
 CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
 
+@error_logger
 @CLIENT.event
 async def on_message(message):
     """
@@ -78,6 +79,7 @@ async def on_message(message):
         ): # This could get really, really ugly...
             await CLIENT.process_commands(message)
         else:
+            print("here")
             can_use = BotResources().check_accepted(message.author.id)
             message_channel_valid = BotResources().get_tos_channel_id(message.server.id)
             if can_use:
