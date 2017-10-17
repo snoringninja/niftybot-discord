@@ -21,7 +21,7 @@ from resources.error import ErrorLogging
 
 from resources.config import ConfigLoader
 from resources.general_resources import BotResources
-from resources.decorators import error_logger
+from resources.decorators import error_logger_callback
 
 import discord
 from discord.ext.commands.view import StringView
@@ -49,7 +49,7 @@ NOT_ACCEPTED_MESSAGE = ConfigLoader().load_config_setting('BotSettings', 'not_ac
 
 CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
 
-@error_logger
+@error_logger_callback
 @CLIENT.event
 async def on_message(message):
     """
@@ -70,13 +70,14 @@ async def on_message(message):
 
     invoker = view.get_word()
 
+    print(invoker)
+    print(CLIENT.commands)
+
     if invoker in CLIENT.commands:
         # @TODO : bot config update for override commands to make this cleaner
         if message.content == '{0}accept'.format(COMMAND_PREFIX):
             await CLIENT.process_commands(message)
-        elif message.content.startswith(
-                "{0}guild".format(COMMAND_PREFIX)
-        ): # This could get really, really ugly...
+        elif message.content.startswith("{0}guild".format(COMMAND_PREFIX)):
             await CLIENT.process_commands(message)
         else:
             print("here")
