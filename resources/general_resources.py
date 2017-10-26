@@ -17,7 +17,6 @@ class BotResources:
     def __init__(self):
         self.prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
-    @error_logger
     def check_accepted(self, user_id):
         """Check if a user has accepted the Terms of Service."""
         print("User ID: {}".format(user_id))
@@ -41,15 +40,15 @@ class BotResources:
                     'not_accepted_channel_id'
                 )
                 return True
-            except Exception:
-                ErrorLogging().log_error_without_await(
-                    traceback.format_exc(),
-                    'BotCommands: get_tos_channel_id'
-                )
+            except ValueError:
+                #ErrorLogging().log_error_without_await(
+                #    traceback.format_exc(),
+                #    'BotResources: get_tos_channel_id (inner)'
+                #)
                 return False
-        except Exception:
+        except ValueError:
             ErrorLogging().log_error_without_await(
                 traceback.format_exc(),
-                'BotCommands: get_tos_channel_id'
+                'BotResources: get_tos_channel_id (outer)'
             )
             return False

@@ -49,7 +49,7 @@ class ErrorLogging:
 
     async def log_error(self, error_string, error_class, user=None, bot=None):
         """Log the error."""
-        print('Logging error.')
+        print('Logging error from {0}'.format(error_class))
         file_suffix = ''.join(random.SystemRandom().choice(
             string.ascii_uppercase + string.digits) for _ in range(6))
         file_suffix = file_suffix + '_{}'.format(time.strftime("%Y%m%d-%H%M%S"))

@@ -240,10 +240,11 @@ class ApiCommands():
             for value in trait_dict[item].items():
                 if isinstance(value, list):
                     for key in value:
-                        trait_list.append(str(key))
+                        trait_list.append(key)
                 else:
-                    trait_spec_list.append(str(value))
+                    trait_spec_list.append(value)
 
+        print(trait_spec_list)
         trait_one = DatabaseHandler().fetch_results(
             "SELECT spec_name FROM gw2_specs WHERE spec_id = {0}".format(int(trait_spec_list[0])))
         trait_two = DatabaseHandler().fetch_results(
@@ -283,7 +284,7 @@ class ApiCommands():
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
-    async def build(self, ctx, character_name: str, game_type: str, member: discord.Member=None):
+    async def build(self, ctx, game_type: str, *, character_name: str, member: discord.Member=None):
         """ Get PvE, WvW, PvP build info for supplied character. """
         try:
             member = ctx.message.author

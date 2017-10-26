@@ -49,7 +49,7 @@ NOT_ACCEPTED_MESSAGE = ConfigLoader().load_config_setting('BotSettings', 'not_ac
 
 CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
 
-@error_logger_callback
+#@error_logger_callback
 @CLIENT.event
 async def on_message(message):
     """
@@ -70,8 +70,8 @@ async def on_message(message):
 
     invoker = view.get_word()
 
-    print(invoker)
-    print(CLIENT.commands)
+    #print(invoker)
+    #print(CLIENT.commands)
 
     if invoker in CLIENT.commands:
         # @TODO : bot config update for override commands to make this cleaner
