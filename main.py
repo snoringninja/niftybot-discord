@@ -21,7 +21,6 @@ from resources.error import ErrorLogging
 
 from resources.config import ConfigLoader
 from resources.general_resources import BotResources
-from resources.decorators import error_logger_callback
 
 import discord
 from discord.ext.commands.view import StringView
@@ -45,7 +44,9 @@ DATABASE_NAME = ConfigLoader().load_config_setting('BotSettings', 'sqlite')
 # Create the plugin list, which is built from the core ini file
 EXTENSIONS = ConfigLoader().load_config_setting('BotSettings', 'enabled_plugins')
 
-NOT_ACCEPTED_MESSAGE = ConfigLoader().load_config_setting('BotSettings', 'not_accepted_message')
+NOT_ACCEPTED_MESSAGE = str(
+    ConfigLoader().load_config_setting('BotSettings', 'not_accepted_message')
+)
 
 CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
 

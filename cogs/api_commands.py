@@ -2,6 +2,8 @@
 api_commands.py
 @author Ryan 'iBeNifty' Malacina
 @site https://snoring.ninja
+
+Return information based on the GW2 API
 """
 
 import json
@@ -40,12 +42,12 @@ class ApiCommands():
 
                     if row is None:
                         base_url = 'https://api.guildwars2.com/v2/tokeninfo?access_token='
-                        header = {'User-Agent': 'Mozlla/5.0'}
+                        header_dict = {'User-Agent': 'Mozlla/5.0'}
 
                         permissions = ['account', 'builds', 'characters']
 
                         response_url = base_url + str(apikey)
-                        header = urllib.parse.urlencode(header)
+                        header = urllib.parse.urlencode(header_dict)
                         header = header.encode("utf-8")
                         response = urlopen(response_url)
                         response = response.read()
@@ -98,11 +100,11 @@ class ApiCommands():
         try:
             base_url = 'https://api.guildwars2.com/v2/characters/'
             base_url2 = '/core?access_token='
-            header = {'User-Agent': 'Mozlla/5.0'}
+            header_dict = {'User-Agent': 'Mozlla/5.0'}
 
             response_url = base_url + \
                 str(character_name) + str(base_url2) + str(api_key)
-            header = urllib.parse.urlencode(header)
+            header = urllib.parse.urlencode(header_dict)
             header = header.encode("utf-8")
             response = urlopen(response_url)
             response = response.read()
@@ -130,11 +132,11 @@ class ApiCommands():
         try:
             base_url = 'https://api.guildwars2.com/v2/characters/'
             base_url2 = '/skills?access_token='
-            header = {'User-Agent': 'Mozlla/5.0'}
+            header_dict = {'User-Agent': 'Mozlla/5.0'}
 
             response_url = base_url + \
                 str(char_name) + str(base_url2) + str(api_key)
-            header = urllib.parse.urlencode(header)
+            header = urllib.parse.urlencode(header_dict)
             header = header.encode("utf-8")
             response = urlopen(response_url)
             response = response.read()
@@ -203,11 +205,11 @@ class ApiCommands():
         """Get the list of trait IDs"""
         base_url = 'https://api.guildwars2.com/v2/characters/'
         base_url2 = '/specializations?access_token='
-        header = {'User-Agent': 'Mozlla/5.0'}
+        header_dict = {'User-Agent': 'Mozlla/5.0'}
 
         response_url = base_url + \
             str(char_name) + str(base_url2) + str(api_key)
-        header = urllib.parse.urlencode(header)
+        header = urllib.parse.urlencode(header_dict)
         header = header.encode("utf-8")
         response = urlopen(response_url)
         response = response.read()
@@ -236,15 +238,15 @@ class ApiCommands():
         trait_three = ''
         trait_list_three = ''
 
+        # @TODO : use enumerate instead of range(len())
         for item in range(len(trait_dict)):
             for value in trait_dict[item].items():
-                if isinstance(value, list):
-                    for key in value:
+                if isinstance(value[1], list):
+                    for key in value[1]:
                         trait_list.append(key)
                 else:
-                    trait_spec_list.append(value)
+                    trait_spec_list.append(value[1])
 
-        print(trait_spec_list)
         trait_one = DatabaseHandler().fetch_results(
             "SELECT spec_name FROM gw2_specs WHERE spec_id = {0}".format(int(trait_spec_list[0])))
         trait_two = DatabaseHandler().fetch_results(
@@ -252,6 +254,8 @@ class ApiCommands():
         trait_three = DatabaseHandler().fetch_results(
             "SELECT spec_name FROM gw2_specs WHERE spec_id = {0}".format(int(trait_spec_list[2])))
 
+        # we're cheating here since we know it's always 9 total traits
+        # to not cheat, we could just use len(trait_list)
         for item in range(9):
             spec_name = DatabaseHandler().fetch_results(
                 "SELECT trait_name FROM gw2_traits WHERE trait_id = {0}"
@@ -294,6 +298,14 @@ class ApiCommands():
 
             plugin_enabled = ConfigLoader().load_server_boolean_setting(
                 server_id, 'ApiCommands', 'enabled')
+
+            # Each new part of the name needs to be upper case, so firstly we will
+            # make everything lower case and then do the upper casing
+            character_name = character_name.lower()
+            character_name = ' '.join(word[0].upper() + word[1:] for word in character_name.split())
+
+            # lower case the game type, just in case
+            game_type = game_type.lower()
 
             # to make this work, check if the plugin is in the list
             if member is not None and plugin_enabled:
