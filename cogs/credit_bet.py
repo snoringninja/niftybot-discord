@@ -386,8 +386,8 @@ class CreditBet():
                 try:
                     row = DatabaseHandler().fetch_all_results(
                         "SELECT displayName, credits, timesBet \
-                        FROM credit_bet WHERE serverID = {0} ORDER BY \
-                        credits DESC LIMIT 5"
+                        FROM credit_bet WHERE serverID = {0} AND credits > 0 \
+                        ORDER BY credits DESC LIMIT 5"
                         .format(str(server_id))
                     )
                     names = {d[0] for d in row}
