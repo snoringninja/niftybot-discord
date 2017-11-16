@@ -28,6 +28,7 @@ class CreditBet():
     def __init__(self, bot):
         self.bot = bot
 
+    @error_logger_callback
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
     async def bet(self, ctx, amount: int, member: discord.Member=None):
@@ -421,7 +422,7 @@ class CreditBet():
             )
             return
 
-    #@error_logger_callback
+    @error_logger_callback
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
     async def helpme(self, ctx, member: discord.Member=None):
