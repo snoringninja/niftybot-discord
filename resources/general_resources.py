@@ -8,7 +8,7 @@ This class serves to be a location for some general use bot functions.
 import traceback
 from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
-from resources.error import ErrorLogging
+from resources.error_logger import ErrorLogging
 
 
 class BotResources:

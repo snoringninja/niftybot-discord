@@ -4,7 +4,7 @@ from discord.ext import commands
 
 import traceback
 
-from resources.error import ErrorLogging
+from resources.error_logger import ErrorLogging
 from resources.config import ConfigLoader
 
 from cogs.config_updater import ConfigUpdater

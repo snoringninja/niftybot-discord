@@ -11,7 +11,7 @@ import traceback
 import os
 
 from discord.ext import commands
-from resources.error import ErrorLogging
+from resources.error_logger import ErrorLogging
 from resources.configgenerator import ConfigGenerator
 from resources.config import ConfigLoader
 

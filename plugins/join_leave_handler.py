@@ -12,7 +12,7 @@ import random
 import discord
 
 from resources.config import ConfigLoader
-from resources.error import ErrorLogging
+from resources.error_logger import ErrorLogging
 
 class JoinLeaveHandler():
     """

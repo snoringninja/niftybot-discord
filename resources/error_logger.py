@@ -90,3 +90,4 @@ class ErrorLogging:
     def get_directory(self):
         """Get the error directory."""
         return self.directory
+    

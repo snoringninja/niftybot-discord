@@ -17,11 +17,10 @@ import traceback
 from plugins.moderation import Moderation
 from plugins.join_leave_handler import JoinLeaveHandler
 
-from resources.error import ErrorLogging
+from resources.error_logger import ErrorLogging
 
 from resources.config import ConfigLoader
 from resources.general_resources import BotResources
-from resources.decorators import error_logger, error_logger_callback
 
 import discord
 from discord.ext.commands.view import StringView
@@ -51,7 +50,6 @@ NOT_ACCEPTED_MESSAGE = str(
 
 CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
 
-@error_logger
 @CLIENT.event
 async def on_message(message):
     """
@@ -86,7 +84,7 @@ async def on_message(message):
             can_use = BotResources().check_accepted(message.author.id)
             message_channel_valid = BotResources().get_tos_channel_id(message.server.id)
             if can_use:
-                await error_logger_callback(CLIENT.process_commands(message))
+                await CLIENT.process_commands(message)
             elif not can_use and message_channel_valid:
                 if message.author.id != CLIENT.user.id:
                     try:
@@ -162,7 +160,25 @@ async def on_member_remove(member):
     server = member.server
     await JoinLeaveHandler(CLIENT).goodbye_user(server.id, member)
 
-@error_logger
+@CLIENT.event
+async def on_command_error(exception, context):
+    """
+    Override the default discord.py on_command_error
+    to log our errors to a file in the errors
+    folder.
+
+    @TODO : better error logging
+    """
+
+    if hasattr(context.command, "on_error"):
+        return
+
+    print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
+    await ErrorLogging().log_error(
+        traceback.format_exc(),
+        context.command
+    )
+
 def main():
     """
     main section of the bot

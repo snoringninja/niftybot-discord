@@ -13,7 +13,7 @@ import traceback
 
 from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
-from resources.error import ErrorLogging
+from resources.error_logger import ErrorLogging
 
 from config_updater import ConfigUpdater
 

@@ -15,7 +15,7 @@ from discord.ext import commands
 
 from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
-from resources.error import ErrorLogging
+from resources.error_logger import ErrorLogging
 from resources.general_resources import BotResources
 
 class BotCommands:

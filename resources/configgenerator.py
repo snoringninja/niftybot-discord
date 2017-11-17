@@ -10,7 +10,7 @@ import os
 import traceback
 import configparser
 
-from resources.error import ErrorLogging
+from resources.error_logger import ErrorLogging
 
 class ConfigGenerator():
     """ConfigGenerator"""
