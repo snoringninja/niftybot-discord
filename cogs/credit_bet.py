@@ -14,7 +14,6 @@ import traceback
 from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
 from resources.error import ErrorLogging
-from resources.decorators import error_logger, error_logger_callback
 
 from config_updater import ConfigUpdater
 
@@ -28,7 +27,7 @@ class CreditBet():
     def __init__(self, bot):
         self.bot = bot
 
-    @error_logger_callback
+    
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
     async def bet(self, ctx, amount: int, member: discord.Member=None):
@@ -136,7 +135,7 @@ class CreditBet():
             print("Error in the initial conditional IF statement (credit_bet).")
         return
 
-    #@error_logger_callback
+    #
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=60, type=commands.BucketType.user)
     async def balance(self, ctx, member: discord.Member=None):
@@ -225,7 +224,7 @@ class CreditBet():
             )
             await self.bot.say("I failed, sorry...please let TD know (reference: balance error).")
 
-    #@error_logger_callback
+    #
     @commands.command(pass_context=True, no_pm=True)
     async def register(self, ctx, member: discord.Member=None):
         """ Register for betting. """
@@ -330,7 +329,7 @@ class CreditBet():
             )
             await self.bot.say("I failed, sorry...please let TD know (reference: register error).")
 
-    #@error_logger_callback
+    #
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
     async def scores(self, ctx, member: discord.Member=None):
@@ -422,7 +421,6 @@ class CreditBet():
             )
             return
 
-    @error_logger_callback
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
     async def helpme(self, ctx, member: discord.Member=None):
@@ -515,7 +513,6 @@ class CreditBet():
                     str(member)
                 )
                 return
-
 def setup(bot):
     """This makes it so we can actually use it."""
     bot.add_cog(CreditBet(bot))

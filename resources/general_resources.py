@@ -9,7 +9,6 @@ import traceback
 from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
 from resources.error import ErrorLogging
-from resources.decorators import error_logger
 
 
 class BotResources:

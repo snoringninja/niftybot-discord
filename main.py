@@ -21,6 +21,7 @@ from resources.error import ErrorLogging
 
 from resources.config import ConfigLoader
 from resources.general_resources import BotResources
+from resources.decorators import error_logger, error_logger_callback
 
 import discord
 from discord.ext.commands.view import StringView
@@ -50,7 +51,7 @@ NOT_ACCEPTED_MESSAGE = str(
 
 CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
 
-#@error_logger_callback
+@error_logger
 @CLIENT.event
 async def on_message(message):
     """
@@ -85,7 +86,7 @@ async def on_message(message):
             can_use = BotResources().check_accepted(message.author.id)
             message_channel_valid = BotResources().get_tos_channel_id(message.server.id)
             if can_use:
-                await CLIENT.process_commands(message)
+                await error_logger_callback(CLIENT.process_commands(message))
             elif not can_use and message_channel_valid:
                 if message.author.id != CLIENT.user.id:
                     try:
@@ -161,6 +162,7 @@ async def on_member_remove(member):
     server = member.server
     await JoinLeaveHandler(CLIENT).goodbye_user(server.id, member)
 
+@error_logger
 def main():
     """
     main section of the bot

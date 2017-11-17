@@ -17,7 +17,6 @@ from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
 from resources.error import ErrorLogging
 from resources.general_resources import BotResources
-from resources.decorators import error_logger
 
 class BotCommands:
     """
