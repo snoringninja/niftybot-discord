@@ -238,14 +238,18 @@ class ApiCommands():
         trait_three = ''
         trait_list_three = ''
 
+        for item in enumerate(trait_dict):
+            print(item[1])
+
         # @TODO : use enumerate instead of range(len())
-        for item in range(len(trait_dict)):
-            for value in trait_dict[item].items():
-                if isinstance(value[1], list):
-                    for key in value[1]:
-                        trait_list.append(key)
-                else:
-                    trait_spec_list.append(value[1])
+        #for item in enumerate(trait_dict):
+            
+            #for value in item.items():
+            #    if isinstance(value[1], list):
+            #        for key in value[1]:
+            #            trait_list.append(key)
+            #    else:
+            #        trait_spec_list.append(value[1])
 
         trait_one = DatabaseHandler().fetch_results(
             "SELECT spec_name FROM gw2_specs WHERE spec_id = {0}".format(int(trait_spec_list[0])))
