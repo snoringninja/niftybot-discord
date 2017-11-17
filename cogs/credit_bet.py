@@ -9,13 +9,9 @@ SQLite database
 
 import random
 from datetime import datetime
-import traceback
 
 from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
-from resources.error_logger import ErrorLogging
-
-from .config_updater import ConfigUpdater
 
 import discord
 from discord.ext import commands
@@ -27,7 +23,6 @@ class CreditBet():
     def __init__(self, bot):
         self.bot = bot
 
-    
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
     async def bet(self, ctx, amount: int, member: discord.Member=None):
@@ -145,84 +140,44 @@ class CreditBet():
         server_id = ctx.message.server.id
 
         # Load some config settings
-        try:
-            channel_id = ConfigLoader().load_server_int_setting(
-                server_id,
-                'BettingGame',
-                'bet_channel_id'
-            )
-        except Exception:
-            await ConfigUpdater(self.bot).updateConfigFile(
-                server_id,
-                'BettingGame',
-                'enabled',
-                'False',
-                True
-            )
-            return await self.bot.say("The value for channel_id must be a int. \
-                                      Disabling plugin until server owner can correct."
-                                     )
+        channel_id = ConfigLoader().load_server_int_setting(
+            server_id,
+            'BettingGame',
+            'bet_channel_id'
+        )
 
-        # if this fails it's not a boolean so we'll fix that but disable the plugin
-        try:
-            plugin_enabled = ConfigLoader().load_server_boolean_setting(
-                server_id,
-                'BettingGame',
-                'enabled'
-            )
-        except Exception:
-            await ConfigUpdater(self.bot).updateConfigFile(
-                server_id,
-                'BettingGame',
-                'enabled',
-                'False',
-                True
-            )
-            return await self.bot.say("The value for enabled must be a boolean. \
-                                      Disabling plugin until server owner can correct."
-                                     )
+        plugin_enabled = ConfigLoader().load_server_boolean_setting(
+            server_id,
+            'BettingGame',
+            'enabled'
+        )
 
-        try:
-            # Have to cast ctx.message.channel and ctx.message.server to strings
-            if member is not None and int(ctx.message.channel.id) == channel_id and plugin_enabled:
-                row = DatabaseHandler().fetch_results(
-                    "SELECT 1 FROM credit_bet WHERE userID = {0} \
-                    and serverID = {1}".format(str(member_id), str(server_id))
+        # Have to cast ctx.message.channel and ctx.message.server to strings
+        if member is not None and int(ctx.message.channel.id) == channel_id and plugin_enabled:
+            row = DatabaseHandler().fetch_results(
+                "SELECT 1 FROM credit_bet WHERE userID = {0} \
+                and serverID = {1}".format(str(member_id), str(server_id))
+            )
+            #print("Row: {}".format(row))
+            if row is None:
+                await self.bot.say(
+                    "{0.mention}: please do &register to \
+                    join the lotto.".format(member))
+                return
+            else:
+                remaining_credits = DatabaseHandler().fetch_results(
+                    "SELECT credits FROM credit_bet \
+                    WHERE userID = {0} AND serverID = {1}".format(
+                        str(member_id),
+                        str(server_id)
+                    )
                 )
-                #print("Row: {}".format(row))
-                if row is None:
-                    await self.bot.say(
-                        "{0.mention}: please do &register to \
-                        join the lotto.".format(member))
-                    return
-                else:
-                    remaining_credits = DatabaseHandler().fetch_results(
-                        "SELECT credits FROM credit_bet \
-                        WHERE userID = {0} AND serverID = {1}".format(
-                            str(member_id),
-                            str(server_id)
-                        )
+                await self.bot.say(
+                    "{0.mention}: your balance is {1}.".format(
+                        member,
+                        remaining_credits[0]
                     )
-                    await self.bot.say(
-                        "{0.mention}: your balance is {1}.".format(
-                            member,
-                            remaining_credits[0]
-                        )
-                    )
-        except Exception:
-            await ErrorLogging().log_error(
-                traceback.format_exc(),
-                'credit_bet: register',
-                str(member)
-            )
-            await ConfigUpdater(self.bot).updateConfigFile(
-                server_id,
-                'BettingGame',
-                'enabled',
-                'False',
-                True
-            )
-            await self.bot.say("I failed, sorry...please let TD know (reference: balance error).")
+                )
 
     #
     @commands.command(pass_context=True, no_pm=True)
@@ -235,99 +190,53 @@ class CreditBet():
         server_id = ctx.message.server.id
 
         # Load some config settings
-        try:
-            channel_id = ConfigLoader().load_server_int_setting(
-                server_id,
-                'BettingGame',
-                'bet_channel_id'
-            )
-        except Exception:
-            await ConfigUpdater(self.bot).updateConfigFile(
-                server_id,
-                'BettingGame',
-                'enabled',
-                'False',
-                True
-            )
-            return await self.bot.say("The value for channel_id must be a int. \
-                                      Disabling plugin until server owner can correct."
-                                     )
+        channel_id = ConfigLoader().load_server_int_setting(
+            server_id,
+            'BettingGame',
+            'bet_channel_id'
+        )
 
-        # if this fails it's not a boolean so we'll fix that but disable the plugin
-        try:
-            plugin_enabled = ConfigLoader().load_server_boolean_setting(
-                server_id,
-                'BettingGame',
-                'enabled'
-            )
-        except Exception:
-            await ConfigUpdater(self.bot).updateConfigFile(
-                server_id,
-                'BettingGame',
-                'enabled',
-                'False',
-                True
-            )
-            return await self.bot.say("The value for enabled must be a boolean. \
-                                      Disabling plugin until server owner can correct."
-                                     )
+        plugin_enabled = ConfigLoader().load_server_boolean_setting(
+            server_id,
+            'BettingGame',
+            'enabled'
+        )
 
-        try:
-            # Have to cast ctx.message.channel and ctx.message.server to strings
-            if (
-                    member is not None
-                    and int(ctx.message.channel.id) == channel_id
-                    and plugin_enabled
-            ):
-                row = DatabaseHandler().fetch_results(
-                    "SELECT 1 FROM credit_bet WHERE userID = {0} \
-                    and serverID = {1}".format(str(member_id), str(server_id))
+        # Have to cast ctx.message.channel and ctx.message.server to strings
+        if (member is not None
+                and int(ctx.message.channel.id) == channel_id
+                and plugin_enabled
+           ):
+            row = DatabaseHandler().fetch_results(
+                "SELECT 1 FROM credit_bet WHERE userID = {0} \
+                and serverID = {1}".format(str(member_id), str(server_id))
+            )
+            if row is None:
+                query = """
+                        INSERT INTO credit_bet (serverID, username, userID, \
+                        displayName, credits, dateJoined, timesBet, lastClaimTime) \
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        """
+                DatabaseHandler().insert_into_database(
+                    query,
+                    (
+                        str(server_id),
+                        str(member),
+                        member_id,
+                        display_name,
+                        500,
+                        str(datetime.now()),
+                        0,
+                        str(datetime.now())
+                    )
                 )
-                if row is None:
-                    try:
-                        query = """
-                                INSERT INTO credit_bet (serverID, username, userID, \
-                                displayName, credits, dateJoined, timesBet, lastClaimTime) \
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                                """
-                        DatabaseHandler().insert_into_database(
-                            query,
-                            (
-                                str(server_id),
-                                str(member),
-                                member_id,
-                                display_name,
-                                500,
-                                str(datetime.now()),
-                                0,
-                                str(datetime.now())
-                            )
-                        )
-                        await self.bot.say("{0.mention}, you are now registered! &bet to play! \
-                                           Goodluck!".format(member)
-                                          )
-                    except Exception:
-                        await ErrorLogging().log_error(
-                            traceback.format_exc(),
-                            'credit_bet: register (inner)',
-                            str(member)
-                        )
-                else:
-                    await self.bot.say("{0.mention}: you're already registered. Please do &bet \
-                                       to play!".format(member)
-                                      )
+                await self.bot.say("{0.mention}, you are now registered! &bet to play! \
+                                    Goodluck!".format(member)
+                                  )
             else:
-                print(member)
-                print(ctx.message.channel.id)
-                print(channel_id)
-                print(plugin_enabled)
-        except Exception:
-            await ErrorLogging().log_error(
-                traceback.format_exc(),
-                'credit_bet: register (outer)',
-                str(member)
-            )
-            await self.bot.say("I failed, sorry...please let TD know (reference: register error).")
+                await self.bot.say("{0.mention}: you're already registered. Please do &bet \
+                                    to play!".format(member)
+                                  )
 
     #
     @commands.command(pass_context=True, no_pm=True)
@@ -337,93 +246,50 @@ class CreditBet():
         member = ctx.message.author
         server_id = ctx.message.server.id
 
-        # Load some config settings
-        try:
-            channel_id = ConfigLoader().load_server_int_setting(
-                server_id,
-                'BettingGame',
-                'bet_channel_id'
-            )
-        except Exception:
-            await ConfigUpdater(self.bot).updateConfigFile(
-                server_id,
-                'BettingGame',
-                'enabled',
-                'False',
-                True
-            )
-            return await self.bot.say("The value for channel_id must be a int. \
-                                      Disabling plugin until server owner can correct."
-                                     )
+        channel_id = ConfigLoader().load_server_int_setting(
+            server_id,
+            'BettingGame',
+            'bet_channel_id'
+        )
 
-        # if this fails it's not a boolean so we'll fix that but disable the plugin
-        try:
-            plugin_enabled = ConfigLoader().load_server_boolean_setting(
-                server_id,
-                'BettingGame',
-                'enabled'
-            )
-        except Exception:
-            await ConfigUpdater(self.bot).updateConfigFile(
-                server_id,
-                'BettingGame',
-                'enabled',
-                'False',
-                True
-            )
-            return await self.bot.say("The value for enabled must be a boolean. \
-                                      Disabling plugin until server owner can correct."
-                                     )
+        plugin_enabled = ConfigLoader().load_server_boolean_setting(
+            server_id,
+            'BettingGame',
+            'enabled'
+        )
+        if (
+                member is not None
+                and int(ctx.message.channel.id) == channel_id
+                and plugin_enabled
+        ):
+            output_string = ''
 
-        try:
-            if (
-                    member is not None
-                    and int(ctx.message.channel.id) == channel_id
-                    and plugin_enabled
-            ):
-                output_string = ''
-
-                try:
-                    row = DatabaseHandler().fetch_all_results(
-                        "SELECT displayName, credits, timesBet \
-                        FROM credit_bet WHERE serverID = {0} AND credits > 0 \
-                        ORDER BY credits DESC LIMIT 5"
-                        .format(str(server_id))
-                    )
-                    names = {d[0] for d in row}
-                    max_name_len = max(map(len, names))
-                    max_name_len = 22 if max_name_len > 22 else max_name_len
-                    spacer = max_name_len + 4
-                    output_string = '```{0: <{1}}  Credits\n'.format('User', spacer)
-                    output_string = output_string + '{0: <{1}}  -------\n'.format('----', spacer)
-                    for item in enumerate(row):
-                        # Add the name and credit amounts of the top 5 users.
-                        # Truncate usernames at 22 spaces and add '..'
-                        output_string = output_string + "{0: <{1}}  {2}\n".format(
-                            row[item][0][:22] + '..' if len(row[item][0]) > 22 else row[item][0],
-                            spacer,
-                            row[item][1]
-                        )
-                        output_string = output_string + "\n```"
-                        await self.bot.say(output_string)
-                except Exception:
-                    await ErrorLogging().log_error(
-                        traceback.format_exc(),
-                        'credit_bet: scores (inner)',
-                        str(member)
-                    )
-                    return
-        except Exception:
-            await ErrorLogging().log_error(
-                traceback.format_exc(),
-                'credit_bet: scores (outer)',
-                str(member)
+            row = DatabaseHandler().fetch_all_results(
+                "SELECT displayName, credits, timesBet \
+                FROM credit_bet WHERE serverID = {0} AND credits > 0 \
+                ORDER BY credits DESC LIMIT 5"
+                .format(str(server_id))
             )
-            return
+            names = {d[0] for d in row}
+            max_name_len = max(map(len, names))
+            max_name_len = 22 if max_name_len > 22 else max_name_len
+            spacer = max_name_len + 4
+            output_string = '```{0: <{1}}  Credits\n'.format('User', spacer)
+            output_string = output_string + '{0: <{1}}  -------\n'.format('----', spacer)
+            for item in enumerate(row):
+                # Add the name and credit amounts of the top 5 users.
+                # Truncate usernames at 22 spaces and add '..'
+                output_string = output_string + "{0: <{1}}  {2}\n".format(
+                    row[item][0][:22] + '..' if len(row[item][0]) > 22 else row[item][0],
+                    spacer,
+                    row[item][1]
+                )
+                output_string = output_string + "\n```"
+                await self.bot.say(output_string)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
-    async def helpme(self, ctx, member: discord.Member=None):
+    async def helpme(self, ctx):
         """ Free credits for those that qualify. """
         # @TODO : let server owners set time between uses, max amount
         # before preventing, and credits each time
@@ -446,73 +312,65 @@ class CreditBet():
         )
 
         if plugin_enabled and int(ctx.message.channel.id) == channel_id:
-            try:
-                information = DatabaseHandler().fetch_all_results(
-                    'SELECT credits, lastClaimTime AS \
-                    "[timestamp]" FROM credit_bet WHERE \
-                    userID = {0} AND serverID = {1}'.format(
-                        str(member_id),
-                        str(server_id))
-                )
-                current_date = datetime.now()
-                member_credits = information[0][0]
-                last_used_time = information[0][1]
-                if member_credits >= 500:
-                    return await self.bot.say(
-                        "{0.mention}, you are above the maximum threshold to \
-                        use this command (balance of {1}).".format(
-                            member,
-                            member_credits
-                        )
+            information = DatabaseHandler().fetch_all_results(
+                'SELECT credits, lastClaimTime AS \
+                "[timestamp]" FROM credit_bet WHERE \
+                userID = {0} AND serverID = {1}'.format(
+                    str(member_id),
+                    str(server_id))
+            )
+            current_date = datetime.now()
+            member_credits = information[0][0]
+            last_used_time = information[0][1]
+            if member_credits >= 500:
+                return await self.bot.say(
+                    "{0.mention}, you are above the maximum threshold to \
+                    use this command (balance of {1}).".format(
+                        member,
+                        member_credits
                     )
-                else:
-                    if last_used_time is not None:
-                        total_seconds = (current_date - last_used_time).total_seconds()
-                    if int(total_seconds) >= 86400:
-                        total_seconds = int(86400 - total_seconds)
-                        total_hours = int(total_seconds / 3600)
-                        used_secs = int(total_hours * 3600)
-                        seconds_left = int(total_seconds - used_secs)
-                        final_minutes = int(seconds_left / 60)
-                        formatted_string = "{0}h:{1}m".format(total_hours * -1, final_minutes * -1)
-                        new_credits = member_credits + 100
-                        print(current_date)
-                        args = (new_credits, str(current_date), str(member_id), str(server_id), )
-                        DatabaseHandler().update_database_with_args(
-                            "UPDATE credit_bet SET credits = ?, \
-                            lastClaimTime = ? WHERE userID = ? AND serverID = ?",
-                            args
-                        )
-                        await self.bot.say(
-                            "{0.mention}, you have been given an additional 100 credits! \
-                            Your 24 cooldown ended {1} ago!".format(member, formatted_string)
-                        )
-                        return
-                    else:
-                        # should we output seconds too?
-                        total_seconds = int(86400 - total_seconds)
-                        total_hours = int(total_seconds / 3600)
-                        used_secs = int(total_hours * 3600)
-                        seconds_left = int(total_seconds - used_secs)
-                        final_minutes = int(seconds_left / 60)
-                        final_seconds = int(seconds_left - (final_minutes * 60))
-                        formatted_string = "{0}h:{1}m:{2}s".format(
-                            total_hours,
-                            final_minutes,
-                            final_seconds
-                        )
-                        await self.bot.say(
-                            "{0.mention}, you can only use this command every 24 hours ({1}), \
-                            and if below 500 credits :cry:".format(member, formatted_string)
-                        )
-                        return
-            except Exception:
-                await ErrorLogging().log_error(
-                    traceback.format_exc(),
-                    'credit_bet: helpme',
-                    str(member)
                 )
-                return
+            else:
+                if last_used_time is not None:
+                    total_seconds = (current_date - last_used_time).total_seconds()
+                if int(total_seconds) >= 86400:
+                    total_seconds = int(86400 - total_seconds)
+                    total_hours = int(total_seconds / 3600)
+                    used_secs = int(total_hours * 3600)
+                    seconds_left = int(total_seconds - used_secs)
+                    final_minutes = int(seconds_left / 60)
+                    formatted_string = "{0}h:{1}m".format(total_hours * -1, final_minutes * -1)
+                    new_credits = member_credits + 100
+                    print(current_date)
+                    args = (new_credits, str(current_date), str(member_id), str(server_id), )
+                    DatabaseHandler().update_database_with_args(
+                        "UPDATE credit_bet SET credits = ?, \
+                        lastClaimTime = ? WHERE userID = ? AND serverID = ?",
+                        args
+                    )
+                    await self.bot.say(
+                        "{0.mention}, you have been given an additional 100 credits! \
+                        Your 24 cooldown ended {1} ago!".format(member, formatted_string)
+                    )
+                    return
+                else:
+                    # should we output seconds too?
+                    total_seconds = int(86400 - total_seconds)
+                    total_hours = int(total_seconds / 3600)
+                    used_secs = int(total_hours * 3600)
+                    seconds_left = int(total_seconds - used_secs)
+                    final_minutes = int(seconds_left / 60)
+                    final_seconds = int(seconds_left - (final_minutes * 60))
+                    formatted_string = "{0}h:{1}m:{2}s".format(
+                        total_hours,
+                        final_minutes,
+                        final_seconds
+                    )
+                    await self.bot.say(
+                        "{0.mention}, you can only use this command every 24 hours ({1}), \
+                        and if below 500 credits :cry:".format(member, formatted_string)
+                    )
+                    return
 def setup(bot):
     """This makes it so we can actually use it."""
     bot.add_cog(CreditBet(bot))
