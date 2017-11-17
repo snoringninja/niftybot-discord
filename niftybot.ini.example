@@ -28,3 +28,4 @@ not_accepted_message = {0.mention}:
 
 [Debugging]
 show_db_info: false
+error_handle_debugger: false

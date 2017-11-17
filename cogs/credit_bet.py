@@ -130,7 +130,6 @@ class CreditBet():
             print("Error in the initial conditional IF statement (credit_bet).")
         return
 
-    #
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=60, type=commands.BucketType.user)
     async def balance(self, ctx, member: discord.Member=None):
@@ -179,7 +178,6 @@ class CreditBet():
                     )
                 )
 
-    #
     @commands.command(pass_context=True, no_pm=True)
     async def register(self, ctx, member: discord.Member=None):
         """ Register for betting. """
@@ -238,7 +236,6 @@ class CreditBet():
                                     to play!".format(member)
                                   )
 
-    #
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
     async def scores(self, ctx, member: discord.Member=None):
@@ -276,13 +273,14 @@ class CreditBet():
             spacer = max_name_len + 4
             output_string = '```{0: <{1}}  Credits\n'.format('User', spacer)
             output_string = output_string + '{0: <{1}}  -------\n'.format('----', spacer)
+
             for item in enumerate(row):
                 # Add the name and credit amounts of the top 5 users.
                 # Truncate usernames at 22 spaces and add '..'
                 output_string = output_string + "{0: <{1}}  {2}\n".format(
-                    row[item][0][:22] + '..' if len(row[item][0]) > 22 else row[item][0],
+                    item[1][0][:22] + '..' if len(item[1][0]) > 22 else item[1][0],
                     spacer,
-                    row[item][1]
+                    item[1][1]
                 )
                 output_string = output_string + "\n```"
                 await self.bot.say(output_string)

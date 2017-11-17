@@ -48,6 +48,10 @@ NOT_ACCEPTED_MESSAGE = str(
     ConfigLoader().load_config_setting('BotSettings', 'not_accepted_message')
 )
 
+SHOW_DEBUG = str(
+    ConfigLoader().load_config_setting_boolean('Debugging', 'error_handle_debugger')
+)
+
 CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
 
 @CLIENT.event
@@ -173,9 +177,21 @@ async def on_command_error(exception, context):
     if hasattr(context.command, "on_error"):
         return
 
+    if isinstance(exception, commands.CommandNotFound):
+        return
+
+    if isinstance(exception, commands.DisabledCommand):
+        return
+
+    if isinstance(exception, commands.NoPrivateMessage):
+        return
+
+    if SHOW_DEBUG:
+        traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
+
     print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
     await ErrorLogging().log_error(
-        traceback.format_exc(),
+        exception,
         context.command
     )
 

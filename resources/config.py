@@ -48,6 +48,11 @@ class ConfigLoader():
         self.parser.read(self.config)
         return str(self.parser.get(section, var))
 
+    def load_config_setting_boolean(self, section, var):
+        """Load a boolean bot config setting."""
+        self.parser.read(self.config)
+        return self.parser.getboolean(section, var)
+
     ####################################################################################
     # Below are for loading specific server config settings, not global config settings
     ####################################################################################
