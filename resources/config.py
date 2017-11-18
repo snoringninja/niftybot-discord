@@ -80,16 +80,19 @@ class ConfigLoader():
 
     def load_server_config_setting(self, filename, section, var):
         """Load a specific server config side."""
-        loaded_file = load_config(
-            '%s.ini' % (
-                os.path.join(
-                    self.server_settings_path,
-                    str(filename)
-                )
-            ),
-        )
-        self.parser.read(loaded_file)
-        return self.parser.get(section, var)
+        try:
+            loaded_file = load_config(
+                '%s.ini' % (
+                    os.path.join(
+                        self.server_settings_path,
+                        str(filename)
+                    )
+                ),
+            )
+            self.parser.read(loaded_file)
+            return self.parser.get(section, var)
+        except configparser.NoSectionError:
+            print("Basic config setting missing from server.")
 
     def load_server_boolean_setting(self, filename, section, var):
         """Load a boolean server config setting."""
@@ -109,26 +112,32 @@ class ConfigLoader():
 
     def load_server_int_setting(self, filename, section, var):
         """Load an int server config setting."""
-        loaded_file = load_config(
-            '%s.ini' % (
-                os.path.join(
-                    self.server_settings_path,
-                    str(filename)
-                )
-            ),
-        )
-        self.parser.read(loaded_file)
-        return self.parser.getint(section, var)
+        try:
+            loaded_file = load_config(
+                '%s.ini' % (
+                    os.path.join(
+                        self.server_settings_path,
+                        str(filename)
+                    )
+                ),
+            )
+            self.parser.read(loaded_file)
+            return self.parser.getint(section, var)
+        except configparser.NoSectionError:
+            print("Integer setting did not exist for server.")
 
     def load_server_config_setting_string(self, filename, section, var):
         """Load a string server config setting."""
-        loaded_file = load_config(
-            '%s.ini' % (
-                os.path.join(
-                    self.server_settings_path,
-                    str(filename)
-                )
-            ),
-        )
-        self.parser.read(loaded_file)
-        return str(self.parser.get(section, var))
+        try:
+            loaded_file = load_config(
+                '%s.ini' % (
+                    os.path.join(
+                        self.server_settings_path,
+                        str(filename)
+                    )
+                ),
+            )
+            self.parser.read(loaded_file)
+            return str(self.parser.get(section, var))
+        except configparser.NoSectionError:
+            print("String setting did not exist for server.")
