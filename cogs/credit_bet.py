@@ -52,8 +52,6 @@ class CreditBet():
             'minimum_bet'
         )
 
-        prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
-
         if (
                 isinstance(amount, int)
                 and plugin_enabled
@@ -69,7 +67,10 @@ class CreditBet():
                 )
                 if row is None:
                     await self.bot.say(
-                        "{0.mention}: please do {1}register to join the lotto.".format(member, self.prefix)
+                        "{0.mention}: please do {1}register to join the lotto.".format(
+                            member,
+                            self.prefix
+                        )
                     )
                     return
                 else:
@@ -101,7 +102,7 @@ class CreditBet():
                                 )
                             )
                             await self.bot.say(
-                                "Sorry, {0.mention}, you lost with a roll of {1}" \
+                                "Sorry, {0.mention}, you lost with a roll of {1} " \
                                 "against {2}! Your balance is now {3}!"
                                 .format(member, user_number, bot_number, new_balance)
                             )
@@ -113,13 +114,13 @@ class CreditBet():
                                 .format(new_balance, str(member_id), str(server_id))
                             )
                             await self.bot.say(
-                                "Congratulations, {0.mention}, you won with a roll" \
+                                "Congratulations, {0.mention}, you won with a roll " \
                                 "of {1} against {2}! Your balance is now {3}!"
                                 .format(member, user_number, bot_number, new_balance)
                             )
                         else:
                             await self.bot.say(
-                                "It was a tie, {0.mention}, with a roll of {1}!" \
+                                "It was a tie, {0.mention}, with a roll of {1}! " \
                                 "Your balance remains {2}!".format(
                                     member,
                                     user_number,
@@ -230,11 +231,11 @@ class CreditBet():
                         str(datetime.now())
                     )
                 )
-                await self.bot.say("{0.mention}, you are now registered! {1}bet to play!" \
+                await self.bot.say("{0.mention}, you are now registered! {1}bet to play! " \
                                     "Goodluck!".format(member, self.prefix)
                                   )
             else:
-                await self.bot.say("{0.mention}: you're already registered. Please do {1}bet" \
+                await self.bot.say("{0.mention}: you're already registered. Please do {1}bet " \
                                     "to play!".format(member, self.prefix)
                                   )
 
@@ -324,7 +325,7 @@ class CreditBet():
             last_used_time = information[0][1]
             if member_credits >= 500:
                 return await self.bot.say(
-                    "{0.mention}, you are above the maximum threshold to" \
+                    "{0.mention}, you are above the maximum threshold to " \
                     "use this command (balance of {1}).".format(
                         member,
                         member_credits
@@ -349,7 +350,7 @@ class CreditBet():
                         args
                     )
                     await self.bot.say(
-                        "{0.mention}, you have been given an additional 100 credits!" \
+                        "{0.mention}, you have been given an additional 100 credits! " \
                         "Your 24 cooldown ended {1} ago!".format(member, formatted_string)
                     )
                     return
@@ -367,7 +368,7 @@ class CreditBet():
                         final_seconds
                     )
                     await self.bot.say(
-                        "{0.mention}, you can only use this command every 24 hours ({1})," \
+                        "{0.mention}, you can only use this command every 24 hours ({1}), " \
                         "and if below 500 credits :cry:".format(member, formatted_string)
                     )
                     return
