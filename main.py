@@ -83,6 +83,8 @@ async def on_message(message):
             await CLIENT.process_commands(message)
         elif message.content.startswith("{0}guild".format(COMMAND_PREFIX)):
             await CLIENT.process_commands(message)
+        elif message.content.startswith("{0}genconfig".format(COMMAND_PREFIX)):
+            await CLIENT.process_commands(message)
         else:
             can_use = BotResources().check_accepted(message.author.id)
             message_channel_valid = BotResources().get_tos_channel_valid(message.server.id)
