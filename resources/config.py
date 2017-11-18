@@ -8,6 +8,7 @@ Functions: Set up everything from the config file we use, Load the required conf
 # Imports for ConfigLoader
 import os
 import configparser
+import errno
 
 def get_config_filename(default_filename):
     """Return the filename; probably not needed at this point."""
@@ -32,6 +33,15 @@ class ConfigLoader():
                 os.path.dirname(__file__),
                 '../channel_settings')
         )
+
+    def create_directory(self):
+        """Create an errors directory if needed."""
+        #print "DIRECTORY: %s" % (self.directory,)
+        try:
+            os.mkdir(self.server_settings_path)
+        except OSError as exception:
+            if exception.errno != errno.EEXIST:
+                raise
 
     def load_config_setting(self, section, var):
         """Load a config setting from the bot config."""

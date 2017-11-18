@@ -204,6 +204,7 @@ def main():
     """
     print('Preparing...')
     ErrorLogging().create_directory()
+    ConfigLoader().create_directory()
     try:
         startup_extensions = []
         for plugin in EXTENSIONS.split():
