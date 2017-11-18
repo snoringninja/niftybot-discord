@@ -16,7 +16,8 @@ class BotResources:
     def __init__(self):
         self.prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
-    def check_accepted(self, user_id):
+    @staticmethod
+    def check_accepted(user_id):
         """Check if a user has accepted the Terms of Service."""
         print("User ID: {}".format(user_id))
         row = DatabaseHandler().fetch_results(
@@ -29,7 +30,8 @@ class BotResources:
             return True
         return False
 
-    def get_tos_channel_id(self, server_id):
+    @staticmethod
+    def get_tos_channel_id(server_id):
         """Check if a channel is set for the ToS Message"""
         try:
             try:

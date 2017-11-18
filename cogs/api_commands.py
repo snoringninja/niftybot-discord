@@ -238,18 +238,16 @@ class ApiCommands():
         trait_three = ''
         trait_list_three = ''
 
+        # this is awful, but works
         for item in enumerate(trait_dict):
-            print(item[1])
-
-        # @TODO : use enumerate instead of range(len())
-        #for item in enumerate(trait_dict):
-            
-            #for value in item.items():
-            #    if isinstance(value[1], list):
-            #        for key in value[1]:
-            #            trait_list.append(key)
-            #    else:
-            #        trait_spec_list.append(value[1])
+            for key in item[1]:
+                if key == 'traits':
+                    for value in item[1].values():
+                        for internal_value in value:
+                            trait_list.append(internal_value)
+                else:
+                    for value in item[1].values():
+                        trait_spec_list.append(value)
 
         trait_one = DatabaseHandler().fetch_results(
             "SELECT spec_name FROM gw2_specs WHERE spec_id = {0}".format(int(trait_spec_list[0])))
@@ -259,15 +257,14 @@ class ApiCommands():
             "SELECT spec_name FROM gw2_specs WHERE spec_id = {0}".format(int(trait_spec_list[2])))
 
         # we're cheating here since we know it's always 9 total traits
-        # to not cheat, we could just use len(trait_list)
-        for item in range(9):
+        for counter in range(9):
             spec_name = DatabaseHandler().fetch_results(
                 "SELECT trait_name FROM gw2_traits WHERE trait_id = {0}"
-                .format(int(trait_list[item]))
+                .format(int(trait_list[counter]))
             )
-            if item in range(3):
+            if counter in range(3):
                 trait_list_one = trait_list_one + ', ' + spec_name[0]
-            elif item in range(3, 6):
+            elif counter in range(3, 6):
                 trait_list_two = trait_list_two + ', ' + spec_name[0]
             else:
                 trait_list_three = trait_list_three + ', ' + spec_name[0]
