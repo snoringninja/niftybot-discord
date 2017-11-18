@@ -19,19 +19,16 @@ class BotResources:
     @staticmethod
     def check_accepted(user_id):
         """Check if a user has accepted the Terms of Service."""
-        print("User ID: {}".format(user_id))
         row = DatabaseHandler().fetch_results(
             "SELECT 1 FROM accepted_users WHERE discord_id = {0}".format(str(user_id))
         )
-
-        print(row)
 
         if row is not None:
             return True
         return False
 
     @staticmethod
-    def get_tos_channel_id(server_id):
+    def get_tos_channel_valid(server_id):
         """Check if a channel is set for the ToS Message"""
         try:
             try:
