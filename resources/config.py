@@ -126,7 +126,7 @@ class ConfigLoader():
         except configparser.NoSectionError:
             print("Integer setting did not exist for server.")
 
-    def load_server_config_setting_string(self, filename, section, var):
+    def load_server_string_setting(self, filename, section, var):
         """Load a string server config setting."""
         try:
             loaded_file = load_config(

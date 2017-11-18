@@ -22,6 +22,7 @@ class CreditBet():
     """
     def __init__(self, bot):
         self.bot = bot
+        self.prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
@@ -51,6 +52,8 @@ class CreditBet():
             'minimum_bet'
         )
 
+        prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
+
         if (
                 isinstance(amount, int)
                 and plugin_enabled
@@ -66,7 +69,7 @@ class CreditBet():
                 )
                 if row is None:
                     await self.bot.say(
-                        "{0.mention}: please do &register to join the lotto.".format(member)
+                        "{0.mention}: please do {1}register to join the lotto.".format(member, self.prefix)
                     )
                     return
                 else:
@@ -98,8 +101,8 @@ class CreditBet():
                                 )
                             )
                             await self.bot.say(
-                                "Sorry, {0.mention}, you lost with a roll of {1} \
-                                against {2}! Your balance is now {3}!"
+                                "Sorry, {0.mention}, you lost with a roll of {1}" \
+                                "against {2}! Your balance is now {3}!"
                                 .format(member, user_number, bot_number, new_balance)
                             )
                         elif user_number > bot_number:
@@ -110,14 +113,14 @@ class CreditBet():
                                 .format(new_balance, str(member_id), str(server_id))
                             )
                             await self.bot.say(
-                                "Congratulations, {0.mention}, you won with a roll \
-                                of {1} against {2}! Your balance is now {3}!"
+                                "Congratulations, {0.mention}, you won with a roll" \
+                                "of {1} against {2}! Your balance is now {3}!"
                                 .format(member, user_number, bot_number, new_balance)
                             )
                         else:
                             await self.bot.say(
-                                "It was a tie, {0.mention}, with a roll of {1}! \
-                                Your balance remains {2}!".format(
+                                "It was a tie, {0.mention}, with a roll of {1}!" \
+                                "Your balance remains {2}!".format(
                                     member,
                                     user_number,
                                     remaining_credits[0]
@@ -159,8 +162,8 @@ class CreditBet():
             #print("Row: {}".format(row))
             if row is None:
                 await self.bot.say(
-                    "{0.mention}: please do &register to \
-                    join the lotto.".format(member))
+                    "{0.mention}: please do {1}register to" \
+                    "join the lotto.".format(member, self.prefix))
                 return
             else:
                 remaining_credits = DatabaseHandler().fetch_results(
@@ -227,12 +230,12 @@ class CreditBet():
                         str(datetime.now())
                     )
                 )
-                await self.bot.say("{0.mention}, you are now registered! &bet to play! \
-                                    Goodluck!".format(member)
+                await self.bot.say("{0.mention}, you are now registered! {1}bet to play!" \
+                                    "Goodluck!".format(member, self.prefix)
                                   )
             else:
-                await self.bot.say("{0.mention}: you're already registered. Please do &bet \
-                                    to play!".format(member)
+                await self.bot.say("{0.mention}: you're already registered. Please do {1}bet" \
+                                    "to play!".format(member, self.prefix)
                                   )
 
     @commands.command(pass_context=True, no_pm=True)
@@ -321,8 +324,8 @@ class CreditBet():
             last_used_time = information[0][1]
             if member_credits >= 500:
                 return await self.bot.say(
-                    "{0.mention}, you are above the maximum threshold to \
-                    use this command (balance of {1}).".format(
+                    "{0.mention}, you are above the maximum threshold to" \
+                    "use this command (balance of {1}).".format(
                         member,
                         member_credits
                     )
@@ -346,8 +349,8 @@ class CreditBet():
                         args
                     )
                     await self.bot.say(
-                        "{0.mention}, you have been given an additional 100 credits! \
-                        Your 24 cooldown ended {1} ago!".format(member, formatted_string)
+                        "{0.mention}, you have been given an additional 100 credits!" \
+                        "Your 24 cooldown ended {1} ago!".format(member, formatted_string)
                     )
                     return
                 else:
@@ -364,8 +367,8 @@ class CreditBet():
                         final_seconds
                     )
                     await self.bot.say(
-                        "{0.mention}, you can only use this command every 24 hours ({1}), \
-                        and if below 500 credits :cry:".format(member, formatted_string)
+                        "{0.mention}, you can only use this command every 24 hours ({1})," \
+                        "and if below 500 credits :cry:".format(member, formatted_string)
                     )
                     return
 def setup(bot):
