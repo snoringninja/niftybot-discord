@@ -83,39 +83,30 @@ async def on_message(message):
             await CLIENT.process_commands(message)
         elif message.content.startswith("{0}guild".format(COMMAND_PREFIX)):
             await CLIENT.process_commands(message)
+        elif message.content.startswith("{0}genconfig".format(COMMAND_PREFIX)):
+            await CLIENT.process_commands(message)
         else:
-            print("here")
             can_use = BotResources().check_accepted(message.author.id)
-            message_channel_valid = BotResources().get_tos_channel_id(message.server.id)
+            message_channel_valid = BotResources().get_tos_channel_valid(message.server.id)
             if can_use:
                 await CLIENT.process_commands(message)
             elif not can_use and message_channel_valid:
                 if message.author.id != CLIENT.user.id:
-                    try:
-                        message_channel_id = ConfigLoader().load_server_int_setting(
-                            message.server.id,
-                            'ServerSettings',
-                            'not_accepted_channel_id'
+                    message_channel_id = ConfigLoader().load_server_int_setting(
+                        message.server.id,
+                        'ServerSettings',
+                        'not_accepted_channel_id'
+                    )
+
+                    bot_message = await CLIENT.send_message(
+                        discord.Object(id=message_channel_id),
+                        NOT_ACCEPTED_MESSAGE.format(
+                            message.author,
+                            COMMAND_PREFIX
                         )
-                        bot_message = await CLIENT.send_message(
-                            discord.Object(id=message_channel_id),
-                            NOT_ACCEPTED_MESSAGE.format(
-                                message.author,
-                                COMMAND_PREFIX
-                            )
-                        )
-                        await asyncio.sleep(20)
-                        await CLIENT.delete_message(bot_message)
-                    except Exception:
-                        bot_message = await CLIENT.send_message(
-                            discord.Object(id=message.channel.id),
-                            NOT_ACCEPTED_MESSAGE.format(
-                                message.author,
-                                COMMAND_PREFIX
-                            )
-                        )
-                        await asyncio.sleep(20)
-                        await CLIENT.delete_message(bot_message)
+                    )
+                    await asyncio.sleep(20)
+                    await CLIENT.delete_message(bot_message)
             else:
                 # This is needed to prevent infinite looping message posting
                 if message.author.id != CLIENT.user.id:
@@ -175,23 +166,36 @@ async def on_command_error(exception, context):
     """
 
     if hasattr(context.command, "on_error"):
+        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
 
     if isinstance(exception, commands.CommandNotFound):
+        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
 
     if isinstance(exception, commands.DisabledCommand):
+        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
 
     if isinstance(exception, commands.NoPrivateMessage):
+        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
 
     if SHOW_DEBUG:
-        traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
+        traceback.print_exception(
+            type(exception),
+            exception,
+            exception.__traceback__,
+            file=sys.stderr
+        )
 
-    print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
+    print("Generating an error log from command {0}".format(context.command), file=sys.stderr)
     await ErrorLogging().log_error(
-        exception,
+        traceback.format_exception(
+            type(exception),
+            exception,
+            exception.__traceback__
+        ),
         context.command
     )
 
@@ -202,6 +206,7 @@ def main():
     """
     print('Preparing...')
     ErrorLogging().create_directory()
+    ConfigLoader().create_directory()
     try:
         startup_extensions = []
         for plugin in EXTENSIONS.split():

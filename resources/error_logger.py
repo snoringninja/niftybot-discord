@@ -49,20 +49,36 @@ class ErrorLogging:
 
     async def log_error(self, error_string, error_class, user=None, bot=None):
         """Log the error."""
-        print('Logging error from {0}'.format(error_class))
+        #print('Logging error from {0}'.format(error_class))
         file_suffix = ''.join(random.SystemRandom().choice(
             string.ascii_uppercase + string.digits) for _ in range(6))
         file_suffix = file_suffix + '_{}'.format(time.strftime("%Y%m%d-%H%M%S"))
         file_name = "ERROR-LOG_{0}.log".format(file_suffix)
-        with open("{0}/{1}".format(self.directory, file_name), "w+") as filename:
-            filename.write("ERROR IN {0}, reported by {1} at {2}!\n\nException:\n {3}"
-                           .format(
-                               str(error_class),
-                               str(user),
-                               str(datetime.datetime.now().time()),
-                               str(error_string)
-                           )
-                          )
+
+        formatted_string = ''
+        if isinstance(error_string, list):
+            for tb_string in error_string:
+                formatted_string = formatted_string + tb_string
+
+            with open("{0}/{1}".format(self.directory, file_name), "w+") as filename:
+                filename.write("ERROR IN {0}, reported by {1} at {2}!\n\nException:\n {3}"
+                               .format(
+                                   str(error_class),
+                                   str(user),
+                                   str(datetime.datetime.now().time()),
+                                   formatted_string
+                               )
+                              )
+        else:
+            with open("{0}/{1}".format(self.directory, file_name), "w+") as filename:
+                filename.write("ERROR IN {0}, reported by {1} at {2}!\n\nException:\n {3}"
+                               .format(
+                                   str(error_class),
+                                   str(user),
+                                   str(datetime.datetime.now().time()),
+                                   str(error_string)
+                               )
+                              )
 
         if bot is not None:
             return await bot.say(self.error_message)

@@ -30,7 +30,6 @@ class CreditBet():
         member = ctx.message.author
         member_id = ctx.message.author.id
         server_id = ctx.message.server.id
-        print("called")
 
         # Load some config settings
         channel_id = ConfigLoader().load_server_int_setting(
