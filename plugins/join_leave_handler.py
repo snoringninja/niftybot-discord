@@ -1,51 +1,96 @@
-from resources.resourcepath import *
-from resources.config import ConfigLoader
-from resources.error import error_logging
-import discord
-import string
-import time
+"""
+join_leave_handler.py
+@author Ryan 'iBeNifty' Malacina
+@site https://snoring.ninja
+
+Send a welcome or part message when a user joins or leaves a server.
+This is configured on a per server basis.
+"""
+
 import traceback
 import random
+import discord
+
+from resources.config import ConfigLoader
+from resources.error_logger import ErrorLogging
 
 class JoinLeaveHandler():
-	def __init__(self, bot):
-		self.bot = bot
+    """
+    Functions for welcoming a user or sending a message if
+    a user leaves
+    """
+    def __init__(self, bot):
+        self.bot = bot
 
-	async def welcomeUser(self, server_id : str, member : str, server : str):
-		welcome_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'JoinPart', 'member_join_enabled')
+    async def welcome_user(self, server_id: str, member: str, server: str):
+        """Welcome a user to the discord server if enabled"""
+        welcome_enabled = ConfigLoader().load_server_boolean_setting(
+            server_id,
+            'JoinPart',
+            'member_join_enabled'
+        )
 
-		try:
-			if welcome_enabled == True:
-				welcome_channel = ConfigLoader().load_server_config_setting(server_id, 'JoinPart', 'welcome_channel_id')
-				display_name = member.display_name
+        try:
+            if welcome_enabled:
+                welcome_channel = ConfigLoader().load_server_config_setting(
+                    server_id,
+                    'JoinPart',
+                    'welcome_channel_id'
+                )
 
-				emoteArray = []
-				for x in member.server.emojis:
-					emoteArray.append(x)
+                emote_array = []
+                for emoji in member.server.emojis:
+                    emote_array.append(emoji)
 
-				if not emoteArray:
-					await self.bot.send_message(discord.Object(id=welcome_channel), "Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun!".format(server, member))
-				else:
-					await self.bot.send_message(discord.Object(id=welcome_channel), "Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun! {2}".format(server, member, random.choice(emoteArray)))
-			else:
-				print("Welcome message disabled.")
-				return
-		except Exception as e:
-			await error_logging().log_error(traceback.format_exc(), 'join_leave_handler: welcomeUser', str(member))
-			return
+                    if not emote_array:
+                        await self.bot.send_message(
+                            discord.Object(id=welcome_channel),
+                            "Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun!"
+                            .format(server, member))
+                    else:
+                        await self.bot.send_message(
+                            discord.Object(id=welcome_channel),
+                            "Welcome to {0.name}\'s Discord, {1.mention}! \
+                            Relax and have some fun! {2}"
+                            .format(server, member, random.choice(emote_array)))
+            else:
+                return
+        except Exception:
+            await ErrorLogging().log_error(
+                traceback.format_exc(),
+                'join_leave_handler: welcome_user',
+                str(member)
+            )
+            return
 
-	async def goodbyeUser(self, server_id : str, member : str):
-		part_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'JoinPart', 'member_part_enabled')
+    async def goodbye_user(self, server_id: str, member: str):
+        """Send a message when a user leaves the server."""
+        part_enabled = ConfigLoader().load_server_boolean_setting(
+            server_id,
+            'JoinPart',
+            'member_part_enabled'
+        )
 
-		try:
-			if part_enabled == True:
-				part_channel = ConfigLoader().load_server_config_setting(server_id, 'JoinPart', 'leave_channel_id')
-				display_name = member.display_name
+        try:
+            if part_enabled:
+                part_channel = ConfigLoader().load_server_config_setting(
+                    server_id,
+                    'JoinPart',
+                    'leave_channel_id'
+                )
+                display_name = member.display_name
 
-				await self.bot.send_message(discord.Object(id=part_channel), "{0} ({1}) has left the server.".format(member, display_name))
-			else:
-				print("Part message disabled.")
-				return
-		except Exception as e:
-			await error_logging().log_error(traceback.format_exc(), 'join_leave_handler: goodbyeUser', str(member))
-			return
+                await self.bot.send_message(
+                    discord.Object(id=part_channel),
+                    "{0} ({1}) has left the server."
+                    .format(member, display_name)
+                )
+            else:
+                return
+        except Exception:
+            await ErrorLogging().log_error(
+                traceback.format_exc(),
+                'join_leave_handler: goodbye_user',
+                str(member)
+            )
+            return

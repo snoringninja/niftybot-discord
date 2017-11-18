@@ -4,7 +4,7 @@ from discord.ext import commands
 
 import traceback
 
-from resources.error import error_logging
+from resources.error_logger import ErrorLogging
 from resources.config import ConfigLoader
 
 from cogs.config_updater import ConfigUpdater
@@ -27,7 +27,7 @@ class RoleAssignor():
 
 		# if this fails it's not a boolean so we'll fix that but disable the plugin
 		try:
-			plugin_enabled = ConfigLoader().load_server_config_setting_boolean(server_id, 'RoleAssignment', 'enabled')
+			plugin_enabled = ConfigLoader().load_server_boolean_setting(server_id, 'RoleAssignment', 'enabled')
 		except Exception as e:
 			await ConfigUpdater(self.bot).updateConfigFile(server_id, 'RoleAssignment', 'enabled', 'False', True)
 			return await self.bot.say("The value for enabled must be a boolean. Disabling plugin until server owner can correct.")
@@ -74,7 +74,7 @@ class RoleAssignor():
 								return
 							except:
 								await self.bot.send_message(ctx.message.channel, "Error.")
-								await error_logging().log_error(traceback.format_exc(), 'role_assignment: assign_role', str(member))
+								await ErrorLogging().log_error(traceback.format_exc(), 'role_assignment: assign_role', str(member))
 								return
 						else:
 							await self.bot.send_message(ctx.message.channel, "{0.mention}: Requested group not found.".format(member))
@@ -86,7 +86,7 @@ class RoleAssignor():
 			else:
 				return
 		except Exception as e:
-			await error_logging().log_error(traceback.format_exc(), 'role_assignment: RoleAssignor', str(member))
+			await ErrorLogging().log_error(traceback.format_exc(), 'role_assignment: RoleAssignor', str(member))
 			return
 
 	@commands.command(pass_context=True, no_pm=False, name='role')
@@ -122,7 +122,7 @@ class RoleAssignor():
 				filename = ctx.message.server.id
 				await ConfigUpdater(self.bot).updateConfigFile(filename, 'RoleAssignment', 'role_list', updated_role_list.strip())
 		except Exception as e:
-			await error_logging().log_error(traceback.format_exc(), 'role_assignment: updateRoleList', str(member))
+			await ErrorLogging().log_error(traceback.format_exc(), 'role_assignment: updateRoleList', str(member))
 			return
 
 	@commands.command(pass_context=True, no_pm=False, name='rolechannel')
@@ -158,7 +158,7 @@ class RoleAssignor():
 				filename = ctx.message.server.id
 				await ConfigUpdater(self.bot).updateConfigFile(filename, 'RoleAssignment', 'assignment_channel_id', updated_channel_list.strip())
 		except Exception as e:
-			await error_logging().log_error(traceback.format_exc(), 'role_assignment: updateChannelList', str(member))
+			await ErrorLogging().log_error(traceback.format_exc(), 'role_assignment: updateChannelList', str(member))
 			return
 
 

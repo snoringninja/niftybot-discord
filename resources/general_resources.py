@@ -1,39 +1,55 @@
-import discord
-import logging
-from discord.ext import commands
-import os
-import configparser
-import traceback
+"""
+general_resources.py
+@author Ryan 'iBeNifty' Malacina
+@site https://snoring.ninja
 
-from resources.database import DatabaseHandler
+This class serves to be a location for some general use bot functions.
+"""
+import traceback
 from resources.config import ConfigLoader
-from resources.error import error_logging
+from resources.database import DatabaseHandler
+from resources.error_logger import ErrorLogging
+
 
 class BotResources:
-	def __init__(self, bot = None):
-		self.prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
+    """General bot resource functions"""
+    def __init__(self):
+        self.prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
-	def checkAccepted(self, user_id, channel_id = None):
-		try:
-			row = DatabaseHandler().fetch_results("SELECT 1 FROM accepted_users WHERE discord_id = {0}".format(str(user_id)))
+    @staticmethod
+    def check_accepted(user_id):
+        """Check if a user has accepted the Terms of Service."""
+        print("User ID: {}".format(user_id))
+        row = DatabaseHandler().fetch_results(
+            "SELECT 1 FROM accepted_users WHERE discord_id = {0}".format(str(user_id))
+        )
 
-			if row is not None:
-				return True
-			else:
-				return False
-		except Exception as e:
-			error_logging().log_error(traceback.format_exc(), 'BotCommands: checkAccepted')
-			return False
+        print(row)
 
-	def get_tos_channel_id(self, server_id):
-		# Load some config settings
-		try:
-			try:
-				channel_id = ConfigLoader().load_server_config_setting_int(server_id, 'ServerSettings', 'not_accepted_channel_id')
-				return True
-			except Exception as e:
-				error_logging().log_error(traceback.format_exc(), 'BotCommands: get_tos_channel_id')
-				return False
-		except Exception as e:
-			error_logging().log_error(traceback.format_exc(), 'BotCommands: get_tos_channel_id')
-			return False
+        if row is not None:
+            return True
+        return False
+
+    @staticmethod
+    def get_tos_channel_id(server_id):
+        """Check if a channel is set for the ToS Message"""
+        try:
+            try:
+                ConfigLoader().load_server_int_setting(
+                    server_id,
+                    'ServerSettings',
+                    'not_accepted_channel_id'
+                )
+                return True
+            except ValueError:
+                #ErrorLogging().log_error_without_await(
+                #    traceback.format_exc(),
+                #    'BotResources: get_tos_channel_id (inner)'
+                #)
+                return False
+        except ValueError:
+            ErrorLogging().log_error_without_await(
+                traceback.format_exc(),
+                'BotResources: get_tos_channel_id (outer)'
+            )
+            return False

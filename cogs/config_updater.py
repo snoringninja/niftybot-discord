@@ -5,10 +5,11 @@ from discord.ext import commands
 import os
 import configparser
 import asyncio
+import traceback
 
 from resources.general_resources import BotResources
 from resources.config import ConfigLoader
-from resources.error import error_logging
+from resources.error_logger import ErrorLogging
 
 class ConfigUpdater:
 	def __init__(self, bot):
@@ -45,7 +46,7 @@ class ConfigUpdater:
 			else:
 				return await self.bot.say("Section '{0}' does not exist.".format(updateSection))
 		except Exception as e:
-			return await error_logging().log_error(traceback.format_exc(), 'ConfigUpdater: updateConfigFile', str(member), self.bot)
+			return await ErrorLogging().log_error(traceback.format_exc(), 'ConfigUpdater: updateConfigFile', str(member), self.bot)
 
 	@commands.command(pass_context=True, no_pm=True, name='config')
 	@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
@@ -60,7 +61,7 @@ class ConfigUpdater:
 				filename = ctx.message.server.id
 				await self.updateConfigFile(filename, updateSection, updateKey, updateValue, ctx.message)
 			except Exception as e:
-				await error_logging().log_error(traceback.format_exc(), 'ConfigUpdater: configUpdate', str(member), self.bot)
+				await ErrorLogging().log_error(traceback.format_exc(), 'ConfigUpdater: configUpdate', str(member), self.bot)
 				return await self.bot.say("Error applying requested config update: {0}".format(e))
 		else:
 			return await self.bot.say("Only the server owner can configure different plugins.")
@@ -96,7 +97,7 @@ class ConfigUpdater:
 			await self.bot.delete_message(ctx.message)
 			return await self.bot.delete_message(bot_message)
 		except Exception as e:
-			return await error_logging().log_error(traceback.format_exc(), 'ConfigUpdater: getConfigInformation', str(member), self.bot)
+			return await ErrorLogging().log_error(traceback.format_exc(), 'ConfigUpdater: getConfigInformation', str(member), self.bot)
 
 def setup(bot):
 	"""This makes it so we can actually use it."""

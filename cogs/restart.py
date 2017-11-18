@@ -5,11 +5,10 @@ import errno
 import os
 import sys
 import traceback
-import psutil
 
 from discord.ext import commands
 
-from resources.error import error_logging
+from resources.error_logger import ErrorLogging
 from resources.config import ConfigLoader
 from resources.general_resources import BotResources
 
