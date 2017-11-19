@@ -48,7 +48,6 @@ class ApiCommands():
                     permissions = ['account', 'builds', 'characters']
 
                     self.base_url = 'https://api.guildwars2.com/v2/tokeninfo?access_token='
-                    self.header_dict = {'User-Agent': 'Mozlla/5.0'}
 
                     self.response_url = self.base_url + str(apikey)
                     self.header = urllib.parse.urlencode(self.header_dict)
@@ -91,7 +90,6 @@ class ApiCommands():
         """
         self.base_url = 'https://api.guildwars2.com/v2/characters/'
         base_url2 = '/core?access_token='
-        self.header_dict = {'User-Agent': 'Mozlla/5.0'}
 
         self.response_url = self.base_url + \
             str(character_name) + str(base_url2) + str(api_key)
@@ -113,22 +111,21 @@ class ApiCommands():
 
     async def get_skill_ids(self, char_name, api_key, game_type):
         """Get the list of skill IDs"""
-        base_url = 'https://api.guildwars2.com/v2/characters/'
+        self.base_url = 'https://api.guildwars2.com/v2/characters/'
         base_url2 = '/skills?access_token='
-        header_dict = {'User-Agent': 'Mozlla/5.0'}
 
-        response_url = base_url + \
+        self.response_url = self.base_url + \
             str(char_name) + str(base_url2) + str(api_key)
-        header = urllib.parse.urlencode(header_dict)
-        header = header.encode("utf-8")
-        response = urlopen(response_url)
+        self.header = urllib.parse.urlencode(self.header_dict)
+        self.header = self.header.encode("utf-8")
+        response = urlopen(self.response_url)
         response = response.read()
         response = response.decode("utf-8")
-        data = json.loads(response)
+        self.data = json.loads(response)
 
         skill_info = {}
 
-        for key, value in data['skills'][game_type].items():
+        for key, value in self.data['skills'][game_type].items():
             if key != 'pets':
                 skill_info.update({key: value})
 
@@ -171,23 +168,22 @@ class ApiCommands():
 
     async def get_trait_ids(self, char_name, api_key, game_type):
         """Get the list of trait IDs"""
-        base_url = 'https://api.guildwars2.com/v2/characters/'
+        self.base_url = 'https://api.guildwars2.com/v2/characters/'
         base_url2 = '/specializations?access_token='
-        header_dict = {'User-Agent': 'Mozlla/5.0'}
 
-        response_url = base_url + \
+        self.response_url = self.base_url + \
             str(char_name) + str(base_url2) + str(api_key)
-        header = urllib.parse.urlencode(header_dict)
-        header = header.encode("utf-8")
-        response = urlopen(response_url)
+        self.header = urllib.parse.urlencode(self.header_dict)
+        self.header = self.header.encode("utf-8")
+        response = urlopen(self.response_url)
         response = response.read()
         response = response.decode("utf-8")
-        data = json.loads(response)
+        self.data = json.loads(response)
 
         trait_info = []
 
-        for item in range(len(data['specializations'][game_type])):
-            for key, value in data['specializations'][game_type][item].items():
+        for item in range(len(self.data['specializations'][game_type])):
+            for key, value in self.data['specializations'][game_type][item].items():
                 trait_info.append({key: value})
 
         return trait_info
@@ -220,8 +216,10 @@ class ApiCommands():
 
         trait_one = DatabaseHandler().fetch_results(
             "SELECT spec_name FROM gw2_specs WHERE spec_id = {0}".format(int(trait_spec_list[0])))
+
         trait_two = DatabaseHandler().fetch_results(
             "SELECT spec_name FROM gw2_specs WHERE spec_id = {0}".format(int(trait_spec_list[1])))
+
         trait_three = DatabaseHandler().fetch_results(
             "SELECT spec_name FROM gw2_specs WHERE spec_id = {0}".format(int(trait_spec_list[2])))
 
@@ -320,15 +318,13 @@ class ApiCommands():
                         print("{0}".format(error_code))
                         await self.bot.say("Character not found.")
                     else:
-                        print("I done failed: {0}.".format(error_code))
+                        print("There was an error with the build command: {0}.".format(error_code))
                     return
             else:
                 return await self.bot.say(
                     "{0.mention}, please private message me your API key."
                     .format(member)
                 )
-        else:
-            print("Attempted to use disabled plugin: api_commands")
 
 
 def setup(bot):
