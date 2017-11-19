@@ -25,6 +25,13 @@ class ApiCommands():
     def __init__(self, bot):
         self.bot = bot
 
+        self.base_url = ''
+        self.header_dict = {'User-Agent': 'Mozlla/5.0'}
+
+        self.response_url = ''
+        self.header = ''
+        self.data = ''
+
     @commands.command(pass_context=True, no_pm=False, name='api')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
     async def add_api_key(self, ctx, apikey: str, member: discord.Member=None):
@@ -38,22 +45,22 @@ class ApiCommands():
                     "SELECT 1 FROM api WHERE discord_id = {0}".format(str(member_id)))
 
                 if row is None:
-                    base_url = 'https://api.guildwars2.com/v2/tokeninfo?access_token='
-                    header_dict = {'User-Agent': 'Mozlla/5.0'}
-
                     permissions = ['account', 'builds', 'characters']
 
-                    response_url = base_url + str(apikey)
-                    header = urllib.parse.urlencode(header_dict)
-                    header = header.encode("utf-8")
-                    response = urlopen(response_url)
+                    self.base_url = 'https://api.guildwars2.com/v2/tokeninfo?access_token='
+                    self.header_dict = {'User-Agent': 'Mozlla/5.0'}
+
+                    self.response_url = self.base_url + str(apikey)
+                    self.header = urllib.parse.urlencode(self.header_dict)
+                    self.header = self.header.encode("utf-8")
+                    response = urlopen(self.response_url)
                     response = response.read()
                     response = response.decode("utf-8")
-                    data = json.loads(response)
+                    self.data = json.loads(response)
 
                     granted_permissions = []
 
-                    for value in data['permissions']:
+                    for value in self.data['permissions']:
                         granted_permissions.append(value)
 
                     for permission in permissions:
@@ -82,24 +89,24 @@ class ApiCommands():
         This function returns character information in the format
         (exmaple) "Name: Level 80 Charr Mesmer"
         """
-        base_url = 'https://api.guildwars2.com/v2/characters/'
+        self.base_url = 'https://api.guildwars2.com/v2/characters/'
         base_url2 = '/core?access_token='
-        header_dict = {'User-Agent': 'Mozlla/5.0'}
+        self.header_dict = {'User-Agent': 'Mozlla/5.0'}
 
-        response_url = base_url + \
+        self.response_url = self.base_url + \
             str(character_name) + str(base_url2) + str(api_key)
-        header = urllib.parse.urlencode(header_dict)
-        header = header.encode("utf-8")
-        response = urlopen(response_url)
+        self.header = urllib.parse.urlencode(self.header_dict)
+        self.header = self.header.encode("utf-8")
+        response = urlopen(self.response_url)
         response = response.read()
         response = response.decode("utf-8")
-        data = json.loads(response)
+        self.data = json.loads(response)
 
         character_name = character_name.replace("%20", " ")
 
         character_info = ''
         character_info = '{0}: Level {1} {2} {3}'.format(
-            character_name, data['level'], data['race'], data['profession']
+            character_name, self.data['level'], self.data['race'], self.data['profession']
         )
 
         return character_info
@@ -187,6 +194,7 @@ class ApiCommands():
 
     async def get_trait_data(self, trait_dict):
         """ Except not really a dict. """
+        # @TODO : could split into three functions, help make pylint stop complaining
         trait_list = []
         trait_spec_list = []
 

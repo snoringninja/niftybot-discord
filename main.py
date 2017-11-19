@@ -8,7 +8,6 @@ Built on discord.py
 """
 
 import asyncio
-import errno
 import sys
 import traceback
 
@@ -217,28 +216,18 @@ def main():
         for extension in startup_extensions:
             try:
                 CLIENT.load_extension(extension)
-            except Exception as err:
+            except (ValueError, AttributeError, TypeError) as err:
                 exc = '{}: {}'.format(type(err).__name__, err)
                 print('Failed to load extension {}\n{}'.format(extension, exc))
         CLIENT.run(BOT_TOKEN)
     except AttributeError:
         ErrorLogging().log_error_without_await(traceback.format_exc(), 'AttributeError in main()')
+        CLIENT.logout()
+        sys.exit(0)
     except TypeError:
         ErrorLogging().log_error_without_await(traceback.format_exc(), 'TypeError in main()')
-    except Exception as err:
-        if errno.ECONNRESET:
-            print("Encountered connection reset.")
-            ErrorLogging().log_error_without_await(traceback.format_exc(), 'conn_reset_error')
-        else:
-            print('Startup error encountered.')
-            print(err)
-            print('Exception: {0}: {1}'.format(type(err).__name__, err))
-            ErrorLogging().log_error_without_await(
-                traceback.format_exc(),
-                'startup error in main()'
-            )
-            CLIENT.logout()
-            sys.exit(0)
+        CLIENT.logout()
+        sys.exit(0)
 
 if __name__ == "__main__":
     try:
@@ -249,7 +238,9 @@ if __name__ == "__main__":
         sys.exit(0)
     except AttributeError:
         ErrorLogging().log_error_without_await(traceback.format_exc(), 'AttributeError at __name__')
+        CLIENT.logout()
+        sys.exit(0)
     except TypeError:
         ErrorLogging().log_error_without_await(traceback.format_exc(), 'TypeError at __name__')
-    except Exception:
-        ErrorLogging().log_error_without_await(traceback.format_exc(), 'main_try_block_exception')
+        CLIENT.logout()
+        sys.exit(0)
