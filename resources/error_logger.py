@@ -12,6 +12,7 @@ import string
 import time
 import random
 import datetime
+import logging
 
 from .config import ConfigLoader
 
@@ -49,11 +50,16 @@ class ErrorLogging:
 
     async def log_error(self, error_string, error_class, user=None, bot=None):
         """Log the error."""
-        #print('Logging error from {0}'.format(error_class))
         file_suffix = ''.join(random.SystemRandom().choice(
             string.ascii_uppercase + string.digits) for _ in range(6))
         file_suffix = file_suffix + '_{}'.format(time.strftime("%Y%m%d-%H%M%S"))
-        file_name = "ERROR-LOG_{0}.log".format(file_suffix)
+
+        if error_class <> 'None' or error_class is not None:
+            file_name = "{0}_{1}.log".format(error_class, file_suffix)
+        else:
+            file_name = "ERROR-LOG_{0}.log".format(file_suffix)
+
+        print('Logging error from {0} as {1}'.format(error_class, file_name))
 
         formatted_string = ''
         if isinstance(error_string, list):
