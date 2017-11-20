@@ -12,7 +12,6 @@ import string
 import time
 import random
 import datetime
-import logging
 
 from .config import ConfigLoader
 
@@ -54,7 +53,7 @@ class ErrorLogging:
             string.ascii_uppercase + string.digits) for _ in range(6))
         file_suffix = file_suffix + '_{}'.format(time.strftime("%Y%m%d-%H%M%S"))
 
-        if error_class <> 'None' or error_class is not None:
+        if error_class != 'None' or error_class is not None:
             file_name = "{0}_{1}.log".format(error_class, file_suffix)
         else:
             file_name = "ERROR-LOG_{0}.log".format(file_suffix)
