@@ -1,6 +1,6 @@
 """
 credit)bet.py
-@author Ryan 'iBeNifty' Malacina
+@author xNifty
 @site https://snoring.ninja
 
 Betting game that stores user data in an
@@ -24,10 +24,20 @@ class CreditBet():
         self.bot = bot
         self.prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
+        self.total_seconds = 0
+        self.total_hours = 0
+        self.used_secs = 0
+        self.seconds_left = 0
+        self.final_minutes = 0
+
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
     async def bet(self, ctx, amount: int, member: discord.Member=None):
-        """ Let's bet. """
+        """ Let's bet.
+
+        :amount: the amount the user has decided to bet
+        :member: empty discord.Member object
+        """
         member = ctx.message.author
         member_id = ctx.message.author.id
         server_id = ctx.message.server.id
@@ -136,7 +146,10 @@ class CreditBet():
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=60, type=commands.BucketType.user)
     async def balance(self, ctx, member: discord.Member=None):
-        """ Get user balance. """
+        """ Get user balance.
+
+        :member: empty discord.Member object
+        """
         member = ctx.message.author
         member_id = ctx.message.author.id
         server_id = ctx.message.server.id
@@ -183,7 +196,10 @@ class CreditBet():
 
     @commands.command(pass_context=True, no_pm=True)
     async def register(self, ctx, member: discord.Member=None):
-        """ Register for betting. """
+        """ Register for betting.
+
+        :member: empty discord.Member object
+        """
 
         member = ctx.message.author
         member_id = ctx.message.author.id
@@ -242,7 +258,10 @@ class CreditBet():
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
     async def scores(self, ctx, member: discord.Member=None):
-        """ Display the top 5 with > 0 points. """
+        """Display the top 5 with > 0 points.
+
+        :member: empty discord.Member object
+        """
         member = ctx.message.author
         server_id = ctx.message.server.id
 
@@ -291,7 +310,17 @@ class CreditBet():
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
     async def helpme(self, ctx):
-        """ Free credits for those that qualify. """
+        """Free credits for those that qualify.
+
+        By default, this will check against a 24 hour timer to determinme
+        if the user is eligable to use the command again.
+
+        @TODO: allow server owners to set time between uses
+        @TODO: allow owners to enable setting so that the 24 hour timer
+               only begins after the user has run out of credits
+        @TODO: allow owners to set the threshold for when eligable
+               to use the command
+        """
         # @TODO : let server owners set time between uses, max amount
         # before preventing, and credits each time
         member_id = ctx.message.author.id
@@ -333,16 +362,19 @@ class CreditBet():
                 )
             else:
                 if last_used_time is not None:
-                    total_seconds = (current_date - last_used_time).total_seconds()
-                if int(total_seconds) >= 86400:
-                    total_seconds = int(86400 - total_seconds)
-                    total_hours = int(total_seconds / 3600)
-                    used_secs = int(total_hours * 3600)
-                    seconds_left = int(total_seconds - used_secs)
-                    final_minutes = int(seconds_left / 60)
-                    formatted_string = "{0}h:{1}m".format(total_hours * -1, final_minutes * -1)
+                    self.total_seconds = (current_date - last_used_time).total_seconds()
+                if int(self.total_seconds) >= 86400:
+                    self.total_seconds = int(86400 - self.total_seconds)
+                    self.total_hours = int(self.total_seconds / 3600)
+                    self.used_secs = int(self.total_hours * 3600)
+                    self.seconds_left = int(self.total_seconds - self.used_secs)
+                    self.final_minutes = int(self.seconds_left / 60)
+                    formatted_string = "{0}h:{1}m".format(
+                        self.total_hours * -1,
+                        self.final_minutes * -1
+                    )
+
                     new_credits = member_credits + 100
-                    print(current_date)
                     args = (new_credits, str(current_date), str(member_id), str(server_id), )
                     DatabaseHandler().update_database_with_args(
                         "UPDATE credit_bet SET credits = ?, \
@@ -356,15 +388,15 @@ class CreditBet():
                     return
                 else:
                     # should we output seconds too?
-                    total_seconds = int(86400 - total_seconds)
-                    total_hours = int(total_seconds / 3600)
-                    used_secs = int(total_hours * 3600)
-                    seconds_left = int(total_seconds - used_secs)
-                    final_minutes = int(seconds_left / 60)
-                    final_seconds = int(seconds_left - (final_minutes * 60))
+                    self.total_seconds = int(86400 - self.total_seconds)
+                    self.total_hours = int(self.total_seconds / 3600)
+                    self.used_secs = int(self.total_hours * 3600)
+                    self.seconds_left = int(self.total_seconds - self.used_secs)
+                    self.final_minutes = int(self.seconds_left / 60)
+                    final_seconds = int(self.seconds_left - (self.final_minutes * 60))
                     formatted_string = "{0}h:{1}m:{2}s".format(
-                        total_hours,
-                        final_minutes,
+                        self.total_hours,
+                        self.final_minutes,
                         final_seconds
                     )
                     await self.bot.say(

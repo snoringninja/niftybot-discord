@@ -7,10 +7,7 @@ Functions: Generate the config file for a server
 """
 
 import os
-import traceback
 import configparser
-
-from resources.error_logger import ErrorLogging
 
 class ConfigGenerator():
     """ConfigGenerator"""
@@ -24,22 +21,27 @@ class ConfigGenerator():
         )
 
     async def check_if_config_exists(self, server_id):
-        """Check if a config file exists."""
-        try:
-            if not os.path.exists('%s.ini' % (os.path.join(
-                    self.server_settings_path,
-                    str(server_id)))):
-                return False
-            return True
-        except Exception:
-            await ErrorLogging().log_error(
-                traceback.format_exc(),
-                'ConfigGenerator: checkIfConfigExists'
-            )
-            return True
+        """Check if a config file exists.
+
+        :server_id: the Discord ID for the server
+        """
+        if not os.path.exists(
+                '%s.ini' % (
+                    os.path.join(
+                        self.server_settings_path,
+                        str(server_id)
+                    )
+                )
+        ):
+            return False
+        return True
 
     async def generate_default_config_file(self, server_id, owner_id):
-        """Generate the config file for a server."""
+        """Generate the config file for a server.
+
+        :server_id: the Discord ID for the server
+        :owner_id: the Discord ID for the user marked as the server owner
+        """
         parser = configparser.ConfigParser()
 
         # Create each section that we need by default; future cogs
@@ -80,23 +82,14 @@ class ConfigGenerator():
             'api_channel_id': 'NOT_SET'
         }
 
-
-        try:
-            with open('%s.ini' % (
+        with open(
+            '%s.ini' % (
                 os.path.join(
                     self.server_settings_path,
                     str(server_id))), 'w'
-                     ) as configfile:
-                parser.write(configfile)
-                return await self.bot.say(
-                    "Configuration file generated. You will need to \
-                    configure the file to your required settings.")
-        except Exception:
-            await ErrorLogging().log_error(
-                traceback.format_exc(),
-                'ConfigGenerator: checkIfConfigExists'
-            )
-            return await self.bot.say(
-                "Error generating configuration file: {0}"
-                .format(traceback.format_exc())
-            )
+            ) as configfile:
+            parser.write(configfile)
+        return await self.bot.say(
+            "Configuration file generated. You will need to " \
+            "configure the file to your desired settings."
+        )

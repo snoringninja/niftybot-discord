@@ -1,6 +1,6 @@
 """
 error.py
-@author Ryan 'iBeNifty' Malacina
+@author xNifty
 @site https://snoring.ninja
 
 Handles creating the error files when called.

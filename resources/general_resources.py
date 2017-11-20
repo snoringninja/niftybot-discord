@@ -1,6 +1,6 @@
 """
 general_resources.py
-@author Ryan 'iBeNifty' Malacina
+@author xNifty
 @site https://snoring.ninja
 
 This class serves to be a location for some general use bot functions.
