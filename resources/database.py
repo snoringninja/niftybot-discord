@@ -65,6 +65,8 @@ class DatabaseHandler(object):
 
     def fetch_all_results(self, query):
         """Fetch all matching results.
+
+        :query: query to be run, without passed arguments
         """
         try:
             database = sqlite3.connect(
