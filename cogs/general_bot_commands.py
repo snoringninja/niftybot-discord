@@ -1,6 +1,6 @@
 """
 general_bot_commands.py
-@author Ryan 'iBeNifty' Malacina
+@author xNifty
 @site https://snoring.ninja
 
 Class to handle general bot commands that have no

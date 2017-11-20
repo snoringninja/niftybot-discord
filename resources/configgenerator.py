@@ -21,7 +21,10 @@ class ConfigGenerator():
         )
 
     async def check_if_config_exists(self, server_id):
-        """Check if a config file exists."""
+        """Check if a config file exists.
+
+        :server_id: the Discord ID for the server
+        """
         if not os.path.exists(
                 '%s.ini' % (
                     os.path.join(
@@ -34,7 +37,11 @@ class ConfigGenerator():
         return True
 
     async def generate_default_config_file(self, server_id, owner_id):
-        """Generate the config file for a server."""
+        """Generate the config file for a server.
+
+        :server_id: the Discord ID for the server
+        :owner_id: the Discord ID for the user marked as the server owner
+        """
         parser = configparser.ConfigParser()
 
         # Create each section that we need by default; future cogs

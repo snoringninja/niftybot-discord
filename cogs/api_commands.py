@@ -1,6 +1,6 @@
 """
 api_commands.py
-@author Ryan 'iBeNifty' Malacina
+@author xNifty
 @site https://snoring.ninja
 
 Return information based on the GW2 API
