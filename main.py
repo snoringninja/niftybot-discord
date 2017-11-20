@@ -25,6 +25,11 @@ import discord
 from discord.ext.commands.view import StringView
 from discord.ext import commands
 
+BOT_CONFIG_GENERATED = ConfigLoader().check_for_bot_config()
+if not BOT_CONFIG_GENERATED:
+    print("Please configure the newly generated niftybot.ini file before restarting the bot.")
+    raise SystemExit
+
 # Not sure we still need this
 DESCRIPTION = ConfigLoader().load_config_setting('BotSettings', 'description')
 
@@ -43,8 +48,9 @@ DATABASE_NAME = ConfigLoader().load_config_setting('BotSettings', 'sqlite')
 # Create the plugin list, which is built from the core ini file
 EXTENSIONS = ConfigLoader().load_config_setting('BotSettings', 'enabled_plugins')
 
-NOT_ACCEPTED_MESSAGE = str(
-    ConfigLoader().load_config_setting('BotSettings', 'not_accepted_message')
+NOT_ACCEPTED_MESSAGE = ConfigLoader().load_config_setting_string(
+    'BotSettings',
+    'not_accepted_message'
 )
 
 SHOW_DEBUG = str(
@@ -220,31 +226,29 @@ def main():
         for extension in startup_extensions:
             try:
                 CLIENT.load_extension(extension)
-            except (ValueError, AttributeError, TypeError) as err:
+            except (ValueError, AttributeError, TypeError, ImportError) as err:
                 exc = '{}: {}'.format(type(err).__name__, err)
-                print('Failed to load extension {}\n{}'.format(extension, exc))
+                print('Failed to load extension {}\n{}\n'.format(extension, exc))
         CLIENT.run(BOT_TOKEN)
     except AttributeError:
-        ErrorLogging().log_error_without_await(traceback.format_exc(), 'AttributeError in main()')
         CLIENT.logout()
-        sys.exit(0)
+        raise AttributeError
     except TypeError:
-        ErrorLogging().log_error_without_await(traceback.format_exc(), 'TypeError in main()')
         CLIENT.logout()
-        sys.exit(0)
+        raise TypeError
+    except discord.LoginFailure as login_error:
+        print("There was an issue with logging in:\n{0}\n".format(login_error))
+        raise SystemExit
 
 if __name__ == "__main__":
     try:
         main()
-    except (KeyboardInterrupt, SystemExit):
-        print("Process ended by user.")
-        CLIENT.logout()
+    except SystemExit:
+        print("Bot process was terminated by a SystemExit.")
         sys.exit(0)
     except AttributeError:
-        ErrorLogging().log_error_without_await(traceback.format_exc(), 'AttributeError at __name__')
-        CLIENT.logout()
+        print("Bot process was terminated by an AttributeError.")
         sys.exit(0)
     except TypeError:
-        ErrorLogging().log_error_without_await(traceback.format_exc(), 'TypeError at __name__')
-        CLIENT.logout()
+        print("Bot process was terminated by an TypeError.")
         sys.exit(0)
