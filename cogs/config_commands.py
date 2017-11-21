@@ -12,7 +12,6 @@ import asyncio
 
 import discord
 from discord.ext import commands
-from resources.configgenerator import ConfigGenerator
 from resources.config import ConfigLoader
 
 def load_config(default_filename):
@@ -43,12 +42,12 @@ class ConfigCommands():
 
         if member_id == ctx.message.server.owner_id or \
         int(member_id) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
-            file_exists = await ConfigGenerator(self.bot).check_if_config_exists(
+            file_exists = await ConfigLoader(self.bot).check_if_config_exists(
                 ctx.message.server.id
             )
 
             if not file_exists:
-                await ConfigGenerator(self.bot).generate_default_config_file(
+                await ConfigLoader(self.bot).generate_default_config_file(
                     ctx.message.server.id,
                     member_id
                 )
