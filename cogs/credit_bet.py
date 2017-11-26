@@ -304,8 +304,8 @@ class CreditBet():
                     spacer,
                     item[1][1]
                 )
-                output_string = output_string + "\n```"
-                await self.bot.say(output_string)
+            output_string = output_string + "\n```"
+            await self.bot.say(output_string)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
