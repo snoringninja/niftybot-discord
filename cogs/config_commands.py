@@ -112,7 +112,7 @@ class ConfigCommands():
             bot_admins = []
 
             try:
-                bot_admins_list = ConfigLoader().load_server_config_setting('ServerSettings', 'bot_admins')
+                bot_admins_list = ConfigLoader().load_server_config_setting(ctx.message.server.id, 'ServerSettings', 'bot_admins')
                 for plugin in bot_admins_list.split():
                     bot_admins.append(plugin)
             except:
