@@ -115,13 +115,15 @@ async def on_message(message):
             else:
                 # This is needed to prevent infinite looping message posting
                 if message.author.id != CLIENT.user.id:
-                    await CLIENT.send_message(
+                    bot_message = await CLIENT.send_message(
                         discord.Object(id=message.channel.id),
                         NOT_ACCEPTED_MESSAGE.format(
                             message.author,
                             COMMAND_PREFIX
                         )
                     )
+                    await asyncio.sleep(20)
+                    await CLIENT.delete_message(bot_message)
 
 @CLIENT.event
 async def on_ready():

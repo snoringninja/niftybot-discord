@@ -1,16 +1,14 @@
 # This is the configuration file for the bot; most of these settings SHOULD be self explanatory
-# This will be cleaned up eventually, and ideally generated on first run, but for now, set these manually
 [BotSettings]
 owner_id: your_id
 server_id: base_server_id
-channel_id: base_channel_id
 bot_token: your_bot_token
 game_name: Set game being played!
 command_prefix: !!
 description: Your_Bot_Description
 sqlite: niftybot.db
 # space seperated list of plugings to enable
-enabled_plugins: credit_bet logout api_commands role_assignment config_updater generate_config general_bot_commands
+enabled_plugins: credit_bet logout api_commands role_assignment config_commands general_bot_commands
 
 error_message: There was an error with the requested bot function. Please let the bot owner know to check the error log for more details.
 
