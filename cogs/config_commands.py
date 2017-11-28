@@ -109,9 +109,19 @@ class ConfigCommands():
         """
         try:
             member_id = ctx.message.author.id
+            bot_admins = []
+
+            try:
+                bot_admins_list = ConfigLoader().load_server_config_setting('ServerSettings', 'bot_admins')
+                for plugin in bot_admins_list.split():
+                    bot_admins.append(plugin)
+            except:
+                pass
+
 
             if member_id == ctx.message.server.owner_id or \
-            int(member_id) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
+            int(member_id) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id') or \
+            int(member_id) in bot_admins:
                 filename = ctx.message.server.id
                 await self.update_config_file(
                     filename,
