@@ -107,32 +107,37 @@ class ConfigCommands():
         :update_key: the key value to be updated in the passed in section
         :update_value: the value that matches the key
         """
-        try:
-            member_id = ctx.message.author.id
-            bot_admins = []
-
+        if update_section == 'ServerSettings':
+            return await self.bot.say("This is a protected section.")
+        else:
             try:
-                bot_admins_list = ConfigLoader().load_server_config_setting(ctx.message.server.id, 'ServerSettings', 'bot_admins')
-                for plugin in bot_admins_list.split():
-                    bot_admins.append(plugin)
-            except Exception as ex:
-                pass
+                member_id = ctx.message.author.id
 
-            if member_id == ctx.message.server.owner_id or \
-            int(member_id) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id') or \
-            str(member_id) in bot_admins:
-                filename = ctx.message.server.id
-                await self.update_config_file(
-                    filename,
-                    update_section,
-                    update_key,
-                    update_value,
-                    ctx.message
-                )
-            else:
-                return await self.bot.say("Only the server owner can configure different plugins.")
-        except (configparser.NoSectionError, configparser.NoOptionError) as config_error:
-            print("Error with updating the configuration file: \n{0}".format(config_error))
+                bot_admin_users = []
+                bot_admin_roles = []
+
+                try:
+                    bot_admins_user_list = ConfigLoader().load_server_config_setting(ctx.message.server.id, 'ServerSettings', 'bot_admin_users')
+                    for plugin in bot_admins_user_list.split():
+                        bot_admin_users.append(plugin)
+                except:
+                    pass
+
+                if member_id == ctx.message.server.owner_id or \
+                int(member_id) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id') or \
+                str(member_id) in bot_admin_users:
+                    filename = ctx.message.server.id
+                    await self.update_config_file(
+                        filename,
+                        update_section,
+                        update_key,
+                        update_value,
+                        ctx.message
+                    )
+                else:
+                    return await self.bot.say("Only the server owner can configure different plugins.")
+            except (configparser.NoSectionError, configparser.NoOptionError) as config_error:
+                print("Error with updating the configuration file: \n{0}".format(config_error))
 
     @commands.command(pass_context=True, no_pm=True, name='getconfig')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)

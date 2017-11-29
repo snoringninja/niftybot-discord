@@ -99,7 +99,7 @@ async def on_message(message):
                 if message.author.id != CLIENT.user.id:
                     message_channel_id = ConfigLoader().load_server_int_setting(
                         message.server.id,
-                        'ServerSettings',
+                        'ConfigSettings',
                         'not_accepted_channel_id'
                     )
 

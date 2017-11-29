@@ -1,6 +1,6 @@
 """
 configgenerator.py
-@author - Ryan Malacina (xNifty)
+@author - xNifty
 
 Functions: Generate the config file for a server
 @TODO: generate missing sections and key-values if missing
@@ -50,7 +50,17 @@ class ConfigGenerator():
         # ServerSettings config['testing'] = {'test': '45', 'test2': 'yes'}
         parser['ServerSettings'] = {
             'owner_id': owner_id,
-            'server_id': server_id,
+            'server_id': server_id
+        }
+
+        # BotAdmins
+        parser['BotAdmins'] = {
+            'bot_admin_users': 'NOT_SET',
+            'bot_admin_roles': 'NOT_SET' 
+        }
+
+        # ConfigSettings
+        parser['ConfigSettings'] = {
             'not_accepted_channel_id': 'NOT_SET'
         }
 

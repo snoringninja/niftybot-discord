@@ -34,7 +34,7 @@ class BotResources:
             try:
                 ConfigLoader().load_server_int_setting(
                     server_id,
-                    'ServerSettings',
+                    'ConfigSettings',
                     'not_accepted_channel_id'
                 )
                 return True
