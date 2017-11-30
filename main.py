@@ -174,17 +174,23 @@ async def on_command_error(exception, context):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
 
-    # PyLint was complaining about the number of return statements, so condensed
-    # them down for now until I can do it better
-    if isinstance(exception, commands.CommandNotFound) or \
-    isinstance(exception, commands.DisabledCommand) or \
-    isinstance(exception, commands.NoPrivateMessage) or \
-    isinstance(exception, commands.MissingRequiredArgument):
+    if isinstance(exception, commands.CommandNotFound):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
 
-    if isinstance(exception, commands.CommandOnCooldown) or \
-    isinstance(exception, commands.Cooldown):
+    if isinstance(exception, commands.DisabledCommand):
+        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
+        return
+
+    if isinstance(exception, commands.NoPrivateMessage):
+        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
+        return
+
+    if isinstance(exception, commands.MissingRequiredArgument):
+        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
+        return
+
+    if isinstance(exception, commands.CommandOnCooldown):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
 

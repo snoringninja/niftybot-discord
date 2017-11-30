@@ -108,7 +108,10 @@ class ConfigCommands():
         :update_value: the value that matches the key
         """
         if update_section == 'ServerSettings':
-            return await self.bot.say("This is a protected section.")
+            bot_message = await self.bot.say("This is a protected section.")
+            await asyncio.sleep(5)
+            await self.bot.delete_message(ctx.message)
+            return await self.bot.delete_message(bot_message)
         else:
             try:
                 member_id = ctx.message.author.id
@@ -118,7 +121,7 @@ class ConfigCommands():
                 user_roles_list = []
 
                 for user_role in ctx.message.author.roles:
-                    user_roles_list.append(user_role)
+                    user_roles_list.append(str(int(user_role.id)))
 
                 try:
                     bot_admins_user_list = ConfigLoader().load_server_string_setting(
@@ -141,25 +144,36 @@ class ConfigCommands():
                 except (configparser.NoSectionError, configparser.Error):
                     pass
 
-                if member_id == ctx.message.server.owner_id or \
-                int(member_id) == ConfigLoader().load_config_setting_int(
-                        'BotSettings', 'owner_id'
-                ) or \
-                str(member_id) in bot_admin_users or \
-                [admin_role for admin_role in user_roles_list if admin_role in bot_admin_roles]:
-                    filename = ctx.message.server.id
-                    await self.update_config_file(
-                        filename,
-                        update_section,
-                        update_key,
-                        update_value,
-                        ctx.message
-                    )
-                else:
-                    return await self.bot.say(
-                        "Only the server owner can " \
-                        "configure different plugins."
-                    )
+                if update_section != 'BotAdmins':
+                    if member_id == ctx.message.server.owner_id or \
+                    int(member_id) == ConfigLoader().load_config_setting_int(
+                            'BotSettings', 'owner_id'
+                    ) or \
+                    str(member_id) in bot_admin_users or \
+                    [admin_role for admin_role in user_roles_list if admin_role in bot_admin_roles]:
+                        filename = ctx.message.server.id
+                        await self.update_config_file(
+                            filename,
+                            update_section,
+                            update_key,
+                            update_value,
+                            ctx.message
+                        )
+                    else:
+                        bot_message = await self.bot.say(
+                            "Only the server owner can " \
+                            "configure different plugins."
+                        )
+                        await asyncio.sleep(5)
+                        await self.bot.delete_message(ctx.message)
+                        return await self.bot.delete_message(bot_message)
+                elif update_section == 'BotAdmins':
+                    if member_id == ctx.message.server.owner_id or \
+                    int(member_id) == ConfigLoader().load_config_setting_int(
+                            'BotSettings', 'owner_id'
+                    ):
+                        # @TODO: function call to handle updating either properly
+                        return print("BotAdmins update code @TODO.")
             except (configparser.NoSectionError, configparser.NoOptionError) as config_error:
                 print("Error with updating the configuration file: \n{0}".format(config_error))
 
