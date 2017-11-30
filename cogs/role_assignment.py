@@ -148,20 +148,20 @@ class RoleAssignor():
                 else:
                     return await self.bot.say("Role already added.")
 
-                if add_or_remove == 'remove':
-                    if contains_word(current_role_list, role_id):
-                        updated_role_list = current_role_list.strip(' ' + role_id + ' ')
+            if add_or_remove == 'remove':
+                if contains_word(current_role_list, role_id):
+                    updated_role_list = current_role_list.strip(' ' + role_id + ' ')
 
-                    if updated_role_list.isspace() or len(updated_role_list) == 0:
-                        updated_role_list = 'NOT_SET'
+                if updated_role_list.isspace() or len(updated_role_list) == 0:
+                    updated_role_list = 'NOT_SET'
 
-                filename = ctx.message.server.id
-                await ConfigCommands(self.bot).update_config(
-                    filename,
-                    'RoleAssignment',
-                    'role_list',
-                    updated_role_list.strip()
-                )
+            filename = ctx.message.server.id
+            await ConfigCommands(self.bot).update_config(
+                filename,
+                'RoleAssignment',
+                'role_list',
+                updated_role_list.strip()
+            )
 
 @commands.command(pass_context=True, no_pm=False, name='rolechannel')
 @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)

@@ -168,27 +168,23 @@ async def on_command_error(exception, context):
     Override the default discord.py on_command_error
     to log our errors to a file in the errors
     folder.
-
-    @TODO : better error logging
     """
 
     if hasattr(context.command, "on_error"):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
 
-    if isinstance(exception, commands.CommandNotFound):
+    # PyLint was complaining about the number of return statements, so condensed
+    # them down for now until I can do it better
+    if isinstance(exception, commands.CommandNotFound) or \
+    isinstance(exception, commands.DisabledCommand) or \
+    isinstance(exception, commands.NoPrivateMessage) or \
+    isinstance(exception, commands.MissingRequiredArgument):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
 
-    if isinstance(exception, commands.DisabledCommand):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.NoPrivateMessage):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.MissingRequiredArgument):
+    if isinstance(exception, commands.CommandOnCooldown) or \
+    isinstance(exception, commands.Cooldown):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
 
