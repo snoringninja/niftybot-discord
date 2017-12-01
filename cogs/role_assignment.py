@@ -123,7 +123,7 @@ class RoleAssignor():
         :add_or_remove: (str) [add, remove] passed in string to determine
         if a role is being added or removed
 
-        :role_id: the discord snowflake ID for the role
+        :role_id: the discord snowflake ID for the role, the pinged username
         :member: empty discord.Member object
         """
         member = ctx.message.author
@@ -138,6 +138,17 @@ class RoleAssignor():
                 'RoleAssignment',
                 'role_list'
             )
+
+            #if not ctx.message.mentions:
+            #    role_id = role_id
+            #else:
+            #    role_id = ctx.message.mentions[0].id
+
+            #print(role_id)
+            if ctx.message.mentions:
+                print(ctx.message.mentions[0])
+            else:
+                print("No mentions.")
 
             if add_or_remove == 'add':
                 if not contains_word(current_role_list, role_id):
