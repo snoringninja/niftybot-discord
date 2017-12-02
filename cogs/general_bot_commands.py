@@ -67,8 +67,10 @@ class BotCommands:
         Return the link for the bot documentation.
         """
         member = ctx.message.author
-        return await self.bot.say("{0.mention}: Please see https://xnifty.github.io \
-                                    for now.".format(member))
+        return await self.bot.say(
+            "{0.mention}: Please see https://xnifty.github.io " \
+            "for now.".format(member)
+        )
 
 def setup(bot):
     """This makes it so we can actually use it."""
