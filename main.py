@@ -186,7 +186,8 @@ async def on_command_error(exception, context):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
 
-    if isinstance(exception, commands.MissingRequiredArgument):
+    if isinstance(exception, commands.MissingRequiredArgument) or \
+    isinstance(exception, commands.BadArgument):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
 

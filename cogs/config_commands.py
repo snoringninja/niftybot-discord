@@ -21,6 +21,19 @@ def load_config(default_filename):
     config = configparser.ConfigParser()
     return config.read(default_filename)
 
+def contains_word(string, word):
+    """Check if a word exists inside the string.
+
+    @TODO: allow user to remove themselves from any of the configured
+    groups that they are able to add themselves to
+
+    @TODO: allow owners to add roles/channels simply by passing in the
+    name of the role or channel instead of requiring them to use the
+    snowflake ID; if there happens to be more than one of either, then
+    require the owner to use the specific ID
+    """
+    return ' ' + word + ' ' in ' ' + string + ' '
+
 class ConfigCommands():
     """GenerateConfig controls the generate_config command"""
     def __init__(self, bot):
@@ -172,8 +185,9 @@ class ConfigCommands():
                     int(member_id) == ConfigLoader().load_config_setting_int(
                             'BotSettings', 'owner_id'
                     ):
-                        # @TODO: function call to handle updating either properly
-                        return print("BotAdmins update code @TODO.")
+                        await self.bot.say(
+                            "Please use the botadmin command to update this section."
+                        )
             except (configparser.NoSectionError, configparser.NoOptionError) as config_error:
                 print("Error with updating the configuration file: \n{0}".format(config_error))
 
@@ -224,6 +238,75 @@ class ConfigCommands():
             return await self.bot.delete_message(bot_message)
         except configparser.Error as config_error:
             print("Error with the configuration file: \n{0}".format(config_error))
+
+    @commands.command(pass_context=True, no_pm=False, name='botadmin')
+    @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
+    async def update_role_list(self, ctx, add_or_remove: str, user_or_role: str, \
+                               role_id: str):
+        """Update the configured role list to add or remove
+        a group.
+
+        :user_or_role: (str) [user, role] passed in string to determine
+        if it's a user or a role that is being updated
+
+        :add_or_remove: (str) [add, remove] passed in string to determine
+        if a role is being added or removed
+
+        :role_id: the discord snowflake ID for the role, the pinged username
+        :member: empty discord.Member object
+        """
+        member_id = ctx.message.author.id
+        server_id = str(ctx.message.server.id)
+
+        if member_id == ctx.message.server.owner_id or \
+        int(member_id) == ConfigLoader().load_config_setting_int(
+                'BotSettings', 'owner_id'
+        ):
+            if add_or_remove != 'add' and add_or_remove != 'remove':
+                return await self.bot.say("Please specify if I am adding or removing a botadmin.")
+
+            if user_or_role != 'user' and user_or_role != 'role':
+                return await self.bot.say(
+                    "Please specify if it's the user or role " \
+                    "list I am updating."
+                )
+
+            current_id_list = ConfigLoader().load_server_string_setting(
+                server_id,
+                'BotAdmins',
+                'bot_admin_users' if user_or_role == 'user' else 'bot_admin_roles'
+            )
+
+            # Hacky fix for when mentioning the role to strip stuff out
+            role_id = role_id.replace('<@&', '')
+            role_id = role_id.replace('<@!', '')
+            role_id = role_id.replace('>', '')
+            role_id = role_id.strip()
+
+            if add_or_remove == 'add':
+                if not contains_word(current_id_list, role_id):
+                    if current_id_list == 'NOT_SET':
+                        updated_id_list = role_id
+                    else:
+                        updated_id_list = current_id_list + " " + role_id
+                else:
+                    return await self.bot.say("Role already added.")
+
+            if add_or_remove == 'remove':
+                if contains_word(current_id_list, role_id):
+                    updated_id_list = current_id_list.replace(role_id, '')
+
+                if updated_id_list.isspace() or len(updated_id_list) == 0:
+                    updated_id_list = 'NOT_SET'
+
+            filename = ctx.message.server.id
+            await ConfigCommands(self.bot).update_config_file(
+                filename,
+                'BotAdmins',
+                'bot_admin_users' if user_or_role == 'user' else 'bot_admin_roles',
+                updated_id_list.strip(),
+                ctx.message
+            )
 
 def setup(bot):
     """This makes it so we can actually use it."""
