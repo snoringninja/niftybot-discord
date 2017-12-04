@@ -170,6 +170,31 @@ async def on_command_error(exception, context):
     to log our errors to a file in the errors
     folder.
     """
+
+    if hasattr(context.command, "on_error"):
+        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
+        return
+
+    if isinstance(exception, commands.CommandNotFound):
+        print('Ignoring CommandNotFound in command {}'.format(context.command), file=sys.stderr)
+        return
+
+    if isinstance(exception, commands.DisabledCommand):
+        print('Ignoring DisabledCommand in command {}'.format(context.command), file=sys.stderr)
+        return
+
+    if isinstance(exception, commands.NoPrivateMessage):
+        print('Ignoring NoPrivateMessage in command {}'.format(context.command), file=sys.stderr)
+        return
+
+    if isinstance(exception, commands.MissingRequiredArgument) or \
+    isinstance(exception, commands.BadArgument):
+        print('Ignoring MissingRequiredArgument/BadArgument in command {}'.format(context.command), file=sys.stderr)
+        return
+
+    if isinstance(exception, commands.CommandOnCooldown):
+        print('Ignoring CommandOnCooldown in command {}'.format(context.command), file=sys.stderr)
+        return
     
     if SHOW_DEBUG:
         traceback.print_exception(
@@ -178,31 +203,6 @@ async def on_command_error(exception, context):
             exception.__traceback__,
             file=sys.stderr
         )
-
-    if hasattr(context.command, "on_error"):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.CommandNotFound):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.DisabledCommand):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.NoPrivateMessage):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.MissingRequiredArgument) or \
-    isinstance(exception, commands.BadArgument):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.CommandOnCooldown):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
-        return
 
     print("Generating an error log from command {0}".format(context.command), file=sys.stderr)
     await ErrorLogging().log_error(
