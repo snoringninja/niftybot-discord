@@ -92,7 +92,7 @@ async def on_message(message):
             await CLIENT.process_commands(message)
         else:
             can_use = BotResources().check_accepted(message.author.id)
-            if not ctx.message.channel.is_private:
+            if not message.channel.is_private:
                 message_channel_valid = BotResources().get_tos_channel_valid(message.server.id)
             if can_use:
                 await CLIENT.process_commands(message)
