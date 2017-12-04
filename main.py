@@ -170,6 +170,14 @@ async def on_command_error(exception, context):
     to log our errors to a file in the errors
     folder.
     """
+    
+    if SHOW_DEBUG:
+        traceback.print_exception(
+            type(exception),
+            exception,
+            exception.__traceback__,
+            file=sys.stderr
+        )
 
     if hasattr(context.command, "on_error"):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
@@ -195,14 +203,6 @@ async def on_command_error(exception, context):
     if isinstance(exception, commands.CommandOnCooldown):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
-
-    if SHOW_DEBUG:
-        traceback.print_exception(
-            type(exception),
-            exception,
-            exception.__traceback__,
-            file=sys.stderr
-        )
 
     print("Generating an error log from command {0}".format(context.command), file=sys.stderr)
     await ErrorLogging().log_error(
