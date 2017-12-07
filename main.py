@@ -174,26 +174,26 @@ async def on_command_error(exception, context):
         return
 
     if isinstance(exception, commands.CommandNotFound):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
+        print('Ignoring CommandNotFound in command {}'.format(context.command), file=sys.stderr)
         return
 
     if isinstance(exception, commands.DisabledCommand):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
+        print('Ignoring DisabledCommand in command {}'.format(context.command), file=sys.stderr)
         return
 
     if isinstance(exception, commands.NoPrivateMessage):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
+        print('Ignoring NoPrivateMessage in command {}'.format(context.command), file=sys.stderr)
         return
 
     if isinstance(exception, commands.MissingRequiredArgument) or \
     isinstance(exception, commands.BadArgument):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
+        print('Ignoring MissingRequiredArgument/BadArgument in command {}'.format(context.command), file=sys.stderr)
         return
 
     if isinstance(exception, commands.CommandOnCooldown):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
+        print('Ignoring CommandOnCooldown in command {}'.format(context.command), file=sys.stderr)
         return
-
+    
     if SHOW_DEBUG:
         traceback.print_exception(
             type(exception),
