@@ -102,14 +102,13 @@ async def on_message(message):
                         message.server.id,
                         'ConfigSettings',
                         'not_accepted_channel_id'
-                    )
+		    )
 
                     bot_message = await CLIENT.send_message(
                         discord.Object(id=message_channel_id),
-                        NOT_ACCEPTED_MESSAGE.format(
-                            message.author,
-                            COMMAND_PREFIX
-                        )
+                        NOT_ACCEPTED_MESSAGE.replace(
+                            "{user}", message.author.mention).replace(
+                            "{prefix}", COMMAND_PREFIX)
                     )
                     await asyncio.sleep(20)
                     await CLIENT.delete_message(bot_message)
@@ -118,10 +117,9 @@ async def on_message(message):
                 if message.author.id != CLIENT.user.id:
                     bot_message = await CLIENT.send_message(
                         discord.Object(id=message.channel.id),
-                        NOT_ACCEPTED_MESSAGE.format(
-                            message.author,
-                            COMMAND_PREFIX
-                        )
+                        NOT_ACCEPTED_MESSAGE.replace(
+                            "{user}", message.author.mention).replace(
+                            "{prefix}", COMMAND_PREFIX)
                     )
                     await asyncio.sleep(20)
                     await CLIENT.delete_message(bot_message)
