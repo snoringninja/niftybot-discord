@@ -50,7 +50,8 @@ class JoinLeaveHandler():
                     discord.Object(id=welcome_channel),
                     welcome_message
                     .replace("{server}", server.name)
-                    .replace("{user}", member.mention))
+                    .replace("{user}", member.mention)
+                    .replace("{emote}", ''))
             else:
                 await self.bot.send_message(
                     discord.Object(id=welcome_channel),
