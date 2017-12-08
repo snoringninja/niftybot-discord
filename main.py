@@ -101,15 +101,13 @@ async def on_message(message):
                     message_channel_id = ConfigLoader().load_server_int_setting(
                         message.server.id,
                         'ConfigSettings',
-                        'not_accepted_channel_id'
-		    )
+                        'not_accepted_channel_id')
 
                     bot_message = await CLIENT.send_message(
                         discord.Object(id=message_channel_id),
                         NOT_ACCEPTED_MESSAGE.replace(
                             "{user}", message.author.mention).replace(
-                            "{prefix}", COMMAND_PREFIX)
-                    )
+                                "{prefix}", COMMAND_PREFIX))
                     await asyncio.sleep(20)
                     await CLIENT.delete_message(bot_message)
             else:
@@ -119,8 +117,7 @@ async def on_message(message):
                         discord.Object(id=message.channel.id),
                         NOT_ACCEPTED_MESSAGE.replace(
                             "{user}", message.author.mention).replace(
-                            "{prefix}", COMMAND_PREFIX)
-                    )
+                                "{prefix}", COMMAND_PREFIX))
                     await asyncio.sleep(20)
                     await CLIENT.delete_message(bot_message)
 
@@ -187,13 +184,14 @@ async def on_command_error(exception, context):
 
     if isinstance(exception, commands.MissingRequiredArgument) or \
     isinstance(exception, commands.BadArgument):
-        print('Ignoring MissingRequiredArgument/BadArgument in command {}'.format(context.command), file=sys.stderr)
+        print('Ignoring MissingRequiredArgument/BadArgument in command {}'.format(
+            context.command), file=sys.stderr)
         return
 
     if isinstance(exception, commands.CommandOnCooldown):
         print('Ignoring CommandOnCooldown in command {}'.format(context.command), file=sys.stderr)
         return
-    
+
     if SHOW_DEBUG:
         traceback.print_exception(
             type(exception),

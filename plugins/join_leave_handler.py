@@ -35,23 +35,30 @@ class JoinLeaveHandler():
                 'welcome_channel_id'
             )
 
+            welcome_message = ConfigLoader().load_server_string_setting(
+                server_id,
+                'JoinPart',
+                'welcome_message'
+            )
+
             emote_array = []
             for emoji in member.server.emojis:
                 emote_array.append(emoji)
 
-                if not emote_array:
-                    await self.bot.send_message(
-                        discord.Object(id=welcome_channel),
-                        "Welcome to {0.name}\'s Discord, {1.mention}! Relax and have some fun!"
-                        .format(server, member))
-                else:
-                    await self.bot.send_message(
-                        discord.Object(id=welcome_channel),
-                        "Welcome to {0.name}\'s Discord, {1.mention}! \
-                        Relax and have some fun! {2}"
-                        .format(server, member, random.choice(emote_array)))
-        else:
-            return
+            if not emote_array:
+                await self.bot.send_message(
+                    discord.Object(id=welcome_channel),
+                    welcome_message
+                    .replace("{server}", server.name)
+                    .replace("{user}", member.mention))
+            else:
+                await self.bot.send_message(
+                    discord.Object(id=welcome_channel),
+                    welcome_message
+                    .replace("{server}", server.name)
+                    .replace("{user}", member.mention)
+                    .replace("{emote}", str(random.choice(emote_array))))
+        return
 
     async def goodbye_user(self, server_id: str, member: str):
         """Send a message when a user leaves the server."""
@@ -67,12 +74,18 @@ class JoinLeaveHandler():
                 'JoinPart',
                 'leave_channel_id'
             )
+
+            part_message = ConfigLoader().load_server_string_setting(
+                server_id,
+                'JoinPart',
+                'part_message'
+            )
             display_name = member.display_name
 
             await self.bot.send_message(
                 discord.Object(id=part_channel),
-                "{0} ({1}) has left the server."
-                .format(member, display_name)
+                part_message
+                .replace("{name}", str(member))
+                .replace("{display_name}", display_name)
             )
-        else:
-            return
+        return

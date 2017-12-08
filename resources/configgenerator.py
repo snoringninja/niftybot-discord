@@ -56,7 +56,7 @@ class ConfigGenerator():
         # BotAdmins
         parser['BotAdmins'] = {
             'bot_admin_users': 'NOT_SET',
-            'bot_admin_roles': 'NOT_SET' 
+            'bot_admin_roles': 'NOT_SET'
         }
 
         # ConfigSettings
@@ -76,7 +76,9 @@ class ConfigGenerator():
             'member_join_enabled': False,
             'member_part_enabled': False,
             'welcome_channel_id': 'NOT_SET',
-            'leave_channel_id': 'NOT_SET'
+            'leave_channel_id': 'NOT_SET',
+            'welcome_message': "Welcome to {server}\'s Discord, {user}! Relax and have some fun!",
+            'part_message': "{name} ({display_name}) has left the server."
         }
 
         # BettingGame
