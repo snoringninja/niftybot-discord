@@ -132,6 +132,7 @@ class ConfigCommands():
                 # This allows us to use #channel_name, @person_name
                 update_value = update_value.replace('<@&', '')
                 update_value = update_value.replace('<@!', '')
+                update_value = update_value.replace('<#', '')
                 update_value = update_value.replace('>', '')
                 update_value = update_value.strip()
 
