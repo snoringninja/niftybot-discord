@@ -129,6 +129,12 @@ class ConfigCommands():
             try:
                 member_id = ctx.message.author.id
 
+                # This allows us to use #channel_name, @person_name
+                update_value = update_value.replace('<@&', '')
+                update_value = update_value.replace('<@!', '')
+                update_value = update_value.replace('>', '')
+                update_value = update_value.strip()
+
                 bot_admin_users = []
                 bot_admin_roles = []
                 user_roles_list = []
