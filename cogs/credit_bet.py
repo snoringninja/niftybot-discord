@@ -16,6 +16,20 @@ from resources.config import ConfigLoader
 import discord
 from discord.ext import commands
 
+def is_valid_hour(seconds):
+    """Check if the provided seconds is a
+    valid hour.
+
+    :seconds: provided seconds value
+    """
+    if seconds % 3600 == 0:
+        return True
+    return False
+
+def convert_seconds_to_hour(seconds):
+    """Convert seconds to hour."""
+    return seconds / 3600
+
 class CreditBet():
     """
     CreditBet class
@@ -309,7 +323,7 @@ class CreditBet():
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
-    async def helpme(self, ctx):
+    async def helpme(self, ctx): # #pylint: disable=R0914
         """Free credits for those that qualify.
 
         By default, this will check against a 24 hour timer to determinme
@@ -318,7 +332,7 @@ class CreditBet():
         @TODO: allow server owners to set time between uses
         @TODO: allow owners to enable setting so that the 24 hour timer
                only begins after the user has run out of credits
-        @TODO: allow owners to set the threshold for when eligable
+        @TODO: allow owners to set the threshold for when eligible
                to use the command
         """
         # @TODO : let server owners set time between uses, max amount
@@ -334,7 +348,29 @@ class CreditBet():
             'bet_channel_id'
         )
 
-        # if this fails it's not a boolean so we'll fix that but disable the plugin
+        # Grab the time between helpme users as set by the server
+        helpme_timer = ConfigLoader().load_server_int_setting(
+            server_id,
+            'BettingGame',
+            'helpme_cooldown'
+        )
+
+        # Grab the mimimum credits for using helpme
+        minimum_credits = ConfigLoader().load_server_int_setting(
+            server_id,
+            'BettinGame',
+            'helpme_minimum'
+        )
+
+        # Grab how many credits they get when using helpme
+        helpme_bonus = ConfigLoader().load_server_int_setting(
+            server_id,
+            'BettingGame',
+            'helpme_bonus'
+        )
+
+        # check if the plugin enabled; if bad value, the function inside
+        # of main will handle catching that
         plugin_enabled = ConfigLoader().load_server_boolean_setting(
             server_id,
             'BettingGame',
@@ -352,19 +388,20 @@ class CreditBet():
             current_date = datetime.now()
             member_credits = information[0][0]
             last_used_time = information[0][1]
-            if member_credits >= 500:
+            if member_credits >= minimum_credits:
                 return await self.bot.say(
-                    "{0.mention}, you are above the maximum threshold to " \
-                    "use this command (balance of {1}).".format(
+                    "{0.mention}, you are above the maximum threshold {1} to " \
+                    "use this command (balance of {2}).".format(
                         member,
+                        minimum_credits,
                         member_credits
                     )
                 )
             else:
                 if last_used_time is not None:
                     self.total_seconds = (current_date - last_used_time).total_seconds()
-                if int(self.total_seconds) >= 86400:
-                    self.total_seconds = int(86400 - self.total_seconds)
+                if int(self.total_seconds) >= helpme_timer:
+                    self.total_seconds = int(helpme_timer - self.total_seconds)
                     self.total_hours = int(self.total_seconds / 3600)
                     self.used_secs = int(self.total_hours * 3600)
                     self.seconds_left = int(self.total_seconds - self.used_secs)
@@ -374,7 +411,7 @@ class CreditBet():
                         self.final_minutes * -1
                     )
 
-                    new_credits = member_credits + 100
+                    new_credits = member_credits + helpme_bonus
                     args = (new_credits, str(current_date), str(member_id), str(server_id), )
                     DatabaseHandler().update_database_with_args(
                         "UPDATE credit_bet SET credits = ?, \
@@ -382,13 +419,17 @@ class CreditBet():
                         args
                     )
                     await self.bot.say(
-                        "{0.mention}, you have been given an additional 100 credits! " \
-                        "Your 24 cooldown ended {1} ago!".format(member, formatted_string)
+                        "{0.mention}, you have been given an additional {1} credits! " \
+                        "Your 24 cooldown ended {2} ago!".format(
+                            member,
+                            helpme_bonus,
+                            formatted_string
+                        )
                     )
                     return
                 else:
                     # should we output seconds too?
-                    self.total_seconds = int(86400 - self.total_seconds)
+                    self.total_seconds = int(helpme_timer - self.total_seconds)
                     self.total_hours = int(self.total_seconds / 3600)
                     self.used_secs = int(self.total_hours * 3600)
                     self.seconds_left = int(self.total_seconds - self.used_secs)
@@ -399,9 +440,14 @@ class CreditBet():
                         self.final_minutes,
                         final_seconds
                     )
+                    converted_hour = convert_seconds_to_hour(helpme_timer)
                     await self.bot.say(
-                        "{0.mention}, you can only use this command every 24 hours ({1}), " \
-                        "and if below 500 credits :cry:".format(member, formatted_string)
+                        "{0.mention}, you can only use this command every {1} hours ({2}), " \
+                        "and if below 500 credits :cry:".format(
+                            member,
+                            converted_hour,
+                            formatted_string
+                        )
                     )
                     return
 def setup(bot):

@@ -14,6 +14,7 @@ import discord
 from discord.ext import commands
 from resources.config import ConfigLoader
 
+# Some helpful functions
 def load_config(default_filename):
     """Load the config file.
     :default_filename: name of the config file to load
