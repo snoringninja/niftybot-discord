@@ -170,8 +170,10 @@ async def on_command_error(exception, context):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
         return
 
-    if isinstance(exception, commands.CommandNotFound):
-        print('Ignoring CommandNotFound in command {}'.format(context.command), file=sys.stderr)
+    if isinstance(exception, commands.CommandNotFound) or \
+    isinstance(exception, commands.CommandInvokeError):
+        print('Ignoring CommandNotFound/ConnandInvokeError ' \
+             'in command {}'.format(context.command), file=sys.stderr)
         return
 
     if isinstance(exception, commands.DisabledCommand):

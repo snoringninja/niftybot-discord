@@ -361,7 +361,7 @@ class CreditBet():
             'BettinGame',
             'helpme_minimum'
         )
-
+        print(minimum_credits)
         # Grab how many credits they get when using helpme
         helpme_bonus = ConfigLoader().load_server_int_setting(
             server_id,
@@ -443,10 +443,11 @@ class CreditBet():
                     converted_hour = convert_seconds_to_hour(helpme_timer)
                     await self.bot.say(
                         "{0.mention}, you can only use this command every {1} hours ({2}), " \
-                        "and if below 500 credits :cry:".format(
+                        "and if at or below {3} credits :cry:".format(
                             member,
                             converted_hour,
-                            formatted_string
+                            formatted_string,
+                            minimum_credits
                         )
                     )
                     return
