@@ -358,10 +358,10 @@ class CreditBet():
         # Grab the mimimum credits for using helpme
         minimum_credits = ConfigLoader().load_server_int_setting(
             server_id,
-            'BettinGame',
+            'BettingGame',
             'helpme_minimum'
         )
-        print(minimum_credits)
+
         # Grab how many credits they get when using helpme
         helpme_bonus = ConfigLoader().load_server_int_setting(
             server_id,
@@ -390,8 +390,8 @@ class CreditBet():
             last_used_time = information[0][1]
             if member_credits >= minimum_credits:
                 return await self.bot.say(
-                    "{0.mention}, you are above the maximum threshold {1} to " \
-                    "use this command (balance of {2}).".format(
+                    "{0.mention}, you are above the minimum amount {1}; you " \
+                    "cannot use this command (balance of {2}).".format(
                         member,
                         minimum_credits,
                         member_credits
