@@ -164,6 +164,15 @@ async def on_command_error(exception, context):
     Override the default discord.py on_command_error
     to log our errors to a file in the errors
     folder.
+
+    @TODO: we need to log the errors in here moving
+    moving forward, otherwise we will likely never
+    get a meaningful error log that we can actually
+    use since we're intentionally ignoring so many
+    different errors. From testing, it's typically
+    CommandInvokeError that gets thrown, so we can start
+    by just using isinstance(exception, commands.CommandInvokeError)
+    and generating the log with the traceback information
     """
 
     if hasattr(context.command, "on_error"):
