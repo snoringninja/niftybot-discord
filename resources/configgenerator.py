@@ -85,7 +85,10 @@ class ConfigGenerator():
         parser['BettingGame'] = {
             'enabled': False,
             'bet_channel_id': 'NOT_SET',
-            'minimum_bet': 'NOT_SET'
+            'minimum_bet': 'NOT_SET',
+            'helpme_cooldown': 86400,
+            'helpme_minimum': 500,
+            'helpme_bonus': 100
         }
 
         # ApiCommands
