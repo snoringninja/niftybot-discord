@@ -182,10 +182,8 @@ def on_command_error(exception, context):
 
     if hasattr(context.command, "on_error"):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
-        return
 
-    if isinstance(exception, commands.CommandNotFound) or \
-    isinstance(exception, commands.CommandInvokeError):
+    if isinstance(exception, commands.CommandNotFound):
         print('Ignoring CommandNotFound/ConnandInvokeError ' \
              'in command {}'.format(context.command), file=sys.stderr)
         return
