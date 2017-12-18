@@ -8,3 +8,10 @@ channel_settings/
 *.db
 niftybot.db
 .vscode/
+bin/
+lib/
+lib64
+niftybot-testing/
+pip-selfcheck.json
+pyvenv.cfg
+share/
