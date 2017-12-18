@@ -122,7 +122,8 @@ async def on_message(message):
                     await CLIENT.delete_message(bot_message)
 
 @CLIENT.event
-async def on_ready():
+@asyncio.coroutine
+def on_ready():
     """
     discord.py on_ready
     """
@@ -132,12 +133,13 @@ async def on_ready():
     print('Setting game to: {0}'.format(GAME_NAME))
     print('Loaded extensions: {0}'.format(EXTENSIONS))
     print('Database name: {0}'.format(DATABASE_NAME))
-    await CLIENT.change_presence(game=discord.Game(type=0, name=GAME_NAME))
+    yield from CLIENT.change_presence(game=discord.Game(type=0, name=GAME_NAME))
     print('Good to go!')
     print('------')
 
 @CLIENT.event
-async def on_member_join(member):
+@asyncio.coroutine
+def on_member_join(member):
     """
     discord.py on_member_join
 
@@ -145,10 +147,11 @@ async def on_member_join(member):
     and if they have the member_join_enabled plugin enabled
     """
     server = member.server
-    await JoinLeaveHandler(CLIENT).welcome_user(server.id, member, server)
+    yield from JoinLeaveHandler(CLIENT).welcome_user(server.id, member, server)
 
 @CLIENT.event
-async def on_member_remove(member):
+@asyncio.coroutine
+def on_member_remove(member):
     """
     discord.py on_member_remove
 
@@ -156,10 +159,11 @@ async def on_member_remove(member):
     and if they have the member_part_enabled plugin enabled
     """
     server = member.server
-    await JoinLeaveHandler(CLIENT).goodbye_user(server.id, member)
+    yield from JoinLeaveHandler(CLIENT).goodbye_user(server.id, member)
 
 @CLIENT.event
-async def on_command_error(exception, context):
+@asyncio.coroutine
+def on_command_error(exception, context):
     """
     Override the default discord.py on_command_error
     to log our errors to a file in the errors
@@ -212,7 +216,7 @@ async def on_command_error(exception, context):
         )
 
     print("Generating an error log from command {0}".format(context.command), file=sys.stderr)
-    await ErrorLogging().log_error(
+    yield from ErrorLogging().log_error(
         traceback.format_exception(
             type(exception),
             exception,
