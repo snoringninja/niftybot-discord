@@ -205,6 +205,16 @@ def on_command_error(exception, context):
     if isinstance(exception, commands.CommandOnCooldown):
         print('Ignoring CommandOnCooldown in command {}'.format(context.command), file=sys.stderr)
         return
+    
+    if isinstance(exception, commands.CommandInvokeError):
+        yield from ErrorLogging().log_error(
+            traceback.format_exception(
+                type(exception),
+                exception,
+                exception.__traceback__
+            ),
+            context.command
+        )
 
     if SHOW_DEBUG:
         traceback.print_exception(
@@ -214,15 +224,7 @@ def on_command_error(exception, context):
             file=sys.stderr
         )
 
-    print("Generating an error log from command {0}".format(context.command), file=sys.stderr)
-    yield from ErrorLogging().log_error(
-        traceback.format_exception(
-            type(exception),
-            exception,
-            exception.__traceback__
-        ),
-        context.command
-    )
+    print("Generated an error log from command {0}".format(context.command), file=sys.stderr)
 
 def main():
     """
