@@ -97,16 +97,16 @@ class RoleAssignor():
                             yield from self.bot.send_message(
                                 ctx.message.channel,
                                 "{0.mention}: You're already assigned to this " \
-                                "group.".format(
-                                    member
-                                )
+                                "group.".format(member)
                             )
+                            return
                         else:
                             yield from self.bot.add_roles(ctx.message.author, requested_guild)
                             yield from self.bot.send_message(
                                 ctx.message.channel,
                                 "{0.mention}: You've been successfully " \
                                 "added to {1}!".format(member, requested_guild.name))
+                            return
         return
 
     @commands.command(pass_context=True, no_pm=False, name='role')
