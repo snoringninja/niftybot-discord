@@ -60,7 +60,8 @@ SHOW_DEBUG = str(
 CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
 
 @CLIENT.event
-async def on_message(message):
+@asyncio.coroutine
+def on_message(message):
     """
     discord.py on_message
     processes messages and checks if a command
@@ -72,7 +73,7 @@ async def on_message(message):
     discord.utils.find(view.skip_string, COMMAND_PREFIX)
 
     if "@everyone" in message.content:
-        await Moderation(CLIENT).purge_everyone_message(message)
+        yield from Moderation(CLIENT).purge_everyone_message(message)
 
     if invoked_prefix is None:
         return
@@ -85,17 +86,17 @@ async def on_message(message):
     if invoker in CLIENT.commands:
         # @TODO : bot config update for override commands to make this cleaner
         if message.content == '{0}accept'.format(COMMAND_PREFIX):
-            await CLIENT.process_commands(message)
+            yield from CLIENT.process_commands(message)
         elif message.content.startswith("{0}guild".format(COMMAND_PREFIX)):
-            await CLIENT.process_commands(message)
+            yield from CLIENT.process_commands(message)
         elif message.content.startswith("{0}genconfig".format(COMMAND_PREFIX)):
-            await CLIENT.process_commands(message)
+            yield from CLIENT.process_commands(message)
         else:
             can_use = BotResources().check_accepted(message.author.id)
             if not message.channel.is_private:
                 message_channel_valid = BotResources().get_tos_channel_valid(message.server.id)
             if can_use:
-                await CLIENT.process_commands(message)
+                yield from CLIENT.process_commands(message)
             elif not can_use and message_channel_valid:
                 if message.author.id != CLIENT.user.id:
                     message_channel_id = ConfigLoader().load_server_int_setting(
@@ -103,23 +104,23 @@ async def on_message(message):
                         'ConfigSettings',
                         'not_accepted_channel_id')
 
-                    bot_message = await CLIENT.send_message(
+                    bot_message = yield from CLIENT.send_message(
                         discord.Object(id=message_channel_id),
                         NOT_ACCEPTED_MESSAGE.replace(
                             "{user}", message.author.mention).replace(
                                 "{prefix}", COMMAND_PREFIX))
-                    await asyncio.sleep(20)
-                    await CLIENT.delete_message(bot_message)
+                    yield from asyncio.sleep(20)
+                    yield from CLIENT.delete_message(bot_message)
             else:
                 # This is needed to prevent infinite looping message posting
                 if message.author.id != CLIENT.user.id:
-                    bot_message = await CLIENT.send_message(
+                    bot_message = yield from CLIENT.send_message(
                         discord.Object(id=message.channel.id),
                         NOT_ACCEPTED_MESSAGE.replace(
                             "{user}", message.author.mention).replace(
                                 "{prefix}", COMMAND_PREFIX))
-                    await asyncio.sleep(20)
-                    await CLIENT.delete_message(bot_message)
+                    yield from asyncio.sleep(20)
+                    yield from CLIENT.delete_message(bot_message)
 
 @CLIENT.event
 @asyncio.coroutine
