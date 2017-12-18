@@ -8,6 +8,7 @@ Handles all role assignment based commands
 
 import traceback
 import logging
+import asyncio
 
 from resources.error_logger import ErrorLogging
 from resources.config import ConfigLoader
@@ -41,7 +42,8 @@ class RoleAssignor():
 
     @commands.command(pass_context=True, no_pm=False, name='guild')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
-    async def assign_role(self, ctx, guild: str, member: discord.Member=None):
+    @asyncio.coroutine
+    def assign_role(self, ctx, guild: str, member: discord.Member=None):
         """Assign users to configured roles if requested
 
         :guild: the requested group name
@@ -74,7 +76,8 @@ class RoleAssignor():
             )
 
             if role_list == 'NOT_SET' or assignment_channel_list == 'NOT_SET':
-                return await self.bot.say("This plugin is not configured for this server.")
+                yield from self.bot.say("This plugin is not configured for this server.")
+                return
 
             channel_list = []
             for channel in map(int, assignment_channel_list.split()):
@@ -91,7 +94,7 @@ class RoleAssignor():
                 requested_guild_id in role_list_split:
                     for role in ctx.message.author.roles:
                         if int(role.id) == requested_guild_id:
-                            await self.bot.send_message(
+                            yield from self.bot.send_message(
                                 ctx.message.channel,
                                 "{0.mention}: You're already assigned to this " \
                                 "group.".format(
@@ -99,18 +102,12 @@ class RoleAssignor():
                                 )
                             )
                         else:
-                            await self.bot.add_roles(ctx.message.author, requested_guild)
-                            await self.bot.send_message(
+                            yield from self.bot.add_roles(ctx.message.author, requested_guild)
+                            yield from self.bot.send_message(
                                 ctx.message.channel,
                                 "{0.mention}: You've been successfully " \
                                 "added to {1}!".format(member, requested_guild.name))
-                        return
-                else:
-                    return
-            else:
-                return
-        else:
-            return
+        return
 
     @commands.command(pass_context=True, no_pm=False, name='role')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
