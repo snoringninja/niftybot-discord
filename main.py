@@ -25,6 +25,9 @@ import discord
 from discord.ext.commands.view import StringView
 from discord.ext import commands
 
+# Disable misleading not-an-iterable
+# pylint: disable=not-an-iterable
+
 BOT_CONFIG_GENERATED = ConfigLoader().check_for_bot_config()
 if not BOT_CONFIG_GENERATED:
     print("Please configure the newly generated niftybot.ini file before restarting the bot.")
@@ -180,12 +183,20 @@ def on_command_error(exception, context):
     and generating the log with the traceback information
     """
 
+    if SHOW_DEBUG is True:
+        print("Showing debug")
+        traceback.print_exception(
+            type(exception),
+            exception,
+            exception.__traceback__,
+            file=sys.stderr
+        )
+
     if hasattr(context.command, "on_error"):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
 
     if isinstance(exception, commands.CommandNotFound):
-        print('Ignoring CommandNotFound/ConnandInvokeError ' \
-             'in command {}'.format(context.command), file=sys.stderr)
+        print('Ignoring CommandNotFound in command {}'.format(context.command), file=sys.stderr)
         return
 
     if isinstance(exception, commands.DisabledCommand):
@@ -197,16 +208,18 @@ def on_command_error(exception, context):
         return
 
     if isinstance(exception, commands.MissingRequiredArgument) or \
-    isinstance(exception, commands.BadArgument):
-        print('Ignoring MissingRequiredArgument/BadArgument in command {}'.format(
+    isinstance(exception, commands.BadArgument) or \
+    isinstance(exception, ValueError):
+        print('Ignoring MissingRequiredArgument/BadArgument/ValueError in command {}'.format(
             context.command), file=sys.stderr)
         return
 
     if isinstance(exception, commands.CommandOnCooldown):
         print('Ignoring CommandOnCooldown in command {}'.format(context.command), file=sys.stderr)
         return
-    
+
     if isinstance(exception, commands.CommandInvokeError):
+        print("Generated an error log from command {0}".format(context.command), file=sys.stderr)
         yield from ErrorLogging().log_error(
             traceback.format_exception(
                 type(exception),
@@ -215,16 +228,7 @@ def on_command_error(exception, context):
             ),
             context.command
         )
-
-    if SHOW_DEBUG:
-        traceback.print_exception(
-            type(exception),
-            exception,
-            exception.__traceback__,
-            file=sys.stderr
-        )
-
-    print("Generated an error log from command {0}".format(context.command), file=sys.stderr)
+        return
 
 def main():
     """

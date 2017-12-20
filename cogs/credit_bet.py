@@ -1,5 +1,5 @@
 """
-credit)bet.py
+credit_bet.py
 @author xNifty
 @site https://snoring.ninja
 
@@ -8,6 +8,7 @@ SQLite database
 """
 
 import random
+import asyncio
 from datetime import datetime
 
 from resources.database import DatabaseHandler
@@ -15,6 +16,9 @@ from resources.config import ConfigLoader
 
 import discord
 from discord.ext import commands
+
+# Disable too-many-locals
+# pylint: disable=too-many-locals
 
 def is_valid_hour(seconds):
     """Check if the provided seconds is a
@@ -46,7 +50,8 @@ class CreditBet():
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
-    async def bet(self, ctx, amount: int, member: discord.Member=None):
+    @asyncio.coroutine
+    def bet(self, ctx, amount: int, member: discord.Member=None):
         """ Let's bet.
 
         :amount: the amount the user has decided to bet
@@ -90,7 +95,7 @@ class CreditBet():
                     )
                 )
                 if row is None:
-                    await self.bot.say(
+                    yield from self.bot.say(
                         "{0.mention}: please do {1}register to join the lotto.".format(
                             member,
                             self.prefix
@@ -106,7 +111,7 @@ class CreditBet():
                         )
                     )
                     if remaining_credits[0] < amount:
-                        await self.bot.say(
+                        yield from self.bot.say(
                             "Insufficient credits ({0})".format(
                                 remaining_credits[0]
                             )
@@ -125,7 +130,7 @@ class CreditBet():
                                     str(server_id)
                                 )
                             )
-                            await self.bot.say(
+                            yield from self.bot.say(
                                 "Sorry, {0.mention}, you lost with a roll of {1} " \
                                 "against {2}! Your balance is now {3}!"
                                 .format(member, user_number, bot_number, new_balance)
@@ -137,13 +142,13 @@ class CreditBet():
                                 WHERE userID = {1} AND serverID = {2}"
                                 .format(new_balance, str(member_id), str(server_id))
                             )
-                            await self.bot.say(
+                            yield from self.bot.say(
                                 "Congratulations, {0.mention}, you won with a roll " \
                                 "of {1} against {2}! Your balance is now {3}!"
                                 .format(member, user_number, bot_number, new_balance)
                             )
                         else:
-                            await self.bot.say(
+                            yield from self.bot.say(
                                 "It was a tie, {0.mention}, with a roll of {1}! " \
                                 "Your balance remains {2}!".format(
                                     member,
@@ -152,14 +157,13 @@ class CreditBet():
                                 )
                             )
             else:
-                await self.bot.say("The minimum bet is {0}".format(minimum_bet))
-        else:
-            print("Error in the initial conditional IF statement (credit_bet).")
+                yield from self.bot.say("The minimum bet is {0}".format(minimum_bet))
         return
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=60, type=commands.BucketType.user)
-    async def balance(self, ctx, member: discord.Member=None):
+    @asyncio.coroutine
+    def balance(self, ctx, member: discord.Member=None):
         """ Get user balance.
 
         :member: empty discord.Member object
@@ -189,7 +193,7 @@ class CreditBet():
             )
             #print("Row: {}".format(row))
             if row is None:
-                await self.bot.say(
+                yield from self.bot.say(
                     "{0.mention}: please do {1}register to" \
                     "join the lotto.".format(member, self.prefix))
                 return
@@ -201,7 +205,7 @@ class CreditBet():
                         str(server_id)
                     )
                 )
-                await self.bot.say(
+                yield from self.bot.say(
                     "{0.mention}: your balance is {1}.".format(
                         member,
                         remaining_credits[0]
@@ -209,7 +213,8 @@ class CreditBet():
                 )
 
     @commands.command(pass_context=True, no_pm=True)
-    async def register(self, ctx, member: discord.Member=None):
+    @asyncio.coroutine
+    def register(self, ctx, member: discord.Member=None):
         """ Register for betting.
 
         :member: empty discord.Member object
@@ -261,17 +266,18 @@ class CreditBet():
                         str(datetime.now())
                     )
                 )
-                await self.bot.say("{0.mention}, you are now registered! {1}bet to play! " \
-                                    "Goodluck!".format(member, self.prefix)
-                                  )
+                yield from self.bot.say(
+                    "{0.mention}, you are now registered! {1}bet to play! " \
+                    "Goodluck!".format(member, self.prefix))
             else:
-                await self.bot.say("{0.mention}: you're already registered. Please do {1}bet " \
-                                    "to play!".format(member, self.prefix)
-                                  )
+                yield from self.bot.say(
+                    "{0.mention}: you're already registered. Please do {1}bet " \
+                    "to play!".format(member, self.prefix))
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
-    async def scores(self, ctx, member: discord.Member=None):
+    @asyncio.coroutine
+    def scores(self, ctx, member: discord.Member=None):
         """Display the top 5 with > 0 points.
 
         :member: empty discord.Member object
@@ -319,11 +325,12 @@ class CreditBet():
                     item[1][1]
                 )
             output_string = output_string + "\n```"
-            await self.bot.say(output_string)
+            yield from self.bot.say(output_string)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
-    async def helpme(self, ctx): # #pylint: disable=R0914
+    @asyncio.coroutine
+    def helpme(self, ctx):
         """Free credits for those that qualify.
 
         By default, this will check against a 24 hour timer to determinme
@@ -389,7 +396,7 @@ class CreditBet():
             member_credits = information[0][0]
             last_used_time = information[0][1]
             if member_credits >= minimum_credits:
-                return await self.bot.say(
+                yield from self.bot.say(
                     "{0.mention}, you are above the minimum amount {1}; you " \
                     "cannot use this command (balance of {2}).".format(
                         member,
@@ -397,6 +404,7 @@ class CreditBet():
                         member_credits
                     )
                 )
+                return
             else:
                 if last_used_time is not None:
                     self.total_seconds = (current_date - last_used_time).total_seconds()
@@ -418,7 +426,7 @@ class CreditBet():
                         lastClaimTime = ? WHERE userID = ? AND serverID = ?",
                         args
                     )
-                    await self.bot.say(
+                    yield from self.bot.say(
                         "{0.mention}, you have been given an additional {1} credits! " \
                         "Your 24 cooldown ended {2} ago!".format(
                             member,
@@ -441,7 +449,7 @@ class CreditBet():
                         final_seconds
                     )
                     converted_hour = convert_seconds_to_hour(helpme_timer)
-                    await self.bot.say(
+                    yield from self.bot.say(
                         "{0.mention}, you can only use this command every {1} hours ({2}), " \
                         "and if at or below {3} credits :cry:".format(
                             member,
