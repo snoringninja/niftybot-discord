@@ -46,7 +46,8 @@ class ConfigCommands():
 
     @commands.command(pass_context=True, no_pm=True, name='genconfig')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
-    async def generate_config(self, ctx):
+    @asyncio.coroutine
+    def generate_config(self, ctx):
         """
         Checks if the member is the server or the
         bot owner and if so runs the generate_config function
@@ -56,23 +57,24 @@ class ConfigCommands():
 
         if member_id == ctx.message.server.owner_id or \
         int(member_id) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
-            file_exists = await ConfigLoader(self.bot).check_if_config_exists(
+            file_exists = yield from ConfigLoader(self.bot).check_if_config_exists(
                 ctx.message.server.id
             )
 
             if not file_exists:
-                await ConfigLoader(self.bot).generate_default_config_file(
+                yield from ConfigLoader(self.bot).generate_default_config_file(
                     ctx.message.server.id,
                     member_id
                 )
             else:
-                await self.bot.say("Configuration file already exists.")
+                yield from self.bot.say("Configuration file already exists.")
         else:
             return
 
-    async def update_config_file(self, filename, update_section, \
-                                 update_key, update_value, message, supress_message=False
-                                ): #pylint: disable=too-many-arguments
+    @asyncio.coroutine
+    def update_config_file(self, filename, update_section, \
+    update_key, update_value, message, supress_message=False
+                          ): #pylint: disable=too-many-arguments
         """Handle updating the config file for the server.
         supress_message is used when we update the config from a function when a command fails
         It defaults to False for when the config is updating from within the server
@@ -101,20 +103,24 @@ class ConfigCommands():
                     ), 'w') as configfile:
                     parser.write(configfile)
                 if not supress_message:
-                    bot_message = await self.bot.say("Configuration file updated.")
-                    await asyncio.sleep(5)
-                    await self.bot.delete_message(message)
-                    return await self.bot.delete_message(bot_message)
+                    bot_message = yield from self.bot.say("Configuration file updated.")
+                    yield from asyncio.sleep(5)
+                    yield from self.bot.delete_message(message)
+                    yield from self.bot.delete_message(bot_message)
+                    return
                 else:
                     return
             else:
-                return await self.bot.say("Key '{0}' does not exist.".format(update_key))
+                yield from self.bot.say("Key '{0}' does not exist.".format(update_key))
+                return
         else:
-            return await self.bot.say("Section '{0}' does not exist.".format(update_section))
+            yield from self.bot.say("Section '{0}' does not exist.".format(update_section))
+            return
 
     @commands.command(pass_context=True, no_pm=True, name='config')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
-    async def update_config(self, ctx, update_section: str, update_key: str, update_value: str): #pylint: disable=R0914
+    @asyncio.coroutine
+    def update_config(self, ctx, update_section: str, update_key: str, update_value: str): #pylint: disable=R0914
         """Update the configuration file
 
         :update_section: section to be updated in the config file
@@ -122,10 +128,11 @@ class ConfigCommands():
         :update_value: the value that matches the key
         """
         if update_section == 'ServerSettings':
-            bot_message = await self.bot.say("This is a protected section.")
-            await asyncio.sleep(5)
-            await self.bot.delete_message(ctx.message)
-            return await self.bot.delete_message(bot_message)
+            bot_message = yield from self.bot.say("This is a protected section.")
+            yield from asyncio.sleep(5)
+            yield from self.bot.delete_message(ctx.message)
+            yield from self.bot.delete_message(bot_message)
+            return
         else:
             try:
                 member_id = ctx.message.author.id
@@ -173,7 +180,7 @@ class ConfigCommands():
                     str(member_id) in bot_admin_users or \
                     [admin_role for admin_role in user_roles_list if admin_role in bot_admin_roles]:
                         filename = ctx.message.server.id
-                        await self.update_config_file(
+                        yield from self.update_config_file(
                             filename,
                             update_section,
                             update_key,
@@ -181,19 +188,20 @@ class ConfigCommands():
                             ctx.message
                         )
                     else:
-                        bot_message = await self.bot.say(
+                        bot_message = yield from self.bot.say(
                             "Only the server owner can " \
                             "configure different plugins."
                         )
-                        await asyncio.sleep(5)
-                        await self.bot.delete_message(ctx.message)
-                        return await self.bot.delete_message(bot_message)
+                        yield from asyncio.sleep(5)
+                        yield from self.bot.delete_message(ctx.message)
+                        yield from self.bot.delete_message(bot_message)
+                        return
                 elif update_section == 'BotAdmins':
                     if member_id == ctx.message.server.owner_id or \
                     int(member_id) == ConfigLoader().load_config_setting_int(
                             'BotSettings', 'owner_id'
                     ):
-                        await self.bot.say(
+                        yield from self.bot.say(
                             "Please use the botadmin command to update this section."
                         )
             except (configparser.NoSectionError, configparser.NoOptionError) as config_error:
@@ -201,7 +209,8 @@ class ConfigCommands():
 
     @commands.command(pass_context=True, no_pm=True, name='getconfig')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
-    async def get_config_information(self, ctx, member: discord.Member=None):
+    @asyncio.coroutine
+    def get_config_information(self, ctx, member: discord.Member=None):
         """Get the server configuration settings and send in a private message
 
         :member: empty discord.Member object
@@ -234,22 +243,25 @@ class ConfigCommands():
 
                 return_string = return_string + "```"
 
-                await self.bot.send_message(member, return_string)
-                return await self.bot.delete_message(ctx.message)
+                yield from self.bot.send_message(member, return_string)
+                yield from self.bot.delete_message(ctx.message)
+                return
         except discord.Forbidden:
-            bot_message = await self.bot.say(
+            bot_message = yield from self.bot.say(
                 "I am unable to message you. You may have me blocked, " \
                 "or personal messages disabled."
             )
-            await asyncio.sleep(5)
-            await self.bot.delete_message(ctx.message)
-            return await self.bot.delete_message(bot_message)
+            yield from asyncio.sleep(5)
+            yield from self.bot.delete_message(ctx.message)
+            yield from self.bot.delete_message(bot_message)
+            return
         except configparser.Error as config_error:
             print("Error with the configuration file: \n{0}".format(config_error))
 
     @commands.command(pass_context=True, no_pm=False, name='botadmin')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
-    async def update_role_list(self, ctx, add_or_remove: str, user_or_role: str, \
+    @asyncio.coroutine
+    def update_role_list(self, ctx, add_or_remove: str, user_or_role: str, \
                                role_id: str):
         """Update the configured role list to add or remove
         a group.
@@ -271,13 +283,15 @@ class ConfigCommands():
                 'BotSettings', 'owner_id'
         ):
             if add_or_remove != 'add' and add_or_remove != 'remove':
-                return await self.bot.say("Please specify if I am adding or removing a botadmin.")
+                yield from self.bot.say("Please specify if I am adding or removing a botadmin.")
+                return
 
             if user_or_role != 'user' and user_or_role != 'role':
-                return await self.bot.say(
+                yield from self.bot.say(
                     "Please specify if it's the user or role " \
                     "list I am updating."
                 )
+                return
 
             current_id_list = ConfigLoader().load_server_string_setting(
                 server_id,
@@ -298,7 +312,8 @@ class ConfigCommands():
                     else:
                         updated_id_list = current_id_list + " " + role_id
                 else:
-                    return await self.bot.say("Role already added.")
+                    yield from self.bot.say("Role already added.")
+                    return
 
             if add_or_remove == 'remove':
                 if contains_word(current_id_list, role_id):
@@ -308,7 +323,7 @@ class ConfigCommands():
                     updated_id_list = 'NOT_SET'
 
             filename = ctx.message.server.id
-            await ConfigCommands(self.bot).update_config_file(
+            yield from ConfigCommands(self.bot).update_config_file(
                 filename,
                 'BotAdmins',
                 'bot_admin_users' if user_or_role == 'user' else 'bot_admin_roles',
