@@ -178,27 +178,15 @@ async def on_command_error(exception, context):
     if hasattr(context.command, "on_error"):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
 
-    if isinstance(exception, commands.CommandNotFound):
-        print('Ignoring CommandNotFound in command {}'.format(context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.DisabledCommand):
-        print('Ignoring DisabledCommand in command {}'.format(context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.NoPrivateMessage):
-        print('Ignoring NoPrivateMessage in command {}'.format(context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.MissingRequiredArgument) or \
-    isinstance(exception, commands.BadArgument) or \
-    isinstance(exception, ValueError):
-        print('Ignoring MissingRequiredArgument/BadArgument/ValueError in command {}'.format(
+    if isinstance(exception, (commands.MissingRequiredArgument,
+                              commands.BadArgument,
+                              commands.DisabledCommand,
+                              commands.NoPrivateMessage,
+                              commands.CommandOnCooldown,
+                              commands.CommandNotFound,
+                              ValueError)):
+        print('Ignoring exception in command {}'.format(
             context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.CommandOnCooldown):
-        print('Ignoring CommandOnCooldown in command {}'.format(context.command), file=sys.stderr)
         return
 
     if isinstance(exception, commands.CommandInvokeError):
@@ -215,7 +203,6 @@ async def on_command_error(exception, context):
 def main():
     """
     main section of the bot
-
     """
     print('Preparing...')
     ErrorLogging().create_directory()
