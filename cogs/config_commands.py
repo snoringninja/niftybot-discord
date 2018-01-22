@@ -303,6 +303,7 @@ class ConfigCommands():
             role_id = role_id.replace('<@&', '')
             role_id = role_id.replace('<@!', '')
             role_id = role_id.replace('>', '')
+            role_id = role_id.replace('<@', '')
             role_id = role_id.strip()
 
             if add_or_remove == 'add':
