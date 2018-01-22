@@ -63,8 +63,7 @@ SHOW_DEBUG = str(
 CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
 
 @CLIENT.event
-@asyncio.coroutine
-def on_message(message):
+async def on_message(message):
     """
     discord.py on_message
     processes messages and checks if a command
@@ -76,30 +75,27 @@ def on_message(message):
     discord.utils.find(view.skip_string, COMMAND_PREFIX)
 
     if "@everyone" in message.content:
-        yield from Moderation(CLIENT).purge_everyone_message(message)
+        await Moderation(CLIENT).purge_everyone_message(message)
 
     if invoked_prefix is None:
         return
 
     invoker = view.get_word()
 
-    #print(invoker)
-    #print(CLIENT.commands)
-
     if invoker in CLIENT.commands:
         # @TODO : bot config update for override commands to make this cleaner
         if message.content == '{0}accept'.format(COMMAND_PREFIX):
-            yield from CLIENT.process_commands(message)
+            await CLIENT.process_commands(message)
         elif message.content.startswith("{0}guild".format(COMMAND_PREFIX)):
-            yield from CLIENT.process_commands(message)
+            await CLIENT.process_commands(message)
         elif message.content.startswith("{0}genconfig".format(COMMAND_PREFIX)):
-            yield from CLIENT.process_commands(message)
+            await CLIENT.process_commands(message)
         else:
             can_use = BotResources().check_accepted(message.author.id)
             if not message.channel.is_private:
                 message_channel_valid = BotResources().get_tos_channel_valid(message.server.id)
             if can_use:
-                yield from CLIENT.process_commands(message)
+                await CLIENT.process_commands(message)
             elif not can_use and message_channel_valid:
                 if message.author.id != CLIENT.user.id:
                     message_channel_id = ConfigLoader().load_server_int_setting(
@@ -107,27 +103,26 @@ def on_message(message):
                         'ConfigSettings',
                         'not_accepted_channel_id')
 
-                    bot_message = yield from CLIENT.send_message(
+                    bot_message = await CLIENT.send_message(
                         discord.Object(id=message_channel_id),
                         NOT_ACCEPTED_MESSAGE.replace(
                             "{user}", message.author.mention).replace(
                                 "{prefix}", COMMAND_PREFIX))
-                    yield from asyncio.sleep(20)
-                    yield from CLIENT.delete_message(bot_message)
+                    await asyncio.sleep(20)
+                    await CLIENT.delete_message(bot_message)
             else:
                 # This is needed to prevent infinite looping message posting
                 if message.author.id != CLIENT.user.id:
-                    bot_message = yield from CLIENT.send_message(
+                    bot_message = await CLIENT.send_message(
                         discord.Object(id=message.channel.id),
                         NOT_ACCEPTED_MESSAGE.replace(
                             "{user}", message.author.mention).replace(
                                 "{prefix}", COMMAND_PREFIX))
-                    yield from asyncio.sleep(20)
-                    yield from CLIENT.delete_message(bot_message)
+                    await asyncio.sleep(20)
+                    await CLIENT.delete_message(bot_message)
 
 @CLIENT.event
-@asyncio.coroutine
-def on_ready():
+async def on_ready():
     """
     discord.py on_ready
     """
@@ -137,13 +132,12 @@ def on_ready():
     print('Setting game to: {0}'.format(GAME_NAME))
     print('Loaded extensions: {0}'.format(EXTENSIONS))
     print('Database name: {0}'.format(DATABASE_NAME))
-    yield from CLIENT.change_presence(game=discord.Game(type=0, name=GAME_NAME))
+    await CLIENT.change_presence(game=discord.Game(type=0, name=GAME_NAME))
     print('Good to go!')
     print('------')
 
 @CLIENT.event
-@asyncio.coroutine
-def on_member_join(member):
+async def on_member_join(member):
     """
     discord.py on_member_join
 
@@ -151,11 +145,10 @@ def on_member_join(member):
     and if they have the member_join_enabled plugin enabled
     """
     server = member.server
-    yield from JoinLeaveHandler(CLIENT).welcome_user(server.id, member, server)
+    await JoinLeaveHandler(CLIENT).welcome_user(server.id, member, server)
 
 @CLIENT.event
-@asyncio.coroutine
-def on_member_remove(member):
+async def on_member_remove(member):
     """
     discord.py on_member_remove
 
@@ -163,24 +156,14 @@ def on_member_remove(member):
     and if they have the member_part_enabled plugin enabled
     """
     server = member.server
-    yield from JoinLeaveHandler(CLIENT).goodbye_user(server.id, member)
+    await JoinLeaveHandler(CLIENT).goodbye_user(server.id, member)
 
 @CLIENT.event
-@asyncio.coroutine
-def on_command_error(exception, context):
+async def on_command_error(exception, context):
     """
     Override the default discord.py on_command_error
     to log our errors to a file in the errors
     folder.
-
-    @TODO: we need to log the errors in here moving
-    moving forward, otherwise we will likely never
-    get a meaningful error log that we can actually
-    use since we're intentionally ignoring so many
-    different errors. From testing, it's typically
-    CommandInvokeError that gets thrown, so we can start
-    by just using isinstance(exception, commands.CommandInvokeError)
-    and generating the log with the traceback information
     """
 
     if SHOW_DEBUG is True:
@@ -195,32 +178,20 @@ def on_command_error(exception, context):
     if hasattr(context.command, "on_error"):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
 
-    if isinstance(exception, commands.CommandNotFound):
-        print('Ignoring CommandNotFound in command {}'.format(context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.DisabledCommand):
-        print('Ignoring DisabledCommand in command {}'.format(context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.NoPrivateMessage):
-        print('Ignoring NoPrivateMessage in command {}'.format(context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.MissingRequiredArgument) or \
-    isinstance(exception, commands.BadArgument) or \
-    isinstance(exception, ValueError):
-        print('Ignoring MissingRequiredArgument/BadArgument/ValueError in command {}'.format(
+    if isinstance(exception, (commands.MissingRequiredArgument,
+                              commands.BadArgument,
+                              commands.DisabledCommand,
+                              commands.NoPrivateMessage,
+                              commands.CommandOnCooldown,
+                              commands.CommandNotFound,
+                              ValueError)):
+        print('Ignoring exception in command {}'.format(
             context.command), file=sys.stderr)
-        return
-
-    if isinstance(exception, commands.CommandOnCooldown):
-        print('Ignoring CommandOnCooldown in command {}'.format(context.command), file=sys.stderr)
         return
 
     if isinstance(exception, commands.CommandInvokeError):
         print("Generated an error log from command {0}".format(context.command), file=sys.stderr)
-        yield from ErrorLogging().log_error(
+        return await ErrorLogging().log_error(
             traceback.format_exception(
                 type(exception),
                 exception,
@@ -228,12 +199,10 @@ def on_command_error(exception, context):
             ),
             context.command
         )
-        return
 
 def main():
     """
     main section of the bot
-
     """
     print('Preparing...')
     ErrorLogging().create_directory()
