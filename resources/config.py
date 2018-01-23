@@ -71,7 +71,7 @@ class ConfigLoader():
                                 'function. Please let the bot owner know to check the error ' \
                                 'log for more details.'
             parser.set('BotSettings', 'not_accepted_message', '')
-            parser['BotSettings']['not_accepted_message'] = "{0.mention}:\n" \
+            parser['BotSettings']['not_accepted_message'] = "{user}:\n" \
                                     "I am sorry, you must accept the bot terms of service " \
                                     "to use commands.\n" \
                                     "I may log the following:\n" \
@@ -81,7 +81,7 @@ class ConfigLoader():
                                     "Information provided to me for different functions, " \
                                     "including but not limited to: GW2 Api Commands, " \
                                     "Credit Betting```\n" \
-                                    "Please type {1}accept to accept these terms, which will " \
+                                    "Please type {prefix}accept to accept these terms, which will " \
                                     "expand to allow you to use commands in all servers.\n" \
                                     "If this makes you uncomfortable, please check with " \
                                     "server owners running me to find out what " \
