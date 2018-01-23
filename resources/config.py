@@ -229,40 +229,45 @@ class ConfigLoader():
         # Create each section that we need by default; future cogs
         # may need to handle writing code to modify the config to add sections
 
-        # ServerSettings config['testing'] = {'test': '45', 'test2': 'yes'}
-        parser['ServerSettings'] = {
-            'owner_id': owner_id,
-            'server_id': server_id,
-            'not_accepted_channel_id': 'NOT_SET'
-        }
+        parser.add_section('ServerSettings')
+        parser.add_section('BotAdmins')
+        parser.add_section('ConfigSettings')
+        parser.add_section('RoleAssignment')
+        parser.add_section('JoinPart')
+        parser.add_section('BettingGame')
+        parser.add_section('ApiCommands')
 
-        # RoleAssignment
-        parser['RoleAssignment'] = {
-            'enabled': False,
-            'role_list': 'NOT_SET',
-            'assignment_channel_id': 'NOT_SET'
-        }
+        parser.set('ServerSettings', 'owner_id', str(owner_id))
+        parser.set('ServerSettings', 'server_id', str(server_id))
 
-        # JoinPart
-        parser['JoinPart'] = {
-            'member_join_enabled': False,
-            'member_part_enabled': False,
-            'welcome_channel_id': 'NOT_SET',
-            'leave_channel_id': 'NOT_SET'
-        }
+        parser.set('BotAdmins', 'bot_admin_users', 'NOT_SET')
+        parser.set('BotAdmins', 'bot_admin_roles', 'NOT_SET')
 
-        # BettingGame
-        parser['BettingGame'] = {
-            'enabled': False,
-            'bet_channel_id': 'NOT_SET',
-            'minimum_bet': 'NOT_SET'
-        }
+        parser.set('ConfigSettings', 'not_accepted_channel_id', 'NOT_SET')
 
-        # ApiCommands
-        parser['ApiCommands'] = {
-            'enabled': False,
-            'api_channel_id': 'NOT_SET'
-        }
+        parser.set('RoleAssignment', 'enabled', 'false')
+        parser.set('RoleAssignment', 'role_list', 'NOT_SET')
+        parser.set('RoleAssignment', 'assignment_channel_id', 'NOT_SET')
+
+        parser.set('JoinPart', 'member_join_enabled', 'false')
+        parser.set('JoinPart', 'member_part_enabled', 'false')
+        parser.set('JoinPart', 'welcome_channel_id', 'NOT_SET')
+        parser.set('JoinPart', 'leave_channel_id', 'false')
+        parser.set('JoinPart', 'welcome_message', 'Welcome to {server}\'s Discord, {user}! Relax and have some fun!')
+        parser.set('JoinPart', 'part_message', '{name} ({display_name}) has left the server.')
+
+        parser.set('BettingGame', 'minimum_bet', '10')
+        parser.set('BettingGame', 'enabled', 'false')
+        parser.set('BettingGame', 'bet_channel_id', 'NOT_SET')
+        parser.set('BettingGame', 'helpme_cooldown', '86400')
+        parser.set('BettingGame', 'helpme_minimum', '500')
+        parser.set('BettingGame', 'force_multiple', '100')
+        parser.set('BettingGame', 'helpme_start_min', '500')
+        parser.set('BettingGame', 'helpme_bonus', '100')
+
+        parser.set('ApiCommands', 'welcome_message', 'false')
+        parser.set('ApiCommands', 'part_message', 'NOT_SET')
+
 
         with open(
             '%s.ini' % (

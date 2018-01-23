@@ -9,6 +9,7 @@ Handles all configuration based commands
 import os
 import configparser
 import asyncio
+import re
 
 import discord
 from discord.ext import commands
@@ -286,10 +287,14 @@ class ConfigCommands():
             )
 
             # Hacky fix for when mentioning the role to strip stuff out
-            role_id = role_id.replace('<@&', '')
-            role_id = role_id.replace('<@!', '')
-            role_id = role_id.replace('>', '')
-            role_id = role_id.strip()
+            # role_id = role_id.replace('<@&', '')
+            # role_id = role_id.replace('<@!', '')
+            # role_id = role_id.replace('>', '')
+            # role_id = role_id.strip()
+            role_id = re.sub('[^0-9]','', role_id)
+
+            print(current_id_list)
+            print(role_id)
 
             if add_or_remove == 'add':
                 if not contains_word(current_id_list, role_id):
