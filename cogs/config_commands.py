@@ -211,9 +211,41 @@ class ConfigCommands():
         member_id = ctx.message.author.id
         server_id = ctx.message.server.id
 
+        bot_admin_users = []
+        bot_admin_roles = []
+        user_roles_list = []
+
+        for user_role in ctx.message.author.roles:
+            user_roles_list.append(str(int(user_role.id)))
+
+        try:
+           bot_admins_user_list = ConfigLoader().load_server_string_setting(
+                ctx.message.server.id,
+                'BotAdmins',
+                'bot_admin_users'
+           )
+
+           bot_admins_role_list = ConfigLoader().load_server_string_setting(
+                ctx.message.server.id,
+                'BotAdmins',
+                'bot_admin_roles'
+           )
+
+           for user in bot_admins_user_list.split():
+               bot_admin_users.append(user)
+
+           for role in bot_admins_role_list.split():
+               bot_admin_roles.append(role)
+        except (configparser.NoSectionError, configparser.Error):
+            pass
+
         try:
             if member_id == ctx.message.server.owner_id or \
-            int(member_id) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
+            int(member_id) == ConfigLoader().load_config_setting_int(
+                      'BotSettings', 'owner_id'
+            ) or \
+            str(member_id) in bot_admin_users or \
+            [admin_role for admin_role in user_roles_list if admin_role in bot_admin_roles]:
                 return_string = "```Settings for {0}:\n\n".format(ctx.message.server.name)
 
                 parser = configparser.ConfigParser()
