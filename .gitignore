@@ -15,5 +15,5 @@ niftybot-testing/
 pip-selfcheck.json
 pyvenv.cfg
 share/
-./idea
+.idea/
 virtualenv
