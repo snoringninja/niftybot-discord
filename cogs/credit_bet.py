@@ -21,6 +21,7 @@ from discord.ext import commands
 # Disable too-many-locals
 # pylint: disable=too-many-locals
 
+
 def is_valid_hour(seconds):
     """Check if the provided seconds is a
     valid hour.
@@ -31,11 +32,13 @@ def is_valid_hour(seconds):
         return True
     return False
 
+
 def convert_seconds_to_hour(seconds):
     """Convert seconds to hour."""
     return seconds / 3600
 
-class CreditBet():
+
+class CreditBet:
     """
     CreditBet class
     """
@@ -458,7 +461,6 @@ class CreditBet():
 
         :member: empty discord.Member object
         """
-        member = ctx.message.author
         member_id = ctx.message.author.id
         server_id = ctx.message.server.id
 
@@ -497,6 +499,11 @@ class CreditBet():
             ) or \
             str(member_id) in bot_admin_users or \
             [admin_role for admin_role in user_roles_list if admin_role in bot_admin_roles]:
+                args = (str(server_id),)
+                DatabaseHandler().update_database_with_args(
+                    "DELETE FROM credit_bet WHERE serverID = ?",
+                    args
+                )
                 return await self.bot.say("This would have reset the lottery table for this server.")
         except configparser.Error as config_error:
             print("Error with resetlotto command.")
