@@ -306,23 +306,27 @@ class CreditBet:
                 ORDER BY credits DESC LIMIT 5"
                 .format(str(server_id))
             )
-            names = {d[0] for d in row}
-            max_name_len = max(map(len, names))
-            max_name_len = 22 if max_name_len > 22 else max_name_len
-            spacer = max_name_len + 4
-            output_string = '```{0: <{1}}  Credits\n'.format('User', spacer)
-            output_string = output_string + '{0: <{1}}  -------\n'.format('----', spacer)
+            if len(row) > 0:
+                names = {d[0] for d in row}
+                max_name_len = max(map(len, names))
+                max_name_len = 22 if max_name_len > 22 else max_name_len
+                spacer = max_name_len + 4
+                output_string = '```{0: <{1}}  Credits\n'.format('User', spacer)
+                output_string = output_string + '{0: <{1}}  -------\n'.format('----', spacer)
 
-            for item in enumerate(row):
-                # Add the name and credit amounts of the top 5 users.
-                # Truncate usernames at 22 spaces and add '..'
-                output_string = output_string + "{0: <{1}}  {2}\n".format(
-                    item[1][0][:22] + '..' if len(item[1][0]) > 22 else item[1][0],
-                    spacer,
-                    item[1][1]
-                )
-            output_string = output_string + "\n```"
-            await self.bot.say(output_string)
+                for item in enumerate(row):
+                    # Add the name and credit amounts of the top 5 users.
+                    # Truncate usernames at 22 spaces and add '..'
+                    output_string = output_string + "{0: <{1}}  {2}\n".format(
+                        item[1][0][:22] + '..' if len(item[1][0]) > 22 else item[1][0],
+                        spacer,
+                        item[1][1]
+                    )
+                output_string = output_string + "\n```"
+                return await self.bot.say(output_string)
+            else:
+                return await self.bot.say("There are no users currently in the lotto, or " \
+                                          "all participating users have 0 credits.")
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
@@ -507,6 +511,7 @@ class CreditBet:
                 return await self.bot.say("This would have reset the lottery table for this server.")
         except configparser.Error as config_error:
             print("Error with resetlotto command.")
+
 
 def setup(bot):
     """This makes it so we can actually use it."""
