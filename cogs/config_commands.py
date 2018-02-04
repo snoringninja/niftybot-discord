@@ -9,6 +9,7 @@ Handles all configuration based commands
 import os
 import configparser
 import asyncio
+import re
 
 import discord
 from discord.ext import commands
@@ -71,8 +72,8 @@ class ConfigCommands():
             return
 
     async def update_config_file(self, filename, update_section, \
-    update_key, update_value, message, supress_message=False
-                          ): #pylint: disable=too-many-arguments
+                                 update_key, update_value, message, suppress_message=False
+                                 ): #pylint: disable=too-many-arguments
         """Handle updating the config file for the server.
         supress_message is used when we update the config from a function when a command fails
         It defaults to False for when the config is updating from within the server
@@ -100,7 +101,7 @@ class ConfigCommands():
                         )
                     ), 'w') as configfile:
                     parser.write(configfile)
-                if not supress_message:
+                if not suppress_message:
                     bot_message = await self.bot.say("Configuration file updated.")
                     await asyncio.sleep(5)
                     await self.bot.delete_message(message)
@@ -130,11 +131,15 @@ class ConfigCommands():
             try:
                 member_id = ctx.message.author.id
 
+                # @TODO : verify this works and remove commented out code
                 # This allows us to use #channel_name, @person_name
-                update_value = update_value.replace('<@&', '')
-                update_value = update_value.replace('<@!', '')
-                update_value = update_value.replace('<#', '')
-                update_value = update_value.replace('>', '')
+                # update_value = update_value.replace('<@&', '')
+                # update_value = update_value.replace('<@!', '')
+                # update_value = update_value.replace('<#', '')
+                # update_value = update_value.replace('>', '')
+
+                # Use regex to replace the characters added if they add via pinging
+                update_value = re.sub('[^0-9]', '', update_value)
                 update_value = update_value.strip()
 
                 bot_admin_users = []
@@ -210,9 +215,41 @@ class ConfigCommands():
         member_id = ctx.message.author.id
         server_id = ctx.message.server.id
 
+        bot_admin_users = []
+        bot_admin_roles = []
+        user_roles_list = []
+
+        for user_role in ctx.message.author.roles:
+            user_roles_list.append(str(int(user_role.id)))
+
+        try:
+           bot_admins_user_list = ConfigLoader().load_server_string_setting(
+                ctx.message.server.id,
+                'BotAdmins',
+                'bot_admin_users'
+           )
+
+           bot_admins_role_list = ConfigLoader().load_server_string_setting(
+                ctx.message.server.id,
+                'BotAdmins',
+                'bot_admin_roles'
+           )
+
+           for user in bot_admins_user_list.split():
+               bot_admin_users.append(user)
+
+           for role in bot_admins_role_list.split():
+               bot_admin_roles.append(role)
+        except (configparser.NoSectionError, configparser.Error):
+            pass
+
         try:
             if member_id == ctx.message.server.owner_id or \
-            int(member_id) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
+            int(member_id) == ConfigLoader().load_config_setting_int(
+                      'BotSettings', 'owner_id'
+            ) or \
+            str(member_id) in bot_admin_users or \
+            [admin_role for admin_role in user_roles_list if admin_role in bot_admin_roles]:
                 return_string = "```Settings for {0}:\n\n".format(ctx.message.server.name)
 
                 parser = configparser.ConfigParser()
@@ -266,6 +303,8 @@ class ConfigCommands():
         member_id = ctx.message.author.id
         server_id = str(ctx.message.server.id)
 
+        updated_id_list = ''
+
         if member_id == ctx.message.server.owner_id or \
         int(member_id) == ConfigLoader().load_config_setting_int(
                 'BotSettings', 'owner_id'
@@ -285,12 +324,12 @@ class ConfigCommands():
                 'bot_admin_users' if user_or_role == 'user' else 'bot_admin_roles'
             )
 
-            # Hacky fix for when mentioning the role to strip stuff out
-            role_id = role_id.replace('<@&', '')
-            role_id = role_id.replace('<@!', '')
-            role_id = role_id.replace('>', '')
-            role_id = role_id.replace('<@', '')
-            role_id = role_id.strip()
+            # @TODO : verify this works and remove commented out code
+            # role_id = role_id.replace('<@&', '')
+            # role_id = role_id.replace('<@!', '')
+            # role_id = role_id.replace('>', '')
+            # role_id = role_id.strip()
+            role_id = re.sub('[^0-9]','', role_id)
 
             if add_or_remove == 'add':
                 if not contains_word(current_id_list, role_id):

@@ -165,9 +165,8 @@ async def on_command_error(exception, context):
     to log our errors to a file in the errors
     folder.
     """
-
-    if SHOW_DEBUG is True:
-        print("Showing debug")
+    if SHOW_DEBUG == "True":
+        print("Showing debug:\n")
         traceback.print_exception(
             type(exception),
             exception,
@@ -185,7 +184,7 @@ async def on_command_error(exception, context):
                               commands.CommandOnCooldown,
                               commands.CommandNotFound,
                               ValueError)):
-        print('Ignoring exception in command {}'.format(
+        print('Ignoring exception in command {0}'.format(
             context.command), file=sys.stderr)
         return
 

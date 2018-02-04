@@ -9,6 +9,7 @@ import os
 import sqlite3
 from resources.config import ConfigLoader
 
+
 class DatabaseHandler(object):
     """DatabaseHandler
 
@@ -17,7 +18,7 @@ class DatabaseHandler(object):
     """
     # @TODO : need a database generation script
     # @TODO : close connection
-    # @TODO : NEED TO USE PARAMATIZED QUERIES EVERY TIME
+    # @TODO : NEED TO USE PARAMETRIZED QUERIES EVERY TIME
 
     def __init__(self):
         self.path = os.path.abspath(

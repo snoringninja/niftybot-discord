@@ -9,6 +9,7 @@ SQLite database
 
 import random
 import asyncio
+import configparser
 from datetime import datetime
 
 from resources.database import DatabaseHandler
@@ -20,6 +21,7 @@ from discord.ext import commands
 # Disable too-many-locals
 # pylint: disable=too-many-locals
 
+
 def is_valid_hour(seconds):
     """Check if the provided seconds is a
     valid hour.
@@ -30,11 +32,13 @@ def is_valid_hour(seconds):
         return True
     return False
 
+
 def convert_seconds_to_hour(seconds):
     """Convert seconds to hour."""
     return seconds / 3600
 
-class CreditBet():
+
+class CreditBet:
     """
     CreditBet class
     """
@@ -302,23 +306,27 @@ class CreditBet():
                 ORDER BY credits DESC LIMIT 5"
                 .format(str(server_id))
             )
-            names = {d[0] for d in row}
-            max_name_len = max(map(len, names))
-            max_name_len = 22 if max_name_len > 22 else max_name_len
-            spacer = max_name_len + 4
-            output_string = '```{0: <{1}}  Credits\n'.format('User', spacer)
-            output_string = output_string + '{0: <{1}}  -------\n'.format('----', spacer)
+            if len(row) > 0:
+                names = {d[0] for d in row}
+                max_name_len = max(map(len, names))
+                max_name_len = 22 if max_name_len > 22 else max_name_len
+                spacer = max_name_len + 4
+                output_string = '```{0: <{1}}  Credits\n'.format('User', spacer)
+                output_string = output_string + '{0: <{1}}  -------\n'.format('----', spacer)
 
-            for item in enumerate(row):
-                # Add the name and credit amounts of the top 5 users.
-                # Truncate usernames at 22 spaces and add '..'
-                output_string = output_string + "{0: <{1}}  {2}\n".format(
-                    item[1][0][:22] + '..' if len(item[1][0]) > 22 else item[1][0],
-                    spacer,
-                    item[1][1]
-                )
-            output_string = output_string + "\n```"
-            await self.bot.say(output_string)
+                for item in enumerate(row):
+                    # Add the name and credit amounts of the top 5 users.
+                    # Truncate usernames at 22 spaces and add '..'
+                    output_string = output_string + "{0: <{1}}  {2}\n".format(
+                        item[1][0][:22] + '..' if len(item[1][0]) > 22 else item[1][0],
+                        spacer,
+                        item[1][1]
+                    )
+                output_string = output_string + "\n```"
+                return await self.bot.say(output_string)
+            else:
+                return await self.bot.say("There are no users currently in the lotto, or " \
+                                          "all participating users have 0 credits.")
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
@@ -448,6 +456,63 @@ class CreditBet():
                             minimum_credits
                         )
                     )
+
+    @commands.command(pass_context=True, no_pm=True, name='resetlotto')
+    @commands.cooldown(rate=1, per=1, type=commands.BucketType.server)
+    async def reset_lotto_entries(self, ctx, member: discord.Member=None):
+        """Reset the lotto entries for the server where
+        where the commands is being used.
+
+        :member: empty discord.Member object
+        """
+        member_id = ctx.message.author.id
+        server_id = ctx.message.server.id
+
+        bot_admin_users = []
+        bot_admin_roles = []
+        user_roles_list = []
+
+        for user_role in ctx.message.author.roles:
+            user_roles_list.append(str(int(user_role.id)))
+
+        try:
+            bot_admins_user_list = ConfigLoader().load_server_string_setting(
+                ctx.message.server.id,
+                'BotAdmins',
+                'bot_admin_users'
+            )
+
+            bot_admins_role_list = ConfigLoader().load_server_string_setting(
+                ctx.message.server.id,
+                'BotAdmins',
+                'bot_admin_roles'
+            )
+
+            for user in bot_admins_user_list.split():
+                bot_admin_users.append(user)
+
+            for role in bot_admins_role_list.split():
+                bot_admin_roles.append(role)
+        except (configparser.NoSectionError, configparser.Error):
+            pass
+
+        try:
+            if member_id == ctx.message.server.owner_id or \
+            int(member_id) == ConfigLoader().load_config_setting_int(
+                        'BotSettings', 'owner_id'
+            ) or \
+            str(member_id) in bot_admin_users or \
+            [admin_role for admin_role in user_roles_list if admin_role in bot_admin_roles]:
+                args = (str(server_id),)
+                DatabaseHandler().update_database_with_args(
+                    "DELETE FROM credit_bet WHERE serverID = ?",
+                    args
+                )
+                return await self.bot.say("This would have reset the lottery table for this server.")
+        except configparser.Error as config_error:
+            print("Error with resetlotto command.")
+
+
 def setup(bot):
     """This makes it so we can actually use it."""
     bot.add_cog(CreditBet(bot))
