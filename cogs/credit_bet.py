@@ -194,7 +194,7 @@ class CreditBet:
             #print("Row: {}".format(row))
             if row is None:
                 return await self.bot.say(
-                    "{0.mention}: please do {1}register to" \
+                    "{0.mention}: please do {1}register to " \
                     "join the lotto.".format(member, self.prefix))
             else:
                 remaining_credits = DatabaseHandler().fetch_results(
@@ -465,6 +465,7 @@ class CreditBet:
 
         :member: empty discord.Member object
         """
+        member = ctx.message.author
         member_id = ctx.message.author.id
         server_id = ctx.message.server.id
 
@@ -508,7 +509,7 @@ class CreditBet:
                     "DELETE FROM credit_bet WHERE serverID = ?",
                     args
                 )
-                return await self.bot.say("This would have reset the lottery table for this server.")
+                return await self.bot.say("{0.mention}: lottery table for this server reset.".format(member))
         except configparser.Error as config_error:
             print("Error with resetlotto command.")
 
