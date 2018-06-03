@@ -1,6 +1,6 @@
 # Niftybot-Discord - Discord bot built on [Discord.py](https://github.com/Rapptz/discord.py)  
   
-  ### Click [here](https://xnifty.github.io/niftybot-discord/) for documentation
+  ### Click [here](https://docs.snoring.ninja/niftybot-discord) for documentation
 
 Some things the bot ships with:
 
@@ -18,8 +18,8 @@ TODO(s):
  * Code cleanup and class merging where applicable
  * Continuing documentation, both within the code and on the documentation site
 
-The bot will be constantly undergoing changes as I decide new little cogs to add.  
-Wish to help out? Please check out the [issues](https://github.com/xNifty/niftybot-discord/issues) and submit a pull request with your changes!  
+We're constantly working on the bot, which means cogs may come and go, or may undertake drastic overhauls.  
+Wish to help out? Please check out the [issues](https://github.com/snoringninja/niftybot-discord/issues) and submit a pull request with your changes!  
 Wish to build a cog for the bot? Please do so, and submit a pull request!
 
 * The included niftybot.db has the tables needed to function
