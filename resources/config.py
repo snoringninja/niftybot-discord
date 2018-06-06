@@ -265,8 +265,8 @@ class ConfigLoader():
         parser.set('BettingGame', 'helpme_start_min', '500')
         parser.set('BettingGame', 'helpme_bonus', '100')
 
-        parser.set('ApiCommands', 'welcome_message', 'false')
-        parser.set('ApiCommands', 'part_message', 'NOT_SET')
+        parser.set('ApiCommands', 'enabled', 'false')
+        parser.set('ApiCommands', 'api_channel_id', 'NOT_SET')
 
 
         with open(
