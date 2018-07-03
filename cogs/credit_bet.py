@@ -336,14 +336,9 @@ class CreditBet:
         By default, this will check against a 24 hour timer to determinme
         if the user is eligable to use the command again.
 
-        @TODO: allow server owners to set time between uses
         @TODO: allow owners to enable setting so that the 24 hour timer
                only begins after the user has run out of credits
-        @TODO: allow owners to set the threshold for when eligible
-               to use the command
         """
-        # @TODO : let server owners set time between uses, max amount
-        # before preventing, and credits each time
         member_id = ctx.message.author.id
         member = ctx.message.author
         server_id = ctx.message.server.id
@@ -362,7 +357,7 @@ class CreditBet:
             'helpme_cooldown'
         )
 
-        # Grab the mimimum credits for using helpme
+        # Grab the minimum credits for using helpme
         minimum_credits = ConfigLoader().load_server_int_setting(
             server_id,
             'BettingGame',
