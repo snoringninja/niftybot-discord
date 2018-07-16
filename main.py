@@ -62,6 +62,7 @@ SHOW_DEBUG = str(
 
 CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
 
+
 @CLIENT.event
 async def on_message(message):
     """
@@ -89,6 +90,8 @@ async def on_message(message):
         elif message.content.startswith("{0}guild".format(COMMAND_PREFIX)):
             await CLIENT.process_commands(message)
         elif message.content.startswith("{0}genconfig".format(COMMAND_PREFIX)):
+            await CLIENT.process_commands(message)
+        elif message.content.startswith("{0}logout".format(COMMAND_PREFIX)):
             await CLIENT.process_commands(message)
         else:
             can_use = BotResources().check_accepted(message.author.id)
@@ -121,6 +124,7 @@ async def on_message(message):
                     await asyncio.sleep(20)
                     await CLIENT.delete_message(bot_message)
 
+
 @CLIENT.event
 async def on_ready():
     """
@@ -136,6 +140,7 @@ async def on_ready():
     print('Good to go!')
     print('------')
 
+
 @CLIENT.event
 async def on_member_join(member):
     """
@@ -147,6 +152,7 @@ async def on_member_join(member):
     server = member.server
     await JoinLeaveHandler(CLIENT).welcome_user(server.id, member, server)
 
+
 @CLIENT.event
 async def on_member_remove(member):
     """
@@ -157,6 +163,7 @@ async def on_member_remove(member):
     """
     server = member.server
     await JoinLeaveHandler(CLIENT).goodbye_user(server.id, member)
+
 
 @CLIENT.event
 async def on_command_error(exception, context):
@@ -199,6 +206,7 @@ async def on_command_error(exception, context):
             context.command
         )
 
+
 def main():
     """
     main section of the bot
@@ -229,6 +237,7 @@ def main():
     except discord.LoginFailure as login_error:
         print("There was an issue with logging in:\n{0}\n".format(login_error))
         raise SystemExit
+
 
 if __name__ == "__main__":
     try:
