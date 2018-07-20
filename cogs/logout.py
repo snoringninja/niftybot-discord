@@ -51,8 +51,11 @@ class Logout:
 
             manager = dbus.Interface(systemd, 'org.freedesktop.systemd1.Manager')
 
+            # I wonder if we should run DisableUnit here, and then on bot startup
+            # check for linux and reenable the service so that we can still use
+            # the normal bot logout method - need to look into that
             manager.StopUnit('{0}.service'.format(service_name), 'fail')
-            print("stop job has run.")
+            print("SHUTDOWN: linux environment in use, using systemd")
 
     @commands.command(pass_context=True, no_pm=True)
     async def logout(self, ctx):
@@ -65,14 +68,15 @@ class Logout:
         """
         user_id = ctx.message.author.id
 
+        await self.bot.say("Shutting down, bye!")
+
         if int(user_id) == self.owner_id:
             try:
-                await self.systemd_logout()
-            except TypeError:
+                await self.bot.logout()
+                await self.systemd_logout("niftybot") # hardcoded for now
+            except TypeError: # okay, not linux, so just do normal logout
                 print("SHUTDOWN: non-linux environment, skipping systemd check")
-                pass
-            await self.bot.say("Shutting down, bye!")
-            await self.bot.logout()
+                await self.bot.logout()
 
         return
 
