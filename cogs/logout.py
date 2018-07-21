@@ -16,23 +16,8 @@ if platform == "linux" or platform == "linux2":
 elif platform == "win32":
     pass
 
-"""
-import dbus
-sysbus = dbus.SystemBus()
-systemd = sysbus.get_object('org.freedesktop.systemd1',
-                        '/org/freedesktop/systemd1')
-
-manager = dbus.Interface(systemd, 'org.freedesktop.systemd1.Manager')
-
-def stop_job(pwd):
-        job = manager.StopUnit('niftybot.service', 'fail')
-        print("stop job has run.")
-
-"""
-
 
 class Logout:
-    # pylint: disable=too-few-public-methods
     """
     Logout cog handles exiting discord and
     shutting down.
@@ -51,9 +36,8 @@ class Logout:
 
             manager = dbus.Interface(systemd, 'org.freedesktop.systemd1.Manager')
 
-            # I wonder if we should run DisableUnit here, and then on bot startup
-            # check for linux and reenable the service so that we can still use
-            # the normal bot logout method - need to look into that
+            # Okay, so we'll just print out the "Shutting down, bye!" message
+            # before we run this or logout
             manager.StopUnit('{0}.service'.format(service_name), 'fail')
             print("SHUTDOWN: linux environment in use, using systemd")
 
@@ -70,11 +54,15 @@ class Logout:
 
         await self.bot.say("Shutting down, bye!")
 
+        # Try to run systemd_logout, and if that fails run the normal logout method
+        # The issue here is if they are using systemd but pass in the wrong service name it'll just reboot
+        # after logging out - not really our problem though, they should correct that in the bot config and try again
+        # Please note: this is hardcoded right now, but it should grab the service name from the bot config
         if int(user_id) == self.owner_id:
             try:
                 await self.bot.logout()
-                await self.systemd_logout("niftybot") # hardcoded for now
-            except TypeError: # okay, not linux, so just do normal logout
+                await self.systemd_logout("niftybot")
+            except TypeError:
                 print("SHUTDOWN: non-linux environment, skipping systemd check")
                 await self.bot.logout()
 
