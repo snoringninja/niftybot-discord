@@ -46,26 +46,21 @@ class Logout:
         """
         Logs the bot out.
         This can only be used by the bot owner.
-
-        This will not work if they are using systemd to reboot the bot on shutdown or crash.
-        We need to implement the systemd_shutdown function into this if they are using systemd to manage
         """
         user_id = ctx.message.author.id
-
-        await self.bot.say("Shutting down, bye!")
 
         # Try to run systemd_logout, and if that fails run the normal logout method
         # The issue here is if they are using systemd but pass in the wrong service name it'll just reboot
         # after logging out - not really our problem though, they should correct that in the bot config and try again
         # Please note: this is hardcoded right now, but it should grab the service name from the bot config
         if int(user_id) == self.owner_id:
+            await self.bot.say("Shutting down, bye!")
             try:
                 await self.bot.logout()
                 await self.systemd_logout("niftybot")
             except TypeError:
                 print("SHUTDOWN: non-linux environment, skipping systemd check")
                 await self.bot.logout()
-
         return
 
 
