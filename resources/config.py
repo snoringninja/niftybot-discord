@@ -64,6 +64,8 @@ class ConfigLoader():
             parser.set('BotSettings', 'command_prefix', 'NOT_SET')
             parser.set('BotSettings', 'description', 'NOT_SET')
             parser.set('BotSettings', 'sqlite', 'niftybot.db')
+            parser.set('BotSettings', 'systemd_enabled', 'true')
+            parser.set('BotSettings', 'systemd_name', 'niftybot')
             parser.set('BotSettings', 'enabled_plugins', 'Space separated list ' \
                                 '(credit_bet logout api_commands)')
             parser.set('BotSettings', 'error_message', '')
@@ -114,7 +116,9 @@ class ConfigLoader():
         return int(self.parser.get(section, var))
 
     def load_config_setting_string(self, section, var):
-        """Load string setting from bot config."""
+        """Load string setting from bot config.
+        :rtype: string
+        """
         self.parser.read(self.config)
         return str(self.parser.get(section, var))
 

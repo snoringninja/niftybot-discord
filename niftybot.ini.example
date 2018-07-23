@@ -7,6 +7,8 @@ game_name: Set game being played!
 command_prefix: !!
 description: Your_Bot_Description
 sqlite: niftybot.db
+systemd_enabled: false
+systemd_name: niftybot
 # space seperated list of plugings to enable
 enabled_plugins: credit_bet logout api_commands role_assignment config_commands general_bot_commands
 
