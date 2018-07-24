@@ -29,6 +29,13 @@ class Logout:
         self.owner_id = ConfigLoader().load_config_setting_int('BotSettings', 'owner_id')
 
     @staticmethod
+    def get_system_environment():
+        if platform == "linux" or platform == "linux2":
+            return True
+        elif platform == "win32":
+            return False
+
+    @staticmethod
     def systemd_logout(service_name):
             sysbus = dbus.SystemBus()
             systemd = sysbus.get_object('org.freedesktop.systemd1',
@@ -38,8 +45,8 @@ class Logout:
 
             # Okay, so we'll just print out the "Shutting down, bye!" message
             # before we run this or logout
-            manager.StopUnit('{0}.service'.format(service_name), 'fail')
             print("SHUTDOWN: linux environment in use, using systemd")
+            manager.StopUnit('{0}.service'.format(service_name), 'fail')
 
     @commands.command(pass_context=True, no_pm=True)
     async def logout(self, ctx):
@@ -56,14 +63,17 @@ class Logout:
         if int(user_id) == self.owner_id:
             await self.bot.say("Shutting down, bye!")
             try:
-                systemd_enabled = ConfigLoader().load_config_setting_boolean('BotSettings', 'systemd_enabled')
+                if self.get_system_environment():
+                    systemd_enabled = ConfigLoader().load_config_setting_boolean('BotSettings', 'systemd_enabled')
 
-                if systemd_enabled == 'true':
-                    # so even if the bot logs out, if the systemd_logout fails the bot is going to come back online
-                    # assuming they have the service set to do so
-                    systemd_name = ConfigLoader().load_config_setting_string('BotSettings', 'systemd_name')
-                    await self.bot.logout()
-                    await self.systemd_logout(systemd_name)
+                    if systemd_enabled == 'true':
+                        # so even if the bot logs out, if the systemd_logout fails the bot is going to come back online
+                        # assuming they have the service set to do so
+                        systemd_name = ConfigLoader().load_config_setting_string('BotSettings', 'systemd_name')
+                        await self.bot.logout()
+                        await self.systemd_logout(systemd_name)
+                    else:
+                        raise TypeError
                 else:
                     raise TypeError
             except TypeError:

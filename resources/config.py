@@ -1,8 +1,9 @@
 """
 config.py
 @author - Ryan Malacina (xNifty)
+@SnoringNinja - https://snoring.ninja
 
-Handls all config based functions that are not used as bot commands
+Handles all config based functions that are not used as bot commands
 """
 
 # Imports for ConfigLoader
@@ -10,14 +11,17 @@ import os
 import configparser
 import errno
 
+
 def get_config_filename(default_filename):
     """Return the filename; probably not needed at this point."""
     return default_filename
+
 
 def load_config(default_filename):
     """Read in the config file."""
     config = configparser.ConfigParser()
     return config.read(default_filename)
+
 
 class ConfigLoader():
     """ConfigLoader"""
@@ -38,7 +42,6 @@ class ConfigLoader():
 
     def create_directory(self):
         """Create an errors directory if needed."""
-        #print "DIRECTORY: %s" % (self.directory,)
         try:
             os.mkdir(self.server_settings_path)
         except OSError as exception:
@@ -89,7 +92,6 @@ class ConfigLoader():
                                     "server owners running me to find out what " \
                                     "information they might be logging."
 
-
             parser['Debugging'] = {
                 'show_db_info': 'false',
                 'error_handle_debugger': 'false'
@@ -100,7 +102,7 @@ class ConfigLoader():
                     os.path.join(
                         self.path,
                         'niftybot')), 'w'
-                ) as configfile:
+            ) as configfile:
                 parser.write(configfile)
             return False
         return True
@@ -139,7 +141,7 @@ class ConfigLoader():
                     str(default_filename))
             ),
         )
-        # honestly, this throws an error in the editor but works fine
+        # does this still show an error in terminal?
         return self.parser.read(config)
 
     def load_server_config_setting(self, filename, section, var):
@@ -272,13 +274,12 @@ class ConfigLoader():
         parser.set('ApiCommands', 'enabled', 'false')
         parser.set('ApiCommands', 'api_channel_id', 'NOT_SET')
 
-
         with open(
             '%s.ini' % (
                 os.path.join(
                     self.server_settings_path,
                     str(server_id))), 'w'
-            ) as configfile:
+        ) as configfile:
             parser.write(configfile)
         return await self.bot.say(
             "Configuration file generated. You will need to " \
