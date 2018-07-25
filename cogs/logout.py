@@ -59,7 +59,7 @@ class Logout:
         # Try to run systemd_logout, and if that fails run the normal logout method
         # The issue here is if they are using systemd but pass in the wrong service name it'll just reboot
         # after logging out - not really our problem though, they should correct that in the bot config and try again
-        # Please note: this is hardcoded right now, but it should grab the service name from the bot config
+        # We should probably raise more acceptable errors than TypeError (but still keep that one)
         if int(user_id) == self.owner_id:
             await self.bot.say("Shutting down, bye!")
             try:
