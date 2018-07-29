@@ -70,12 +70,12 @@ async def on_message(message):
     processes messages and checks if a command
     """
     view = StringView(message.content)
-    invoked_prefix = COMMAND_PREFIX
+    invoked_prefix = COMMAND_PREFIX  # Can we remove this? It's reset immediately after
 
     invoked_prefix = discord.utils.find(view.skip_string, COMMAND_PREFIX)
     discord.utils.find(view.skip_string, COMMAND_PREFIX)
 
-    if "@everyone" in message.content:
+    if "@everyone" in message.content:  # This seems rather hacky
         await Moderation(CLIENT).purge_everyone_message(message)
 
     if invoked_prefix is None:
