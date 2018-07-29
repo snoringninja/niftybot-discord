@@ -11,6 +11,9 @@ from sys import platform
 from discord.ext import commands
 from resources.config import ConfigLoader
 
+# When we import dbus, there could be an issue that it's not actually installed if being run through virtualenv
+# If that is the case, there is an issue when installing it that system libraries may need to be installed.
+# We should really add a FAQ for something like this and set up a testing environment to grab everything that is needed
 if platform == "linux" or platform == "linux2":
     import dbus # will only be imported if on linux
 elif platform == "win32":
