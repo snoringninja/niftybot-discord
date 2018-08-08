@@ -139,7 +139,7 @@ class ConfigCommands():
                 # update_value = update_value.replace('>', '')
 
                 # Use regex to replace the characters added if they add via pinging
-                update_value = re.sub('[^0-9]', '', update_value)
+                update_value = re.sub('[^\w]', '', update_value)
                 update_value = update_value.strip()
 
                 bot_admin_users = []
