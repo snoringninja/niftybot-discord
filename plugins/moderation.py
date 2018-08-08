@@ -13,7 +13,8 @@ import discord
 from resources.config import ConfigLoader
 from cogs.config_commands import ConfigCommands
 
-class Moderation(): # pylint: disable=too-few-public-methods
+
+class Moderation:  # pylint: disable=too-few-public-methods
     """Collection of moderator plugins.
     """
     def __init__(self, bot):
@@ -28,7 +29,7 @@ class Moderation(): # pylint: disable=too-few-public-methods
 
         Note: even doing this, all users will still get a
         notification that there was a ping; there is nothing
-        you can do about that.
+        you can do about that, it's a Discord thing
         """
         server_id = message.server.id
         channel_id = message.channel.id
@@ -61,7 +62,7 @@ class Moderation(): # pylint: disable=too-few-public-methods
                                                       [@]everyone and and please use \
                                                       the [@]here highlight instead."
                                                       .format(member)
-                                                     )
+                                                      )
             await self.bot.delete_message(message)
             await asyncio.sleep(5)
             return await self.bot.delete_message(bot_message)

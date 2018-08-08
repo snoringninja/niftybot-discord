@@ -67,30 +67,30 @@ class ConfigLoader():
             parser.set('BotSettings', 'command_prefix', 'NOT_SET')
             parser.set('BotSettings', 'description', 'NOT_SET')
             parser.set('BotSettings', 'sqlite', 'niftybot.db')
-            parser.set('BotSettings', 'systemd_enabled', 'true')
+            parser.set('BotSettings', 'systemd_enabled', 'false')
             parser.set('BotSettings', 'systemd_name', 'niftybot')
-            parser.set('BotSettings', 'enabled_plugins', 'Space separated list ' \
-                                '(credit_bet logout api_commands)')
+            parser.set('BotSettings', 'enabled_plugins', 'Space separated list '
+                       '(credit_bet logout api_commands)')
             parser.set('BotSettings', 'error_message', '')
             parser['BotSettings']['error_message'] = 'There was an error with the requested bot ' \
-                                'function. Please let the bot owner know to check the error ' \
-                                'log for more details.'
+                'function. Please let the bot owner know to check the error ' \
+                'log for more details.'
             parser.set('BotSettings', 'not_accepted_message', '')
             parser['BotSettings']['not_accepted_message'] = "{user}:\n" \
-                                    "I am sorry, you must accept the bot terms of service " \
-                                    "to use commands.\n" \
-                                    "I may log the following:\n" \
-                                    "```Your public discord userID\n" \
-                                    "The ID of the server you used in the command\n" \
-                                    "Your current display name\n" \
-                                    "Information provided to me for different functions, " \
-                                    "including but not limited to: GW2 Api Commands, " \
-                                    "Credit Betting```\n" \
-                                    "Please type {prefix}accept to accept these terms, which will " \
-                                    "expand to allow you to use commands in all servers.\n" \
-                                    "If this makes you uncomfortable, please check with " \
-                                    "server owners running me to find out what " \
-                                    "information they might be logging."
+                "I am sorry, you must accept the bot terms of service " \
+                "to use commands.\n" \
+                "I may log the following:\n" \
+                "```Your public discord userID\n" \
+                "The ID of the server you used in the command\n" \
+                "Your current display name\n" \
+                "Information provided to me for different functions, " \
+                "including but not limited to: GW2 Api Commands, " \
+                "Credit Betting```\n" \
+                "Please type {prefix}accept to accept these terms, which will " \
+                "expand to allow you to use commands in all servers.\n" \
+                "If this makes you uncomfortable, please check with " \
+                "server owners running me to find out what " \
+                "information they might be logging."
 
             parser['Debugging'] = {
                 'show_db_info': 'false',
