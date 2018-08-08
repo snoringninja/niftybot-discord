@@ -68,7 +68,7 @@ class BotCommands:
         """
         member = ctx.message.author
         return await self.bot.say(
-            "{0.mention}: Please see https://xnifty.github.io " \
+            "{0.mention}: Please see https://docs.snoring.ninja " \
             "for now.".format(member)
         )
 
