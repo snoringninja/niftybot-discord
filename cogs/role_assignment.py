@@ -43,7 +43,7 @@ class RoleAssignor():
     @commands.command(pass_context=True, no_pm=False, name='guild')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
     @asyncio.coroutine
-    def assign_role(self, ctx, guild: str, member: discord.Member=None):
+    def assign_role(self, ctx, *, guild: str, member: discord.Member=None):
         """Assign users to configured roles if requested
 
         :guild: the requested group name
