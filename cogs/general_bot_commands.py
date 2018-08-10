@@ -40,8 +40,8 @@ class BotCommands:
         else:
             query = """INSERT INTO accepted_users (discord_id) VALUES (?)"""
             DatabaseHandler().insert_into_database(query, (str(member_id), ))
-            return await self.bot.say("{0.mention}: thanks for accepting. You may now \
-                                        use commands.".format(member))
+            return await self.bot.say("{0.mention}: thanks for accepting. You may now " \
+                                      "use commands.".format(member))
 
     @commands.command(pass_context=True, no_pm=True, name='nick')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
