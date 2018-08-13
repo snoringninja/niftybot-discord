@@ -84,29 +84,29 @@ class RoleAssignor():
                 channel_list.append(channel)
 
             if requested_guild is not None:
-                requested_guild_id = int(requested_guild.id)
 
                 role_list_split = []
                 for role in map(int, role_list.split()):
                     role_list_split.append(role)
 
                 if int(ctx.message.channel.id) in channel_list and \
-                requested_guild_id in role_list_split:
+                int(requested_guild.id) in role_list_split:
                     for role in ctx.message.author.roles:
-                        if int(role.id) == requested_guild_id:
+                        if (role.id == requested_guild.id):
                             yield from self.bot.send_message(
                                 ctx.message.channel,
                                 "{0.mention}: You're already assigned to this " \
                                 "group.".format(member)
                             )
                             return
-                        else:
-                            yield from self.bot.add_roles(ctx.message.author, requested_guild)
-                            yield from self.bot.send_message(
-                                ctx.message.channel,
-                                "{0.mention}: You've been successfully " \
-                                "added to {1}!".format(member, requested_guild.name))
-                            return
+
+                    # So we got this far, add the user to the role
+                    yield from self.bot.add_roles(ctx.message.author, requested_guild)
+                    yield from self.bot.send_message(
+                        ctx.message.channel,
+                        "{0.mention}: You've been successfully " \
+                        "added to {1}!".format(member, requested_guild.name))
+                    return
         return
 
     @commands.command(pass_context=True, no_pm=False, name='role')
