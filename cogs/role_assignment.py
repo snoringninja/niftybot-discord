@@ -100,10 +100,12 @@ class RoleAssignor():
                 int(requested_guild.id) in role_list_split:
                     for role in ctx.message.author.roles:
                         if (role.id == requested_guild.id):
+                            yield from self.bot.remove_roles(
+                                            ctx.message.author, requested_guild)
                             yield from self.bot.send_message(
                                 ctx.message.channel,
-                                "{0.mention}: You're already assigned to this " \
-                                "group.".format(member)
+                                "{0.mention}: You've been removed from {1}."
+                                    .format(member, requested_guild.name)
                             )
                             return
 
