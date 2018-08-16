@@ -61,12 +61,14 @@ class RoleAssignor():
         member = ctx.message.author
 
         if member is not None and plugin_enabled:
-            print("\n{0}, {1}".format(guild, len(guild)))
-            for x in ctx.message.server.roles:
-                print('{0}, {1}, {2}'.format(x.id, x.name, len(x.name)))
-                if x.name == guild.replace("'", "''"):
-                    print("Okay!")
             requested_guild = discord.utils.get(ctx.message.server.roles, name=guild)
+
+            if requested_guild is None:
+                # We ran into an issue where a role name was using acute accents
+                # This is the attempt to fix that if requested_guild is none
+                # If still none after this we'll need to get examples to fix it
+                guild = guild.replace("'", "’")
+                requested_guild = discord.utils.get(ctx.message.server.roles, name=guild)
 
             role_list = ConfigLoader().load_server_string_setting(
                 server_id,
