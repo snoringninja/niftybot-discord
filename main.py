@@ -150,6 +150,7 @@ async def on_member_join(member):
     and if they have the member_join_enabled plugin enabled
     """
     server = member.server
+    await JoinLeaveHandler(CLIENT).on_join_assign_user_role(server.id, member)
     await JoinLeaveHandler(CLIENT).welcome_user(server.id, member, server)
 
 

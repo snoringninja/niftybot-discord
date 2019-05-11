@@ -105,7 +105,7 @@ class RoleAssignor():
                             yield from self.bot.send_message(
                                 ctx.message.channel,
                                 "{0.mention}: You've been removed from {1}."
-                                    .format(member, requested_guild.name)
+                                .format(member, requested_guild.name)
                             )
                             return
 
@@ -122,7 +122,7 @@ class RoleAssignor():
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
     async def update_role_list(self, ctx, add_or_remove: str, \
                                role_id: str, member: discord.Member=None
-                              ):
+                               ):
         """Update the configured role list to add or remove
         a group.
 
