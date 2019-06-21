@@ -80,7 +80,7 @@ class Logout:
                 else:
                     raise TypeError
             except TypeError:
-                print("SHUTDOWN: non-linux environment, skipping systemd check")
+                print("SHUTDOWN: non-linux environment or systemd not enabled")
                 await self.bot.logout()
         return
 

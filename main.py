@@ -28,6 +28,14 @@ from discord.ext import commands
 # Disable misleading not-an-iterable
 # pylint: disable=not-an-iterable
 
+BOT_VERSION = "1.0.4"
+
+'''
+Check if there is a valid niftybot.ini file
+If no file is found, generate the file and then exit the bot via SystemExit
+@TODO: likely need the same check as the logout function runs, in case the bot is being
+run via systemd which will just keep restarting the bot over and over
+'''
 BOT_CONFIG_GENERATED = ConfigLoader().check_for_bot_config()
 if not BOT_CONFIG_GENERATED:
     print("Please configure the newly generated niftybot.ini file before restarting the bot.")
@@ -44,6 +52,7 @@ BOT_TOKEN = ConfigLoader().load_config_setting('BotSettings', 'bot_token')
 
 # Set the game name from the core ini
 GAME_NAME = ConfigLoader().load_config_setting('BotSettings', 'game_name')
+GAME_NAME.replace("{version", BOT_VERSION)
 
 # load the database name from the core ini
 DATABASE_NAME = ConfigLoader().load_config_setting('BotSettings', 'sqlite')
@@ -51,15 +60,18 @@ DATABASE_NAME = ConfigLoader().load_config_setting('BotSettings', 'sqlite')
 # Create the plugin list, which is built from the core ini file
 EXTENSIONS = ConfigLoader().load_config_setting('BotSettings', 'enabled_plugins')
 
+# Set the message that will display if a user hasn't accepted the terms of service
 NOT_ACCEPTED_MESSAGE = ConfigLoader().load_config_setting_string(
     'BotSettings',
     'not_accepted_message'
 )
 
+# Should we show debug strings or not
 SHOW_DEBUG = str(
     ConfigLoader().load_config_setting_boolean('Debugging', 'error_handle_debugger')
 )
 
+# Finally, last thing to set is the information required to do bot stuff
 CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
 
 
