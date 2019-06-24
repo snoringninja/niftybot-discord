@@ -71,9 +71,9 @@ class ConfigCommands():
         else:
             return
 
-    async def update_config_file(self, filename, update_section, \
+    async def update_config_file(self, filename, update_section,
                                  update_key, update_value, message, suppress_message=False
-                                 ): #pylint: disable=too-many-arguments
+                                 ):
         """Handle updating the config file for the server.
         supress_message is used when we update the config from a function when a command fails
         It defaults to False for when the config is updating from within the server
@@ -162,21 +162,27 @@ class ConfigCommands():
                         'bot_admin_roles'
                     )
 
-                    for user in bot_admins_user_list.split():
-                        bot_admin_users.append(user)
+                    if len(bot_admins_user_list) != 0:
+                        for user in bot_admins_user_list.split():
+                            bot_admin_users.append(user)
 
-                    for role in bot_admins_role_list.split():
-                        bot_admin_roles.append(role)
+                    if len(bot_admins_role_list) != 0:
+                        for role in bot_admins_role_list.split():
+                            bot_admin_roles.append(role)
+
                 except (configparser.NoSectionError, configparser.Error):
+                    await self.bot.say("There was an error.  Please confirm the server configuration file exists "
+                                       "via the genconfig command (only usable by server owner).")
                     pass
 
+                # PEP8 formatting is amusing
                 if update_section != 'BotAdmins':
                     if member_id == ctx.message.server.owner_id or \
-                    int(member_id) == ConfigLoader().load_config_setting_int(
+                        int(member_id) == ConfigLoader().load_config_setting_int(
                             'BotSettings', 'owner_id'
-                    ) or \
-                    str(member_id) in bot_admin_users or \
-                    [admin_role for admin_role in user_roles_list if admin_role in bot_admin_roles]:
+                        ) or \
+                        str(member_id) in bot_admin_users or \
+                            [admin_role for admin_role in user_roles_list if admin_role in bot_admin_roles]:
                         filename = ctx.message.server.id
                         await self.update_config_file(
                             filename,
@@ -187,7 +193,7 @@ class ConfigCommands():
                         )
                     else:
                         bot_message = await self.bot.say(
-                            "Only the server owner can " \
+                            "Only the server owner can "
                             "configure different plugins."
                         )
                         await asyncio.sleep(5)

@@ -50,9 +50,8 @@ COMMAND_PREFIX = ConfigLoader().load_config_setting('BotSettings', 'command_pref
 # Load the bot token from the core ini
 BOT_TOKEN = ConfigLoader().load_config_setting('BotSettings', 'bot_token')
 
-# Set the game name from the core ini
-GAME_NAME = ConfigLoader().load_config_setting('BotSettings', 'game_name')
-GAME_NAME.replace("{version", BOT_VERSION)
+# Set the game name from the core ini, including the version if applicable
+GAME_NAME = ConfigLoader().load_config_setting('BotSettings', 'game_name').replace("{version}", BOT_VERSION)
 
 # load the database name from the core ini
 DATABASE_NAME = ConfigLoader().load_config_setting('BotSettings', 'sqlite')
@@ -61,15 +60,10 @@ DATABASE_NAME = ConfigLoader().load_config_setting('BotSettings', 'sqlite')
 EXTENSIONS = ConfigLoader().load_config_setting('BotSettings', 'enabled_plugins')
 
 # Set the message that will display if a user hasn't accepted the terms of service
-NOT_ACCEPTED_MESSAGE = ConfigLoader().load_config_setting_string(
-    'BotSettings',
-    'not_accepted_message'
-)
+NOT_ACCEPTED_MESSAGE = ConfigLoader().load_config_setting_string('BotSettings', 'not_accepted_message')
 
 # Should we show debug strings or not
-SHOW_DEBUG = str(
-    ConfigLoader().load_config_setting_boolean('Debugging', 'error_handle_debugger')
-)
+SHOW_DEBUG = str(ConfigLoader().load_config_setting_boolean('Debugging', 'error_handle_debugger'))
 
 # Finally, last thing to set is the information required to do bot stuff
 CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
@@ -82,7 +76,7 @@ async def on_message(message):
     processes messages and checks if a command
     """
     view = StringView(message.content)
-    invoked_prefix = COMMAND_PREFIX  # Can we remove this? It's reset immediately after
+    # invoked_prefix = COMMAND_PREFIX  # Can we remove this? It's reset immediately after
 
     invoked_prefix = discord.utils.find(view.skip_string, COMMAND_PREFIX)
     discord.utils.find(view.skip_string, COMMAND_PREFIX)
@@ -162,7 +156,7 @@ async def on_member_join(member):
     and if they have the member_join_enabled plugin enabled
     """
     server = member.server
-    await JoinLeaveHandler(CLIENT).on_join_assign_user_role(server.id, member)
+    await JoinLeaveHandler(CLIENT).on_join_assign_user_role(server, server.id, member)
     await JoinLeaveHandler(CLIENT).welcome_user(server.id, member, server)
 
 
