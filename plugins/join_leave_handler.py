@@ -61,7 +61,7 @@ class JoinLeaveHandler():
                     .replace("{emote}", str(random.choice(emote_array))))
         return
 
-    async def on_join_assign_user_role(self, server, server_id: str, member: str):
+    async def on_join_assign_user_role(self, client, server_id: str, member: str):
         welcome_enabled = ConfigLoader().load_server_boolean_setting(
             server_id,
             'JoinPart',
@@ -78,12 +78,13 @@ class JoinLeaveHandler():
 
                 try:
                     if join_assignment_role != '':
-                        for role in server.roles:
-                            print(role.id)
-                        print("join_assignment_role = {0}".format(join_assignment_role))
-                        role = server.get_role(join_assignment_role) # still wrong
-                        print(role)
-                        await self.bot.add_roles(member, role)
+                        guild = client.get_server(server_id)
+                        for role in guild.roles:
+                            # print("{0} - {1}".format(role.id, join_assignment_role))
+                            if int(role.id) == join_assignment_role:
+                                # print("join_assignment_role = {0}".format(join_assignment_role))
+                                # print(role)
+                                await self.bot.add_roles(member, role)
                 except Exception as ex2:
                     print("EX2: {0}".format(ex2))
             except Exception as ex:  # update this exception later to be more specific

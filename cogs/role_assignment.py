@@ -97,9 +97,9 @@ class RoleAssignor():
                     role_list_split.append(role)
 
                 if int(ctx.message.channel.id) in channel_list and \
-                int(requested_guild.id) in role_list_split:
+                        int(requested_guild.id) in role_list_split:
                     for role in ctx.message.author.roles:
-                        if (role.id == requested_guild.id):
+                        if role.id == requested_guild.id:
                             yield from self.bot.remove_roles(
                                             ctx.message.author, requested_guild)
                             yield from self.bot.send_message(
@@ -113,14 +113,14 @@ class RoleAssignor():
                     yield from self.bot.add_roles(ctx.message.author, requested_guild)
                     yield from self.bot.send_message(
                         ctx.message.channel,
-                        "{0.mention}: You've been successfully " \
+                        "{0.mention}: You've been successfully "
                         "added to {1}!".format(member, requested_guild.name))
                     return
         return
 
     @commands.command(pass_context=True, no_pm=False, name='role')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
-    async def update_role_list(self, ctx, add_or_remove: str, \
+    async def update_role_list(self, ctx, add_or_remove: str,
                                role_id: str, member: discord.Member=None
                                ):
         """Update the configured role list to add or remove
