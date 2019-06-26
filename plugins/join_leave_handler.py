@@ -62,8 +62,6 @@ class JoinLeaveHandler():
         return
 
     async def on_join_assign_user_role(self, server, server_id: str, member: str):
-        join_assignment_role = ''
-
         welcome_enabled = ConfigLoader().load_server_boolean_setting(
             server_id,
             'JoinPart',
@@ -80,7 +78,11 @@ class JoinLeaveHandler():
 
                 try:
                     if join_assignment_role != '':
-                        role = discord.utils.get(server.roles, name=join_assignment_role)
+                        for role in server.roles:
+                            print(role.id)
+                        print("join_assignment_role = {0}".format(join_assignment_role))
+                        role = server.get_role(join_assignment_role) # still wrong
+                        print(role)
                         await self.bot.add_roles(member, role)
                 except Exception as ex2:
                     print("EX2: {0}".format(ex2))
