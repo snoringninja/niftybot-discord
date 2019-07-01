@@ -224,6 +224,39 @@ class ConfigLoader():
             return False
         return True
 
+    async def add_config_section(self, server_id, section, keyvalues):
+        """
+        :param server_id: discord server_id
+        :param section: the new section to be added
+        :param keyvalues: dictionary of key-value pairs to be added
+        :return:
+
+        This should never be called via a server command, and is instead something to be used be new
+        cogs that need to add sections to config to function properly
+
+        @TODO: better error handling for this, for things such as when the section already exists or the function
+               bombs for another reason
+        """
+        parser = configparser.ConfigParser()
+
+        try:
+            parser.add_section(section)
+
+            for key, value in keyvalues.items():
+                parser.set(section, key, value)
+
+            with open(
+                '%s.ini' % (
+                    os.path.join(
+                        self.server_settings_path,
+                        str(server_id))), 'w'
+            ) as configfile:
+                parser.write(configfile)
+            return True
+        except Exception as ex:  # clean this up later to add more specific error catching as needed
+            print("add_config_section error: {0}".format(ex))
+            return False
+
     async def generate_default_config_file(self, server_id, owner_id):
         """Generate the config file for a server.
 
