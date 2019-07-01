@@ -9,8 +9,10 @@ This is configured on a per server basis.
 
 import random
 import discord
+import traceback
 
 from resources.config import ConfigLoader
+from resources.error_logger import ErrorLogging
 
 class JoinLeaveHandler():
     """
@@ -62,33 +64,59 @@ class JoinLeaveHandler():
         return
 
     async def on_join_assign_user_role(self, client, server_id: str, member: str):
-        welcome_enabled = ConfigLoader().load_server_boolean_setting(
-            server_id,
-            'JoinPart',
-            'assign_role_enabled'
-        )
+        try:
+            welcome_enabled = ConfigLoader().load_server_boolean_setting(
+                server_id,
+                'JoinPart',
+                'assign_role_enabled'
+            )
 
-        if welcome_enabled:
-            try:
-                join_assignment_role = ConfigLoader().load_server_int_setting(
-                    server_id,
-                    'JoinPart',
-                    'role_assignment_id'
-                )
-
+            if welcome_enabled:
                 try:
-                    if join_assignment_role != '':
-                        guild = client.get_server(server_id)
-                        for role in guild.roles:
-                            # print("{0} - {1}".format(role.id, join_assignment_role))
-                            if int(role.id) == join_assignment_role:
-                                # print("join_assignment_role = {0}".format(join_assignment_role))
-                                # print(role)
-                                await self.bot.add_roles(member, role)
-                except Exception as ex2:
-                    print("EX2: {0}".format(ex2))
-            except Exception as ex:  # update this exception later to be more specific
-                print(ex)
+                    join_assignment_role = ConfigLoader().load_server_int_setting(
+                        server_id,
+                        'JoinPart',
+                        'role_assignment_id'
+                    )
+
+                    try:
+                        if join_assignment_role != '':
+                            guild = client.get_server(server_id)
+                            for role in guild.roles:
+                                # print("{0} - {1}".format(role.id, join_assignment_role))
+                                if int(role.id) == join_assignment_role:
+                                    # print("join_assignment_role = {0}".format(join_assignment_role))
+                                    # print(role)
+                                    await self.bot.add_roles(member, role)
+                    except Exception as ex2:
+                        return await ErrorLogging().log_error(
+                            traceback.format_exception(
+                                type(ex2),
+                                ex2,
+                                ex2.__traceback__
+                            ),
+                            member
+                        )
+                except Exception as ex:  # update this exception later to be more specific
+                    await ErrorLogging().log_error(
+                        traceback.format_exception(
+                            type(ex),
+                            ex,
+                            ex.__traceback__
+                        ),
+                        member
+                    )
+                    pass
+        except Exception as ex:  # update this exception later to be more specific
+            await ErrorLogging().log_error(
+                traceback.format_exception(
+                    type(ex),
+                    ex,
+                    ex.__traceback__
+                ),
+                member
+            )
+            pass
         return
 
     async def goodbye_user(self, server_id: str, member: str):
