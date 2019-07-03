@@ -115,7 +115,7 @@ class ConfigCommands():
 
     @commands.command(pass_context=True, no_pm=True, name='config')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
-    async def update_config(self, ctx, update_section: str, update_key: str, update_value: str): #pylint: disable=R0914
+    async def update_config(self, ctx, update_section: str, update_key: str, *, update_value: str): #pylint: disable=R0914
         """Update the configuration file
 
         :update_section: section to be updated in the config file
