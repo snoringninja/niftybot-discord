@@ -133,14 +133,14 @@ class ConfigCommands():
 
                 # @TODO : verify this works and remove commented out code
                 # This allows us to use #channel_name, @person_name
-                # update_value = update_value.replace('<@&', '')
-                # update_value = update_value.replace('<@!', '')
-                # update_value = update_value.replace('<#', '')
-                # update_value = update_value.replace('>', '')
+                update_value = update_value.replace('<@&', '')
+                update_value = update_value.replace('<@!', '')
+                update_value = update_value.replace('<#', '')
+                update_value = update_value.replace('>', '')
 
                 # Use regex to replace the characters added if they add via pinging
-                update_value = re.sub('[^\w]', '', update_value)
-                update_value = update_value.strip()
+                # update_value = re.sub('[^\w]', '', update_value)
+                update_value = update_value.rstrip().lstrip()
 
                 bot_admin_users = []
                 bot_admin_roles = []
