@@ -1,5 +1,5 @@
 """
-generate_config.py
+config_commands.py
 @author xNifty
 @site https://snoring.ninja
 
@@ -15,6 +15,7 @@ import discord
 from discord.ext import commands
 from resources.config import ConfigLoader
 
+
 # Some helpful functions
 def load_config(default_filename):
     """Load the config file.
@@ -22,6 +23,7 @@ def load_config(default_filename):
     """
     config = configparser.ConfigParser()
     return config.read(default_filename)
+
 
 def contains_word(string, word):
     """Check if a word exists inside the string.
@@ -36,8 +38,12 @@ def contains_word(string, word):
     """
     return ' ' + word + ' ' in ' ' + string + ' '
 
-class ConfigCommands():
-    """GenerateConfig controls the generate_config command"""
+
+class ConfigCommands:
+    """
+    Class of different configuration commands that are used in multiple different files and cogs to update the
+    configuration file for a server.
+    """
     def __init__(self, bot):
         self.bot = bot
         self.server_settings_path = os.path.abspath(
@@ -52,11 +58,13 @@ class ConfigCommands():
         Checks if the member is the server or the
         bot owner and if so runs the generate_config function
         from the general_bot_resources
+
+        :param ctx: discord.py Context
         """
         member_id = ctx.message.author.id
 
         if member_id == ctx.message.server.owner_id or \
-        int(member_id) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
+                int(member_id) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
             file_exists = await ConfigLoader(self.bot).check_if_config_exists(
                 ctx.message.server.id
             )
@@ -74,9 +82,15 @@ class ConfigCommands():
     async def update_config_file(self, filename, update_section,
                                  update_key, update_value, message, suppress_message=False
                                  ):
-        """Handle updating the config file for the server.
-        supress_message is used when we update the config from a function when a command fails
-        It defaults to False for when the config is updating from within the server
+        """
+        Handle updating the config file for the server.
+
+        :param filename: the name of the file we are updating
+        :param update_section: section to be updated in the config file
+        :param update_key: the key value to be updated in the passed in section
+        :param update_value: the value that matches the key
+        :param message: passed in message object that is used to delete the user command after update complete
+        :param suppress_message: defaults to false; suppress the update complete message if configured to
         """
         parser = configparser.ConfigParser()
         loaded_file = load_config(
@@ -115,12 +129,14 @@ class ConfigCommands():
 
     @commands.command(pass_context=True, no_pm=True, name='config')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
-    async def update_config(self, ctx, update_section: str, update_key: str, *, update_value: str): #pylint: disable=R0914
-        """Update the configuration file
+    async def update_config(self, ctx, update_section: str, update_key: str, *, update_value: str):
+        """
+        Update the configuration file
 
-        :update_section: section to be updated in the config file
-        :update_key: the key value to be updated in the passed in section
-        :update_value: the value that matches the key
+        :param ctx: discord.py Context
+        :param update_section: section to be updated in the config file
+        :param update_key: the key value to be updated in the passed in section
+        :param update_value: the value that matches the key; this uses consume rest behavior
         """
         if update_section == 'ServerSettings':
             bot_message = await self.bot.say("This is a protected section.")
@@ -201,9 +217,9 @@ class ConfigCommands():
                         return await self.bot.delete_message(bot_message)
                 elif update_section == 'BotAdmins':
                     if member_id == ctx.message.server.owner_id or \
-                    int(member_id) == ConfigLoader().load_config_setting_int(
+                        int(member_id) == ConfigLoader().load_config_setting_int(
                             'BotSettings', 'owner_id'
-                    ):
+                            ):
                         await self.bot.say(
                             "Please use the botadmin command to update this section."
                         )
@@ -215,7 +231,9 @@ class ConfigCommands():
     async def get_config_information(self, ctx, member: discord.Member=None):
         """Get the server configuration settings and send in a private message
 
-        :member: empty discord.Member object
+        :param ctx: discord.py Context
+        :param member: empty discord.Member object
+        :return:
         """
         member = ctx.message.author
         member_id = ctx.message.author.id
@@ -229,23 +247,24 @@ class ConfigCommands():
             user_roles_list.append(str(int(user_role.id)))
 
         try:
-           bot_admins_user_list = ConfigLoader().load_server_string_setting(
+            bot_admins_user_list = ConfigLoader().load_server_string_setting(
                 ctx.message.server.id,
                 'BotAdmins',
                 'bot_admin_users'
-           )
+            )
 
-           bot_admins_role_list = ConfigLoader().load_server_string_setting(
+            bot_admins_role_list = ConfigLoader().load_server_string_setting(
                 ctx.message.server.id,
                 'BotAdmins',
                 'bot_admin_roles'
-           )
+            )
 
-           for user in bot_admins_user_list.split():
-               bot_admin_users.append(user)
+            for user in bot_admins_user_list.split():
+                bot_admin_users.append(user)
 
-           for role in bot_admins_role_list.split():
-               bot_admin_roles.append(role)
+            for role in bot_admins_role_list.split():
+                bot_admin_roles.append(role)
+
         except (configparser.NoSectionError, configparser.Error):
             pass
 
@@ -293,19 +312,18 @@ class ConfigCommands():
 
     @commands.command(pass_context=True, no_pm=False, name='botadmin')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
-    async def update_role_list(self, ctx, add_or_remove: str, user_or_role: str, \
+    async def update_role_list(self, ctx, add_or_remove: str, user_or_role: str,
                                role_id: str):
-        """Update the configured role list to add or remove
-        a group.
+        """
+        Update the configured role list to add or remove a group.
 
-        :user_or_role: (str) [user, role] passed in string to determine
-        if it's a user or a role that is being updated
-
-        :add_or_remove: (str) [add, remove] passed in string to determine
+        :param ctx: discord.py Context
+        :param add_or_remove: (str) [add, remove] passed in string to determine
         if a role is being added or removed
-
-        :role_id: the discord snowflake ID for the role, the pinged username
-        :member: empty discord.Member object
+        :param user_or_role: (str) [user, role] passed in string to determine
+        if it's a user or a role that is being updated
+        :param role_id: the discord snowflake ID for the role, the pinged username
+        :return:
         """
         member_id = ctx.message.author.id
         server_id = str(ctx.message.server.id)
@@ -363,6 +381,7 @@ class ConfigCommands():
                 ctx.message
             )
 
+
 def setup(bot):
-    """This makes it so we can actually use it."""
+    """Required for these to be registered as commands."""
     bot.add_cog(ConfigCommands(bot))

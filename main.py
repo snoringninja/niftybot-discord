@@ -19,7 +19,7 @@ from plugins.join_leave_handler import JoinLeaveHandler
 from resources.error_logger import ErrorLogging
 
 from resources.config import ConfigLoader
-from resources.general_resources import BotResources
+from resources.bot_resources import BotResources
 
 import discord
 from discord.ext.commands.view import StringView
@@ -104,6 +104,7 @@ async def on_message(message):
             await CLIENT.process_commands(message)
         else:
             can_use = BotResources().check_accepted(message.author.id)
+            message_channel_valid = False
             if not message.channel.is_private:
                 message_channel_valid = BotResources().get_tos_channel_valid(message.server.id)
             if can_use:

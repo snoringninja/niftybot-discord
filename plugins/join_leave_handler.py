@@ -14,6 +14,7 @@ import traceback
 from resources.config import ConfigLoader
 from resources.error_logger import ErrorLogging
 
+
 class JoinLeaveHandler():
     """
     Functions for welcoming a user or sending a message if
@@ -23,7 +24,16 @@ class JoinLeaveHandler():
         self.bot = bot
 
     async def welcome_user(self, server_id: str, member: str, server: str):
-        """Welcome a user to the discord server if enabled"""
+        """
+        Send a message to a configured channel when a user joins the server.
+
+        :param server_id: the discord server snowflake ID
+        :param member: the discord member snowflake ID
+        :param server: the discord server that triggered this
+        :return:
+
+        @TODO: can probably reduce arguments and just pass the server argument, and from this grab the server.id
+        """
         welcome_enabled = ConfigLoader().load_server_boolean_setting(
             server_id,
             'JoinPart',
@@ -64,6 +74,13 @@ class JoinLeaveHandler():
         return
 
     async def on_join_assign_user_role(self, client, server_id: str, member: str):
+        """
+
+        :param client: the discord client object
+        :param server_id: the discord server snowflake ID
+        :param member: discord member object
+        :return:
+        """
         try:
             welcome_enabled = ConfigLoader().load_server_boolean_setting(
                 server_id,
@@ -120,7 +137,16 @@ class JoinLeaveHandler():
         return
 
     async def goodbye_user(self, server_id: str, member: str):
-        """Send a message when a user leaves the server."""
+        """
+        Send a message to a configured channel when a user leaves (or is kicked) from the server.
+
+        :param server_id: the discord server snowflake ID
+        :param member: the discord member snowflake ID
+        :param server: the discord server that triggered this
+        :return:
+
+        @TODO: can probably reduce arguments and just pass the server argument, and from this grab the server.id
+        """
         part_enabled = ConfigLoader().load_server_boolean_setting(
             server_id,
             'JoinPart',

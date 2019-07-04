@@ -1,14 +1,14 @@
 """
-general_resources.py
+bot_resources.py
 @author xNifty
 @site https://snoring.ninja
 
 This class serves to be a location for some general use bot functions.
 """
-import traceback
+# import traceback
 from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
-from resources.error_logger import ErrorLogging
+# from resources.error_logger import ErrorLogging
 
 
 class BotResources:
@@ -39,14 +39,14 @@ class BotResources:
                 )
                 return True
             except ValueError:
-                #ErrorLogging().log_error_without_await(
-                #    traceback.format_exc(),
-                #    'BotResources: get_tos_channel_id (inner)'
-                #)
+                # ErrorLogging().log_error_without_await(
+                #     traceback.format_exc(),
+                #     'BotResources: get_tos_channel_id (inner)'
+                # )
                 return False
         except ValueError:
-            ErrorLogging().log_error_without_await(
-                traceback.format_exc(),
-                'BotResources: get_tos_channel_id (outer)'
-            )
+            # ErrorLogging().log_error_without_await(
+            #     traceback.format_exc(),
+            #     'BotResources: get_tos_channel_id (outer)'
+            # )
             return False
