@@ -131,16 +131,16 @@ class ConfigCommands():
             try:
                 member_id = ctx.message.author.id
 
-                # @TODO : verify this works and remove commented out code
+                # @TODO : can we go back to using the regex option at some point? This is ugly...
                 # This allows us to use #channel_name, @person_name
                 update_value = update_value.replace('<@&', '')
                 update_value = update_value.replace('<@!', '')
                 update_value = update_value.replace('<#', '')
                 update_value = update_value.replace('>', '')
+                update_value = update_value.rstrip().lstrip()  # Strip out leading and trailing whitespace
 
-                # Use regex to replace the characters added if they add via pinging
+                # Use regex to replace the characters added if they add via pinging; this causes whitespace issues
                 # update_value = re.sub('[^\w]', '', update_value)
-                update_value = update_value.rstrip().lstrip()
 
                 bot_admin_users = []
                 bot_admin_roles = []
@@ -251,11 +251,11 @@ class ConfigCommands():
 
         try:
             if member_id == ctx.message.server.owner_id or \
-            int(member_id) == ConfigLoader().load_config_setting_int(
+                int(member_id) == ConfigLoader().load_config_setting_int(
                       'BotSettings', 'owner_id'
-            ) or \
-            str(member_id) in bot_admin_users or \
-            [admin_role for admin_role in user_roles_list if admin_role in bot_admin_roles]:
+                ) or \
+                str(member_id) in bot_admin_users or \
+                    [admin_role for admin_role in user_roles_list if admin_role in bot_admin_roles]:
                 return_string = "```Settings for {0}:\n\n".format(ctx.message.server.name)
 
                 parser = configparser.ConfigParser()
@@ -280,8 +280,9 @@ class ConfigCommands():
                 await self.bot.send_message(member, return_string)
                 return await self.bot.delete_message(ctx.message)
         except discord.Forbidden:
+            print("There was a discord.Forbidden error.")
             bot_message = await self.bot.say(
-                "I am unable to message you. You may have me blocked, " \
+                "I am unable to message you. You may have me blocked, "
                 "or personal messages disabled."
             )
             await asyncio.sleep(5)
@@ -312,15 +313,15 @@ class ConfigCommands():
         updated_id_list = ''
 
         if member_id == ctx.message.server.owner_id or \
-        int(member_id) == ConfigLoader().load_config_setting_int(
+            int(member_id) == ConfigLoader().load_config_setting_int(
                 'BotSettings', 'owner_id'
-        ):
+            ):
             if add_or_remove != 'add' and add_or_remove != 'remove':
                 return await self.bot.say("Please specify if I am adding or removing a botadmin.")
 
             if user_or_role != 'user' and user_or_role != 'role':
                 return await self.bot.say(
-                    "Please specify if it's the user or role " \
+                    "Please specify if it's the user or role "
                     "list I am updating."
                 )
 
@@ -335,7 +336,7 @@ class ConfigCommands():
             # role_id = role_id.replace('<@!', '')
             # role_id = role_id.replace('>', '')
             # role_id = role_id.strip()
-            role_id = re.sub('[^0-9]','', role_id)
+            role_id = re.sub('[^0-9]', '', role_id)
 
             if add_or_remove == 'add':
                 if not contains_word(current_id_list, role_id):

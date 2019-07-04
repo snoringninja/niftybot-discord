@@ -28,7 +28,7 @@ from discord.ext import commands
 # Disable misleading not-an-iterable
 # pylint: disable=not-an-iterable
 
-BOT_VERSION = "1.0.10"
+BOT_VERSION = "1.0.11"
 
 '''
 Check if there is a valid niftybot.ini file

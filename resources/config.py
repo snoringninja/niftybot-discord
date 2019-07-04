@@ -295,7 +295,7 @@ class ConfigLoader():
         parser.set('JoinPart', 'welcome_message', 'Welcome to {server}\'s Discord, {user}! Relax and have some fun!')
         parser.set('JoinPart', 'part_message', '{name} ({display_name}) has left the server.')
         parser.set('JoinPart', 'assign_role_enabled', 'false')
-        parser.ser('JoinPart', 'role_assignment_id', 'NOT_SET')
+        parser.set('JoinPart', 'role_assignment_id', 'NOT_SET')
 
         parser.set('BettingGame', 'minimum_bet', '10')
         parser.set('BettingGame', 'enabled', 'false')
