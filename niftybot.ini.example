@@ -11,7 +11,7 @@ systemd_enabled: false
 systemd_name: niftybot
 # space seperated list of plugings to enable
 enabled_plugins: credit_bet logout api_commands role_assignment config_commands general_bot_commands
-
+command_whitelist = accept logout genconfig help
 error_message: There was an error with the requested bot function. Please let the bot owner know to check the error log for more details.
 
 # I do not suggest changing this

@@ -28,7 +28,7 @@ from discord.ext import commands
 # Disable misleading not-an-iterable
 # pylint: disable=not-an-iterable
 
-BOT_VERSION = "1.0.4"
+BOT_VERSION = "1.0.10"
 
 '''
 Check if there is a valid niftybot.ini file
@@ -65,6 +65,12 @@ NOT_ACCEPTED_MESSAGE = ConfigLoader().load_config_setting_string('BotSettings', 
 # Should we show debug strings or not
 SHOW_DEBUG = str(ConfigLoader().load_config_setting_boolean('Debugging', 'error_handle_debugger'))
 
+# Command whitelist - these commands can be run without having to accept any terms
+COMMAND_WHITELIST = ConfigLoader().load_config_setting('BotSettings', 'command_whitelist')
+whitelist = []
+for command in COMMAND_WHITELIST.split():
+    whitelist.append('{0}'.format(COMMAND_PREFIX) + command)
+
 # Finally, last thing to set is the information required to do bot stuff
 CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
 
@@ -81,7 +87,9 @@ async def on_message(message):
     invoked_prefix = discord.utils.find(view.skip_string, COMMAND_PREFIX)
     discord.utils.find(view.skip_string, COMMAND_PREFIX)
 
-    if "@everyone" in message.content:  # This seems rather hacky
+    # This is fairly worthless.  While it can purge the message, everyone will still get a notification that there
+    # was a message for them.  That's on Discord themselves to correct if the message is deleted.
+    if "@everyone" in message.content:
         await Moderation(CLIENT).purge_everyone_message(message)
 
     if invoked_prefix is None:
@@ -90,14 +98,9 @@ async def on_message(message):
     invoker = view.get_word()
 
     if invoker in CLIENT.commands:
-        # @TODO : bot config update for override commands to make this cleaner
-        if message.content == '{0}accept'.format(COMMAND_PREFIX):
-            await CLIENT.process_commands(message)
-        elif message.content.startswith("{0}guild".format(COMMAND_PREFIX)):
-            await CLIENT.process_commands(message)
-        elif message.content.startswith("{0}genconfig".format(COMMAND_PREFIX)):
-            await CLIENT.process_commands(message)
-        elif message.content.startswith("{0}logout".format(COMMAND_PREFIX)):
+        # If the message content is a command within the whitelist, run the command; otherwise, they must have accepted
+        # the bot terms before the command can be used
+        if message.content in whitelist:
             await CLIENT.process_commands(message)
         else:
             can_use = BotResources().check_accepted(message.author.id)
