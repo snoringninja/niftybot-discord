@@ -15,7 +15,7 @@ from resources.config import ConfigLoader
 from resources.error_logger import ErrorLogging
 
 
-class JoinLeaveHandler():
+class JoinLeaveHandler:
     """
     Functions for welcoming a user or sending a message if
     a user leaves

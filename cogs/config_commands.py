@@ -26,16 +26,7 @@ def load_config(default_filename):
 
 
 def contains_word(string, word):
-    """Check if a word exists inside the string.
-
-    @TODO: allow user to remove themselves from any of the configured
-    groups that they are able to add themselves to
-
-    @TODO: allow owners to add roles/channels simply by passing in the
-    name of the role or channel instead of requiring them to use the
-    snowflake ID; if there happens to be more than one of either, then
-    require the owner to use the specific ID
-    """
+    """Check if a word exists inside the string."""
     return ' ' + word + ' ' in ' ' + string + ' '
 
 

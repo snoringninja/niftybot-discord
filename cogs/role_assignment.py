@@ -18,6 +18,7 @@ from cogs.config_commands import ConfigCommands
 import discord
 from discord.ext import commands
 
+
 def contains_word(string, word):
     """Check if a word exists inside the string.
 
@@ -31,23 +32,27 @@ def contains_word(string, word):
     """
     return ' ' + word + ' ' in ' ' + string + ' '
 
-class RoleAssignor():
+
+class RoleAssignor:
     """RoleAssignor
 
     Handles commands for adding or removing a role, adding or
     removing a channel, or adding a user to a configured role
     """
+
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(pass_context=True, no_pm=False, name='guild')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
     @asyncio.coroutine
-    def assign_role(self, ctx, *, guild: str, member: discord.Member=None):
+    def assign_role(self, ctx, *, guild: str, member: discord.Member = None):
         """Assign users to configured roles if requested
 
-        :guild: the requested group name
-        :member: empty discord.Member object
+        :param ctx: discord.py Context
+        :param guild: the requested group name, uses consume rest behavior
+        :param member: empty discord.Member object
+        :return:
         """
         server_id = ctx.message.server.id
         member = ctx.message.author
@@ -57,8 +62,6 @@ class RoleAssignor():
             'RoleAssignment',
             'enabled'
         )
-
-        member = ctx.message.author
 
         if member is not None and plugin_enabled:
             requested_guild = discord.utils.get(ctx.message.server.roles, name=guild)
@@ -101,7 +104,7 @@ class RoleAssignor():
                     for role in ctx.message.author.roles:
                         if role.id == requested_guild.id:
                             yield from self.bot.remove_roles(
-                                            ctx.message.author, requested_guild)
+                                ctx.message.author, requested_guild)
                             yield from self.bot.send_message(
                                 ctx.message.channel,
                                 "{0.mention}: You've been removed from {1}."
@@ -121,16 +124,16 @@ class RoleAssignor():
     @commands.command(pass_context=True, no_pm=False, name='role')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
     async def update_role_list(self, ctx, add_or_remove: str,
-                               role_id: str, member: discord.Member=None
+                               role_id: str, member: discord.Member = None
                                ):
-        """Update the configured role list to add or remove
-        a group.
+        """
+        Update the configured role list to add or remove a group.
 
-        :add_or_remove: (str) [add, remove] passed in string to determine
-        if a role is being added or removed
-
-        :role_id: the discord snowflake ID for the role, the pinged username
-        :member: empty discord.Member object
+        :param ctx: discord.py Context
+        :param add_or_remove: (str) [add, remove] passed in string to determine if a role is being added or removed
+        :param role_id: the discord snowflake ID for the role, the pinged username
+        :param member: empty discord.Member object
+        :return:
         """
         member = ctx.message.author
         server_id = str(ctx.message.server.id)
@@ -145,10 +148,12 @@ class RoleAssignor():
                 'role_list'
             )
 
-            # Hacky fix for when mentioning the role to strip stuff out
+            # Somewhat ugly fix for when mentioning the role to strip stuff out
             role_id = role_id.replace('<@&', '')
             role_id = role_id.replace('>', '')
             role_id = role_id.strip()
+
+            updated_role_list = ''
 
             if add_or_remove == 'add':
                 if not contains_word(current_role_list, role_id):
@@ -175,56 +180,58 @@ class RoleAssignor():
                 ctx.message
             )
 
-@commands.command(pass_context=True, no_pm=False, name='rolechannel')
-@commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
-async def update_channel_list(self, ctx, add_or_remove: str, \
-                              channel_id: str, member: discord.Member=None
-                             ):
-    """Update the configured channel list to
-    add or remove a channel where the guild command can be used
+    @commands.command(pass_context=True, no_pm=False, name='rolechannel')
+    @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
+    async def update_channel_list(self, ctx, add_or_remove: str,
+                                  channel_id: str, member: discord.Member = None
+                                  ):
+        """
+        Update the configured channel list to add or remove a channel where the guild command can be used
 
-    :add_or_remove: (str) [add, remove] passed in string to determine
-    if a channel is being added or removed
+        :param ctx: discord.py Context
+        :param add_or_remove: (str) [add, remove] passed in string to determine if a channel is being added or removed
+        :param channel_id: the discord snowflake ID for the channel
+        :param member: empty discord.Member object
+        :return:
+        """
+        member = ctx.message.author
+        server_id = str(ctx.message.server.id)
 
-    :channel_id: the discord snowflake ID for the channel
-    :member: empty discord.Member object
-    """
-    member = ctx.message.author
-    server_id = str(ctx.message.server.id)
+        if member is not None:
+            if add_or_remove != 'add' and add_or_remove != 'remove':
+                return await self.bot.say("Please specify if I am adding or removing a channel.")
 
-    if member is not None:
-        if add_or_remove != 'add' and add_or_remove != 'remove':
-            return await self.bot.say("Please specify if I am adding or removing a channel.")
-
-        current_channel_list = ConfigLoader().load_server_config_setting(
-            server_id,
-            'RoleAssignment',
-            'assignment_channel_id'
-        )
-
-        if add_or_remove == 'add':
-            if not self.contains_word(current_channel_list, channel_id):
-                if current_channel_list == 'NOT_SET':
-                    updated_channel_list = channel_id
-                else:
-                    updated_channel_list = current_channel_list + " " + channel_id
-            else:
-                return await self.bot.say("Channel already added.")
-
-            if add_or_remove == 'remove':
-                if self.contains_word(current_channel_list, channel_id):
-                    updated_channel_list = current_channel_list.strip(' ' + channel_id + ' ')
-
-            if updated_channel_list.isspace() or len(updated_channel_list) == 0:
-                updated_channel_list = 'NOT_SET'
-
-            filename = ctx.message.server.id
-            await ConfigUpdater(self.bot).update_config_file(
-                filename,
+            current_channel_list = ConfigLoader().load_server_config_setting(
+                server_id,
                 'RoleAssignment',
-                'assignment_channel_id',
-                updated_channel_list.strip()
+                'assignment_channel_id'
             )
+
+            if add_or_remove == 'add':
+                if not contains_word(current_channel_list, channel_id):
+                    if current_channel_list == 'NOT_SET':
+                        updated_channel_list = channel_id
+                    else:
+                        updated_channel_list = current_channel_list + " " + channel_id
+                else:
+                    return await self.bot.say("Channel already added.")
+
+                if add_or_remove == 'remove':
+                    if contains_word(current_channel_list, channel_id):
+                        updated_channel_list = current_channel_list.strip(' ' + channel_id + ' ')
+
+                if updated_channel_list.isspace() or len(updated_channel_list) == 0:
+                    updated_channel_list = 'NOT_SET'
+
+                filename = ctx.message.server.id
+                await ConfigCommands(self.bot).update_config_file(
+                    filename,
+                    'RoleAssignment',
+                    'assignment_channel_id',
+                    updated_channel_list.strip(),
+                    ctx.message
+                )
+
 
 def setup(bot):
     """This makes it so we can actually use it."""
