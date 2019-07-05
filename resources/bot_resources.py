@@ -50,3 +50,8 @@ class BotResources:
             #     'BotResources: get_tos_channel_id (outer)'
             # )
             return False
+
+    @staticmethod
+    def contains_word(string, word):
+        """Check if a word exists inside the string."""
+        return ' ' + word + ' ' in ' ' + string + ' '

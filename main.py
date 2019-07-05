@@ -1,12 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-main.py
-@author Ryan Malacina
-@SnoringNinja - https://snoring.ninja
-
-Built on discord.py
-"""
-
 import asyncio
 import sys
 import traceback

@@ -1,11 +1,3 @@
-"""
-logout.py
-@author Ryan Malacina
-@SnoringNinja - https://snoring.ninja
-
-Handles logging the bot out of discord
-"""
-
 from sys import platform
 
 from discord.ext import commands
@@ -28,6 +20,12 @@ class Logout:
 
     @staticmethod
     def get_system_environment():
+        """
+        Check which platform the bot is running under.
+        Return True if Linux, False if Windows
+
+        :return:
+        """
         if platform == "linux" or platform == "linux2":
             return True
         elif platform == "win32":
@@ -35,6 +33,13 @@ class Logout:
 
     @staticmethod
     def systemd_logout(service_name):
+        """
+        Attempt to stop the service that is running the bot so that the logout is successful and doesn't
+        restart, which is something that can be configured when using systemd.
+
+        :param service_name: the systemd service name that the bot is running under
+        :type service_name: str
+        """
         sysbus = dbus.SystemBus()
         systemd = sysbus.get_object('org.freedesktop.systemd1',
                                     '/org/freedesktop/systemd1')
@@ -46,7 +51,10 @@ class Logout:
         print("SHUTDOWN: linux environment in use, using systemd")
 
         # This will fail if the user/group running the bot requires authentication to run systemctl commands
-        manager.StopUnit('{0}.service'.format(service_name), 'fail')
+        try:
+            manager.StopUnit('{0}.service'.format(service_name), 'fail')
+        except dbus.exceptions.DBusException:
+            print("Unable to shutdown the service, likely due to requiring authentication.")
 
     @commands.command(pass_context=True, no_pm=True)
     async def logout(self, ctx):
@@ -91,5 +99,5 @@ class Logout:
 
 
 def setup(bot):
-    """This makes it so we can actually use it."""
+    """Required to allow the bot to access anything in here as a command."""
     bot.add_cog(Logout(bot))
