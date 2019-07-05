@@ -15,7 +15,7 @@ from resources.config import ConfigLoader
 # If that is the case, there is an issue when installing it that system libraries may need to be installed.
 # We should really add a FAQ for something like this and set up a testing environment to grab everything that is needed
 if platform == "linux" or platform == "linux2":
-    import dbus # will only be imported if on linux
+    import dbus  # will only be imported if on linux
 elif platform == "win32":
     pass
 
@@ -40,16 +40,16 @@ class Logout:
 
     @staticmethod
     def systemd_logout(service_name):
-            sysbus = dbus.SystemBus()
-            systemd = sysbus.get_object('org.freedesktop.systemd1',
-                                        '/org/freedesktop/systemd1')
+        sysbus = dbus.SystemBus()
+        systemd = sysbus.get_object('org.freedesktop.systemd1',
+                                    '/org/freedesktop/systemd1')
 
-            manager = dbus.Interface(systemd, 'org.freedesktop.systemd1.Manager')
+        manager = dbus.Interface(systemd, 'org.freedesktop.systemd1.Manager')
 
-            # Okay, so we'll just print out the "Shutting down, bye!" message
-            # before we run this or logout
-            print("SHUTDOWN: linux environment in use, using systemd")
-            manager.StopUnit('{0}.service'.format(service_name), 'fail')
+        # Okay, so we'll just print out the "Shutting down, bye!" message
+        # before we run this or logout
+        print("SHUTDOWN: linux environment in use, using systemd")
+        manager.StopUnit('{0}.service'.format(service_name), 'fail')
 
     @commands.command(pass_context=True, no_pm=True)
     async def logout(self, ctx):
@@ -79,7 +79,8 @@ class Logout:
                         raise TypeError
                 else:
                     raise TypeError
-            except TypeError:
+            except TypeError as ex:
+                print(ex)
                 print("SHUTDOWN: non-linux environment or systemd not enabled")
                 await self.bot.logout()
         return
