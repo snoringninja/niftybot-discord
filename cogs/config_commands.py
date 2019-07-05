@@ -98,13 +98,7 @@ class ConfigCommands:
             if parser.has_option(update_section, update_key):
                 parser.set(update_section, update_key, update_value)
 
-                with open(
-                    '%s.ini' % (
-                        os.path.join(
-                            self.server_settings_path,
-                            str(filename)
-                        )
-                    ), 'w') as configfile:
+                with open('%s.ini' % (os.path.join(self.server_settings_path, str(filename))), 'w') as configfile:
                     parser.write(configfile)
                 if not suppress_message:
                     bot_message = await self.bot.say("Configuration file updated.")
