@@ -11,21 +11,16 @@ from sys import platform
 from discord.ext import commands
 from resources.config import ConfigLoader
 
-# When we import dbus, there could be an issue that it's not actually installed if being run through virtualenv
-# If that is the case, there is an issue when installing it that system libraries may need to be installed.
-# We should really add a FAQ for something like this and set up a testing environment to grab everything that is needed
+# Note: please see the README for issues that can arise when install dbus
 if platform == "linux" or platform == "linux2":
-    import dbus  # will only be imported if on linux
+    import dbus
 elif platform == "win32":
     pass
 
 
 class Logout:
     """
-    Logout cog handles exiting discord and
-    shutting down.
-
-    TODO: check if running as a systemd service, and if so, shutdown correctly using dbus
+    Handles all logout functionality, depending on which platform the bot is running on.
     """
     def __init__(self, bot):
         self.bot = bot
@@ -49,13 +44,23 @@ class Logout:
         # Okay, so we'll just print out the "Shutting down, bye!" message
         # before we run this or logout
         print("SHUTDOWN: linux environment in use, using systemd")
+
+        # This will fail if the user/group running the bot requires authentication to run systemctl commands
         manager.StopUnit('{0}.service'.format(service_name), 'fail')
 
     @commands.command(pass_context=True, no_pm=True)
     async def logout(self, ctx):
         """
-        Logs the bot out.
-        This can only be used by the bot owner.
+        This function is designed to logout the bot out depending on the environment in use.  It still makes use of
+        the logout functionality built right into discord.py, but with an extra step if using a linux environment.
+
+        It is important to note that the systemd_logout functionality won't work if the user/group the bot is running
+        under requires authentication to run the following: systemctl stop SERVICENAME
+
+        Please keep that in mind.
+
+        :param ctx: discord.py Context
+        :return:
         """
         user_id = ctx.message.author.id
 
@@ -79,8 +84,8 @@ class Logout:
                         raise TypeError
                 else:
                     raise TypeError
-            except TypeError as ex:
-                print("SHUTDOWN: non-linux environment or systemd not enabled")
+            except TypeError:
+                print("SHUTDOWN: non-linux environment, systemd not enabled, or something failed.")
                 await self.bot.logout()
         return
 
