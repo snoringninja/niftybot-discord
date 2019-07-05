@@ -69,7 +69,7 @@ class Logout:
                 if self.get_system_environment():
                     systemd_enabled = ConfigLoader().load_config_setting_boolean('BotSettings', 'systemd_enabled')
 
-                    if systemd_enabled == 'true':
+                    if systemd_enabled:
                         # so even if the bot logs out, if the systemd_logout fails the bot is going to come back online
                         # assuming they have the service set to do so
                         systemd_name = ConfigLoader().load_config_setting_string('BotSettings', 'systemd_name')
@@ -80,7 +80,6 @@ class Logout:
                 else:
                     raise TypeError
             except TypeError as ex:
-                print(ex)
                 print("SHUTDOWN: non-linux environment or systemd not enabled")
                 await self.bot.logout()
         return
