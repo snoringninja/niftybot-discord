@@ -1,9 +1,3 @@
-"""
-role_assignment.py
-@author Ryan Malacina (xNifty)
-@site https://snoring.ninja
-"""
-
 import traceback
 import logging
 import asyncio
@@ -207,7 +201,7 @@ class RoleAssignor:
 
             > rolechannel add 1234567890
             Role already added.
-            
+
             > rolechannel test 1234567890
             Please specify if I am adding or removing a channel.
 

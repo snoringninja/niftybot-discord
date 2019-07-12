@@ -1,12 +1,3 @@
-"""
-join_leave_handler.py
-@author xNifty
-@site https://snoring.ninja
-
-Send a welcome or part message when a user joins or leaves a server.
-This is configured on a per server basis.
-"""
-
 import random
 import discord
 import traceback
