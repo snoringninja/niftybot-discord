@@ -1,10 +1,3 @@
-"""
-bot_resources.py
-@author xNifty
-@site https://snoring.ninja
-
-This class serves to be a location for some general use bot functions.
-"""
 # import traceback
 import configparser
 
@@ -14,13 +7,21 @@ from resources.database import DatabaseHandler
 
 
 class BotResources:
-    """General bot resource functions"""
+    """
+    Contains multiple different functions that are general use for different purposes that were better suited to be
+    within a single class and not rewritten across classes when needed.
+    """
     def __init__(self):
         self.prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
     @staticmethod
     def check_accepted(user_id):
-        """Check if a user has accepted the Terms of Service."""
+        """
+        Check if a user has accepted the terms of service for the bot to remain Discord ToS compliant
+
+        :param user_id: discord.Member userID
+        :return: True if accepted, False if not
+        """
         row = DatabaseHandler().fetch_results(
             "SELECT 1 FROM accepted_users WHERE discord_id = {0}".format(str(user_id))
         )
@@ -31,7 +32,13 @@ class BotResources:
 
     @staticmethod
     def get_tos_channel_valid(server_id):
-        """Check if a channel is set for the ToS Message"""
+        """
+        Check if the server has specified a specific channel to display the message informing a user that they
+        must accept the Terms of Service before they can use certain commands.
+
+        :param server_id: the discord server snowflake ID
+        :return: True if channel specified, False if not
+        """
         try:
             try:
                 ConfigLoader().load_server_int_setting(
@@ -55,13 +62,23 @@ class BotResources:
 
     @staticmethod
     def contains_word(string, word):
-        """Check if a word exists inside the string."""
+        """
+        Checks if a word exists within a string.  Useful for those specific circumstances where you need to know
+        if a word is, in fact, within a string.
+
+        :param string: String that is being searched for word
+        :param word: The word that is being searched for
+        :return: True if in string, False if not
+        """
         return ' ' + word + ' ' in ' ' + string + ' '
 
     @staticmethod
     def load_config(default_filename):
-        """Load the config file.
-        :default_filename: name of the config file to load
+        """
+        Load the specified configuration file.
+
+        :param default_filename: name of the config file to load
+        :return: read in filename
         """
         config = configparser.ConfigParser()
         return config.read(default_filename)
