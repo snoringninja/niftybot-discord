@@ -6,6 +6,8 @@ bot_resources.py
 This class serves to be a location for some general use bot functions.
 """
 # import traceback
+import configparser
+
 from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
 # from resources.error_logger import ErrorLogging
@@ -55,3 +57,11 @@ class BotResources:
     def contains_word(string, word):
         """Check if a word exists inside the string."""
         return ' ' + word + ' ' in ' ' + string + ' '
+
+    @staticmethod
+    def load_config(default_filename):
+        """Load the config file.
+        :default_filename: name of the config file to load
+        """
+        config = configparser.ConfigParser()
+        return config.read(default_filename)

@@ -14,20 +14,7 @@ import re
 import discord
 from discord.ext import commands
 from resources.config import ConfigLoader
-
-
-# Some helpful functions
-def load_config(default_filename):
-    """Load the config file.
-    :default_filename: name of the config file to load
-    """
-    config = configparser.ConfigParser()
-    return config.read(default_filename)
-
-
-def contains_word(string, word):
-    """Check if a word exists inside the string."""
-    return ' ' + word + ' ' in ' ' + string + ' '
+from resources.bot_resources import BotResources
 
 
 class ConfigCommands:
@@ -84,7 +71,7 @@ class ConfigCommands:
         :param suppress_message: defaults to false; suppress the update complete message if configured to
         """
         parser = configparser.ConfigParser()
-        loaded_file = load_config(
+        loaded_file = BotResources().load_config(
             '%s.ini' % (
                 os.path.join(
                     self.server_settings_path,
@@ -263,7 +250,7 @@ class ConfigCommands:
                 return_string = "```Settings for {0}:\n\n".format(ctx.message.server.name)
 
                 parser = configparser.ConfigParser()
-                loaded_file = load_config(
+                loaded_file = BotResources().load_config(
                     '%s.ini' % (
                         os.path.join(
                             self.server_settings_path,
@@ -342,7 +329,7 @@ class ConfigCommands:
             role_id = re.sub('[^0-9]', '', role_id)
 
             if add_or_remove == 'add':
-                if not contains_word(current_id_list, role_id):
+                if not BotResources().contains_word(current_id_list, role_id):
                     if current_id_list == 'NOT_SET':
                         updated_id_list = role_id
                     else:
@@ -351,7 +338,7 @@ class ConfigCommands:
                     return await self.bot.say("Role already added.")
 
             if add_or_remove == 'remove':
-                if contains_word(current_id_list, role_id):
+                if BotResources().contains_word(current_id_list, role_id):
                     updated_id_list = current_id_list.replace(role_id, '')
 
                 if updated_id_list.isspace() or len(updated_id_list) == 0:
