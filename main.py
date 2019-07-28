@@ -211,6 +211,8 @@ async def on_command_error(exception, context):
     if hasattr(context.command, "on_error"):
         print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
 
+    # We are going to ignore A LOT of exceptions via the discord.py error handler
+    # Instead, we should be handling error logging on our own via the ErrorLogging class
     if isinstance(exception, (commands.MissingRequiredArgument,
                               commands.BadArgument,
                               commands.DisabledCommand,
