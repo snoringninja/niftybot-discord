@@ -45,7 +45,7 @@ class RoleAssignor(commands.Cog):
         :param member: optional discord.Member object
         :return: Nothing
         """
-        server_id = ctx.message.server.id
+        server_id = ctx.message.guild.id
 
         if member is None:
             member = ctx.message.author
@@ -142,7 +142,7 @@ class RoleAssignor(commands.Cog):
         :return:
         """
         member = ctx.message.author
-        server_id = str(ctx.message.server.id)
+        server_id = str(ctx.message.guild.id)
 
         if member is not None:
             if add_or_remove != 'add' and add_or_remove != 'remove':
@@ -177,7 +177,7 @@ class RoleAssignor(commands.Cog):
                 if updated_role_list.isspace() or len(updated_role_list) == 0:
                     updated_role_list = 'NOT_SET'
 
-            filename = ctx.message.server.id
+            filename = ctx.message.guild.id
             await ConfigCommands(self.bot).update_config_file(
                 filename,
                 'RoleAssignment',
@@ -215,7 +215,7 @@ class RoleAssignor(commands.Cog):
         :return:
         """
         member = ctx.message.author
-        server_id = str(ctx.message.server.id)
+        server_id = str(ctx.message.guild.id)
 
         if member is not None:
             if add_or_remove != 'add' and add_or_remove != 'remove':
@@ -243,7 +243,7 @@ class RoleAssignor(commands.Cog):
                 if updated_channel_list.isspace() or len(updated_channel_list) == 0:
                     updated_channel_list = 'NOT_SET'
 
-                filename = ctx.message.server.id
+                filename = ctx.message.guild.id
                 await ConfigCommands(self.bot).update_config_file(
                     filename,
                     'RoleAssignment',

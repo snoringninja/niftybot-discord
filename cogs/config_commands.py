@@ -44,12 +44,12 @@ class ConfigCommands(commands.Cog):
         if member_id == ctx.message.server.owner_id or \
                 int(member_id) == ConfigLoader().load_config_setting_int('BotSettings', 'owner_id'):
             file_exists = await ConfigLoader(self.bot).check_if_config_exists(
-                ctx.message.server.id
+                ctx.message.guild.id
             )
 
             if not file_exists:
                 await ConfigLoader(self.bot).generate_default_config_file(
-                    ctx.message.server.id,
+                    ctx.message.guild.id,
                     member_id
                 )
             else:
@@ -139,13 +139,13 @@ class ConfigCommands(commands.Cog):
 
                 try:
                     bot_admins_user_list = ConfigLoader().load_server_string_setting(
-                        ctx.message.server.id,
+                        ctx.message.guild.id,
                         'BotAdmins',
                         'bot_admin_users'
                     )
 
                     bot_admins_role_list = ConfigLoader().load_server_string_setting(
-                        ctx.message.server.id,
+                        ctx.message.guild.id,
                         'BotAdmins',
                         'bot_admin_roles'
                     )
@@ -171,7 +171,7 @@ class ConfigCommands(commands.Cog):
                         ) or \
                         str(member_id) in bot_admin_users or \
                             [admin_role for admin_role in user_roles_list if admin_role in bot_admin_roles]:
-                        filename = ctx.message.server.id
+                        filename = ctx.message.guild.id
                         await self.update_config_file(
                             filename,
                             update_section,
@@ -209,7 +209,7 @@ class ConfigCommands(commands.Cog):
         """
         member = ctx.message.author
         member_id = ctx.message.author.id
-        server_id = ctx.message.server.id
+        server_id = ctx.message.guild.id
 
         bot_admin_users = []
         bot_admin_roles = []
@@ -220,13 +220,13 @@ class ConfigCommands(commands.Cog):
 
         try:
             bot_admins_user_list = ConfigLoader().load_server_string_setting(
-                ctx.message.server.id,
+                ctx.message.guild.id,
                 'BotAdmins',
                 'bot_admin_users'
             )
 
             bot_admins_role_list = ConfigLoader().load_server_string_setting(
-                ctx.message.server.id,
+                ctx.message.guild.id,
                 'BotAdmins',
                 'bot_admin_roles'
             )
@@ -298,7 +298,7 @@ class ConfigCommands(commands.Cog):
         :return:
         """
         member_id = ctx.message.author.id
-        server_id = str(ctx.message.server.id)
+        server_id = str(ctx.message.guild.id)
 
         updated_id_list = ''
 
@@ -344,7 +344,7 @@ class ConfigCommands(commands.Cog):
                 if updated_id_list.isspace() or len(updated_id_list) == 0:
                     updated_id_list = 'NOT_SET'
 
-            filename = ctx.message.server.id
+            filename = ctx.message.guild.id
             await ConfigCommands(self.bot).update_config_file(
                 filename,
                 'BotAdmins',

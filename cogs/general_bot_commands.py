@@ -64,6 +64,7 @@ class BotCommands(commands.Cog):
             "for now.".format(member)
         )
 
+
 def setup(bot):
     """This makes it so we can actually use it."""
     bot.add_cog(BotCommands(bot))

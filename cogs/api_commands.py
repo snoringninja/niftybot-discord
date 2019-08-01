@@ -260,7 +260,7 @@ class ApiCommands(commands.Cog):
         member = ctx.message.author
         member_id = ctx.message.author.id
 
-        server_id = str(ctx.message.server.id)
+        server_id = str(ctx.message.guild.id)
 
         plugin_enabled = ConfigLoader().load_server_boolean_setting(
             server_id, 'ApiCommands', 'enabled')

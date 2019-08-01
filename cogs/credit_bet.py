@@ -44,7 +44,7 @@ class CreditBet(commands.Cog):
         """
         member = ctx.message.author
         member_id = ctx.message.author.id
-        server_id = ctx.message.server.id
+        server_id = ctx.message.guild.id
 
         # Load some config settings
         channel_id = ConfigLoader().load_server_int_setting(
@@ -71,7 +71,7 @@ class CreditBet(commands.Cog):
                 and plugin_enabled
                 and int(ctx.message.channel.id) == channel_id
         ):
-            # Have to cast ctx.message.channel.id and ctx.message.server.id to ints
+            # Have to cast ctx.message.channel.id and ctx.message.guild.id to ints
             if member is not None and amount >= minimum_bet:
                 row = DatabaseHandler().fetch_results(
                     "SELECT 1 FROM credit_bet WHERE userID = {0} and serverID = {1}".format(
@@ -80,7 +80,7 @@ class CreditBet(commands.Cog):
                     )
                 )
                 if row is None:
-                    return await self.bot.say(
+                    return await ctx.send(
                         "{0.mention}: please do {1}register to join the lotto.".format(
                             member,
                             self.prefix
@@ -95,7 +95,7 @@ class CreditBet(commands.Cog):
                         )
                     )
                     if remaining_credits[0] < amount:
-                        return await self.bot.say(
+                        return await ctx.send(
                             "Insufficient credits ({0})".format(
                                 remaining_credits[0]
                             )
@@ -113,7 +113,7 @@ class CreditBet(commands.Cog):
                                     str(server_id)
                                 )
                             )
-                            await self.bot.say(
+                            await ctx.send(
                                 "Sorry, {0.mention}, you lost with a roll of {1} " \
                                 "against {2}! Your balance is now {3}!"
                                 .format(member, user_number, bot_number, new_balance)
@@ -125,13 +125,13 @@ class CreditBet(commands.Cog):
                                 WHERE userID = {1} AND serverID = {2}"
                                 .format(new_balance, str(member_id), str(server_id))
                             )
-                            await self.bot.say(
+                            await ctx.send(
                                 "Congratulations, {0.mention}, you won with a roll " \
                                 "of {1} against {2}! Your balance is now {3}!"
                                 .format(member, user_number, bot_number, new_balance)
                             )
                         else:
-                            await self.bot.say(
+                            await ctx.send(
                                 "It was a tie, {0.mention}, with a roll of {1}! " \
                                 "Your balance remains {2}!".format(
                                     member,
@@ -140,7 +140,7 @@ class CreditBet(commands.Cog):
                                 )
                             )
             else:
-                await self.bot.say("The minimum bet is {0}".format(minimum_bet))
+                await ctx.send("The minimum bet is {0}".format(minimum_bet))
         return
 
     @commands.command(pass_context=True, no_pm=True)
@@ -152,7 +152,7 @@ class CreditBet(commands.Cog):
         """
         member = ctx.message.author
         member_id = ctx.message.author.id
-        server_id = ctx.message.server.id
+        server_id = ctx.message.guild.id
 
         # Load some config settings
         channel_id = ConfigLoader().load_server_int_setting(
@@ -175,7 +175,7 @@ class CreditBet(commands.Cog):
             )
             #print("Row: {}".format(row))
             if row is None:
-                return await self.bot.say(
+                return await ctx.send(
                     "{0.mention}: please do {1}register to " \
                     "join the lotto.".format(member, self.prefix))
             else:
@@ -186,7 +186,7 @@ class CreditBet(commands.Cog):
                         str(server_id)
                     )
                 )
-                await self.bot.say(
+                await ctx.send(
                     "{0.mention}: your balance is {1}.".format(
                         member,
                         remaining_credits[0]
@@ -203,7 +203,7 @@ class CreditBet(commands.Cog):
         member = ctx.message.author
         member_id = ctx.message.author.id
         display_name = ctx.message.author.name
-        server_id = ctx.message.server.id
+        server_id = ctx.message.guild.id
 
         # Load some config settings
         channel_id = ConfigLoader().load_server_int_setting(
@@ -246,11 +246,11 @@ class CreditBet(commands.Cog):
                         str(datetime.now())
                     )
                 )
-                await self.bot.say(
+                await ctx.send(
                     "{0.mention}, you are now registered! {1}bet to play! " \
                     "Goodluck!".format(member, self.prefix))
             else:
-                await self.bot.say(
+                await ctx.send(
                     "{0.mention}: you're already registered. Please do {1}bet " \
                     "to play!".format(member, self.prefix))
 
@@ -262,7 +262,7 @@ class CreditBet(commands.Cog):
         :member: empty discord.Member object
         """
         member = ctx.message.author
-        server_id = ctx.message.server.id
+        server_id = ctx.message.guild.id
 
         channel_id = ConfigLoader().load_server_int_setting(
             server_id,
@@ -305,9 +305,9 @@ class CreditBet(commands.Cog):
                         item[1][1]
                     )
                 output_string = output_string + "\n```"
-                return await self.bot.say(output_string)
+                return await ctx.send(output_string)
             else:
-                return await self.bot.say("There are no users currently in the lotto, or " \
+                return await ctx.send("There are no users currently in the lotto, or " \
                                           "all participating users have 0 credits.")
 
     @commands.command(pass_context=True, no_pm=True)
@@ -323,7 +323,7 @@ class CreditBet(commands.Cog):
         """
         member_id = ctx.message.author.id
         member = ctx.message.author
-        server_id = ctx.message.server.id
+        server_id = ctx.message.guild.id
 
         # Load some config settings
         channel_id = ConfigLoader().load_server_int_setting(
@@ -373,8 +373,8 @@ class CreditBet(commands.Cog):
             member_credits = information[0][0]
             last_used_time = information[0][1]
             if member_credits >= minimum_credits:
-                return await self.bot.say(
-                    "{0.mention}, you are above the minimum amount {1}; you " \
+                return await ctx.send(
+                    "{0.mention}, you are above the minimum amount {1}; you "
                     "cannot use this command (balance of {2}).".format(
                         member,
                         minimum_credits,
@@ -402,7 +402,7 @@ class CreditBet(commands.Cog):
                         lastClaimTime = ? WHERE userID = ? AND serverID = ?",
                         args
                     )
-                    return await self.bot.say(
+                    return await ctx.send(
                         "{0.mention}, you have been given an additional {1} credits! " \
                         "Your 24 cooldown ended {2} ago!".format(
                             member,
@@ -424,7 +424,7 @@ class CreditBet(commands.Cog):
                         final_seconds
                     )
                     converted_hour = BotResources().convert_seconds_to_hour(helpme_timer)
-                    return await self.bot.say(
+                    return await ctx.send(
                         "{0.mention}, you can only use this command every {1} hours ({2}), "
                         "and if at or below {3} credits :cry:".format(
                             member,
@@ -444,7 +444,7 @@ class CreditBet(commands.Cog):
         """
         member = ctx.message.author
         member_id = ctx.message.author.id
-        server_id = ctx.message.server.id
+        server_id = ctx.message.guild.id
 
         bot_admin_users = []
         bot_admin_roles = []
@@ -455,13 +455,13 @@ class CreditBet(commands.Cog):
 
         try:
             bot_admins_user_list = ConfigLoader().load_server_string_setting(
-                ctx.message.server.id,
+                ctx.message.guild.id,
                 'BotAdmins',
                 'bot_admin_users'
             )
 
             bot_admins_role_list = ConfigLoader().load_server_string_setting(
-                ctx.message.server.id,
+                ctx.message.guild.id,
                 'BotAdmins',
                 'bot_admin_roles'
             )
@@ -486,7 +486,7 @@ class CreditBet(commands.Cog):
                     "DELETE FROM credit_bet WHERE serverID = ?",
                     args
                 )
-                return await self.bot.say("{0.mention}: lottery table for this server reset.".format(member))
+                return await ctx.send("{0.mention}: lottery table for this server reset.".format(member))
         except configparser.Error as config_error:
             print("Error with resetlotto command.")
 
