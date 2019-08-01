@@ -31,7 +31,7 @@ class Moderation:  # pylint: disable=too-few-public-methods
         notification that there was a ping; there is nothing
         you can do about that, it's a Discord thing
         """
-        server_id = message.server.id
+        server_id = message.guild.id
         channel_id = message.channel.id
         member = message.author
         try:

@@ -10,6 +10,8 @@ class BotResources:
     """
     Contains multiple different functions that are general use for different purposes that were better suited to be
     within a single class and not rewritten across classes when needed.
+
+    @TODO: re-implement error logging
     """
     def __init__(self):
         self.prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
@@ -82,3 +84,25 @@ class BotResources:
         """
         config = configparser.ConfigParser()
         return config.read(default_filename)
+
+    @staticmethod
+    def is_valid_hour(seconds):
+        """
+        Check if the provided seconds is a valid hour.
+
+        :param seconds: (int) seconds
+        :return: True if valid hour, False if not
+        """
+        if seconds % 3600 == 0:
+            return True
+        return False
+
+    @staticmethod
+    def convert_seconds_to_hour(seconds):
+        """
+        Convert seconds to hour.
+
+        :param seconds: (int) seconds
+        :return: seconds / 3600
+        """
+        return seconds / 3600

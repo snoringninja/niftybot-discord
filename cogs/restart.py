@@ -14,11 +14,11 @@ import sys
 from discord.ext import commands
 from resources.config import ConfigLoader
 
-class Restart():
-    """Restart()
 
-    Restart the bot python process; I wouldn't recommend using
-    this in its current state
+class Restart(commands.Cog):
+    """
+    Restart the bot python process
+    I wouldn't recommend using this in its current state, as it's fairly buggy and may not always work right
     """
     def __init__(self, bot):
         self.bot = bot

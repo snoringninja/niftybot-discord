@@ -19,7 +19,7 @@ from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
 
 
-class ApiCommands():
+class ApiCommands(commands.Cog):
     """Multiple commands based around the Guild Wars 2 API."""
 
     def __init__(self, bot):
@@ -75,12 +75,11 @@ class ApiCommands():
                 else:
                     return await self.bot.say("You already have an API key registered.")
             else:
-                return await self.bot.say("Some unknown error occured. Please try again.")
+                return await self.bot.say("Some unknown error occurred. Please try again.")
         else:
             await self.bot.delete_message(ctx.message)
             return await self.bot.say(
-                "{0.mention}: please private message me your API key."
-                .format(member)
+                "{0.mention}: please private message me your API key.".format(member)
             )
 
     async def get_character_level(self, api_key, character_name):
@@ -261,7 +260,7 @@ class ApiCommands():
         member = ctx.message.author
         member_id = ctx.message.author.id
 
-        server_id = str(ctx.message.server.id)
+        server_id = str(ctx.message.guild.id)
 
         plugin_enabled = ConfigLoader().load_server_boolean_setting(
             server_id, 'ApiCommands', 'enabled')

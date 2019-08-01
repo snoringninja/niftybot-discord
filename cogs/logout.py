@@ -10,7 +10,7 @@ elif platform == "win32":
     pass
 
 
-class Logout:
+class Logout(commands.Cog):
     """
     Handles all logout functionality, depending on which platform the bot is running on.
     """
@@ -77,7 +77,7 @@ class Logout:
         # after logging out - not really our problem though, they should correct that in the bot config and try again
         # We should probably raise more acceptable errors than TypeError (but still keep that one)
         if int(user_id) == self.owner_id:
-            await self.bot.say("Shutting down, bye!")
+            await ctx.send("Shutting down, bye!")
             try:
                 if self.get_system_environment():
                     systemd_enabled = ConfigLoader().load_config_setting_boolean('BotSettings', 'systemd_enabled')

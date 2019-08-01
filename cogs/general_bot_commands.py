@@ -1,12 +1,3 @@
-"""
-general_bot_commands.py
-@author xNifty
-@site https://snoring.ninja
-
-Class to handle general bot commands that have no
-place in other classes.
-"""
-
 import discord
 from discord.ext import commands
 
@@ -14,7 +5,8 @@ from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
 from resources.bot_resources import BotResources
 
-class BotCommands:
+
+class BotCommands(commands.Cog):
     """
     Class to control multiple different functions that
     have no place in other classes.
@@ -61,7 +53,7 @@ class BotCommands:
             return await self.bot.say("Changed my username!")
 
     @commands.command(pass_context=True, no_pm=True, name="help")
-    @commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
+    @commands.cooldown(rate=1, per=30, type=commands.BucketType.guild)
     async def get_help(self, ctx, member: discord.Member=None):
         """
         Return the link for the bot documentation.
@@ -71,6 +63,7 @@ class BotCommands:
             "{0.mention}: Please see https://docs.snoring.ninja " \
             "for now.".format(member)
         )
+
 
 def setup(bot):
     """This makes it so we can actually use it."""

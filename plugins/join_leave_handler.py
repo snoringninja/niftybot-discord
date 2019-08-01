@@ -45,18 +45,18 @@ class JoinLeaveHandler:
             )
 
             emote_array = []
-            for emoji in member.server.emojis:
+            for emoji in member.guild.emojis:
                 emote_array.append(emoji)
 
             if not emote_array:
-                await self.bot.send_message(
+                await server.send_message(
                     discord.Object(id=welcome_channel),
                     welcome_message
                     .replace("{server}", server.name)
                     .replace("{user}", member.mention)
                     .replace("{emote}", ''))
             else:
-                await self.bot.send_message(
+                await server.send_message(
                     discord.Object(id=welcome_channel),
                     welcome_message
                     .replace("{server}", server.name)

@@ -17,9 +17,7 @@ import discord
 from discord.ext.commands.view import StringView
 from discord.ext import commands
 
-
-BOT_VERSION = "2.0.12"
-
+BOT_VERSION = "3.0.1"
 
 # Check if there is a valid niftybot.ini file
 # If no file is found, generate the file and then exit the bot via SystemExit
@@ -34,7 +32,7 @@ if not BOT_CONFIG_GENERATED:
 DESCRIPTION = ConfigLoader().load_config_setting('BotSettings', 'description')
 
 # Load the command prefix from the core ini
-COMMAND_PREFIX = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
+COMMAND_PREFIX = ConfigLoader().load_config_setting_string('BotSettings', 'command_prefix')
 
 # Load the bot token from the core ini
 BOT_TOKEN = ConfigLoader().load_config_setting('BotSettings', 'bot_token')
@@ -61,7 +59,7 @@ for command in COMMAND_WHITELIST.split():
     whitelist.append('{0}'.format(COMMAND_PREFIX) + command)
 
 # Finally, last thing to set is the information required to do bot stuff
-CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
+CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX)
 
 
 @CLIENT.event
@@ -78,7 +76,7 @@ async def on_message(message):
     they can use commands.
     """
     view = StringView(message.content)
-    # invoked_prefix = COMMAND_PREFIX  # Can we remove this? It's reset immediately after
+    invoked_prefix = COMMAND_PREFIX  # Can we remove this? It's reset immediately after
 
     invoked_prefix = discord.utils.find(view.skip_string, COMMAND_PREFIX)
     discord.utils.find(view.skip_string, COMMAND_PREFIX)
@@ -93,42 +91,44 @@ async def on_message(message):
 
     invoker = view.get_word()
 
-    if invoker in CLIENT.commands:
-        # If the message content is a command within the whitelist, run the command; otherwise, they must have accepted
-        # the bot terms before the command can be used.
-        if message.content in whitelist:
-            await CLIENT.process_commands(message)
-        else:
-            can_use = BotResources().check_accepted(message.author.id)
-            message_channel_valid = False
-            if not message.channel.is_private:
-                message_channel_valid = BotResources().get_tos_channel_valid(message.server.id)
-            if can_use:
+    # Boy, this got ugly thanks to rewrite
+    for x in CLIENT.commands:
+        if str(x) == invoker:
+            # If the message content is a command within the whitelist, run the command
+            # Otherwise, they must accept the Terms of Service for the bot before using the command
+            if message.content in whitelist:
                 await CLIENT.process_commands(message)
-            elif not can_use and message_channel_valid:
-                if message.author.id != CLIENT.user.id:
-                    message_channel_id = ConfigLoader().load_server_int_setting(
-                        message.server.id,
-                        'ConfigSettings',
-                        'not_accepted_channel_id')
-
-                    bot_message = await CLIENT.send_message(
-                        discord.Object(id=message_channel_id),
-                        NOT_ACCEPTED_MESSAGE.replace(
-                            "{user}", message.author.mention).replace(
-                                "{prefix}", COMMAND_PREFIX))
-                    await asyncio.sleep(20)
-                    await CLIENT.delete_message(bot_message)
             else:
-                # This is needed to prevent infinite looping message posting
-                if message.author.id != CLIENT.user.id:
-                    bot_message = await CLIENT.send_message(
-                        discord.Object(id=message.channel.id),
-                        NOT_ACCEPTED_MESSAGE.replace(
-                            "{user}", message.author.mention).replace(
-                                "{prefix}", COMMAND_PREFIX))
-                    await asyncio.sleep(20)
-                    await CLIENT.delete_message(bot_message)
+                can_use = BotResources().check_accepted(message.author.id)
+                message_channel_valid = False
+                if not isinstance(message.channel, discord.abc.PrivateChannel):
+                    message_channel_valid = BotResources().get_tos_channel_valid(message.guild.id)
+                if can_use:
+                    await CLIENT.process_commands(message)
+                elif not can_use and message_channel_valid:
+                    if message.author.id != CLIENT.user.id:
+                        message_channel_id = ConfigLoader().load_server_int_setting(
+                            message.guild.id,
+                            'ConfigSettings',
+                            'not_accepted_channel_id')
+
+                        bot_message = await CLIENT.send_message(
+                            discord.Object(id=message_channel_id),
+                            NOT_ACCEPTED_MESSAGE.replace(
+                                "{user}", message.author.mention).replace(
+                                    "{prefix}", COMMAND_PREFIX))
+                        await asyncio.sleep(20)
+                        await CLIENT.delete_message(bot_message)
+                else:
+                    # This is needed to prevent infinite looping message posting
+                    if message.author.id != CLIENT.user.id:
+                        bot_message = await CLIENT.send_message(
+                            discord.Object(id=message.channel.id),
+                            NOT_ACCEPTED_MESSAGE.replace(
+                                "{user}", message.author.mention).replace(
+                                    "{prefix}", COMMAND_PREFIX))
+                        await asyncio.sleep(20)
+                        await CLIENT.delete_message(bot_message)
 
 
 @CLIENT.event
@@ -145,7 +145,7 @@ async def on_ready():
     print('Setting game to: {0}'.format(GAME_NAME))
     print('Loaded extensions: {0}'.format(EXTENSIONS))
     print('Database name: {0}'.format(DATABASE_NAME))
-    await CLIENT.change_presence(game=discord.Game(type=0, name=GAME_NAME))
+    await CLIENT.change_presence(activity=discord.Game(type=0, name=GAME_NAME))
     print('Good to go!')
     print('------')
 
@@ -166,7 +166,7 @@ async def on_member_join(member):
     JoinPart > assign_role_enabled
     JoinPart > role_assignment_id
     """
-    server = member.server
+    server = member.guild
     await JoinLeaveHandler(CLIENT).on_join_assign_user_role(CLIENT, server.id, member)
     await JoinLeaveHandler(CLIENT).welcome_user(server.id, member, server)
 
@@ -183,12 +183,12 @@ async def on_member_remove(member):
     JoinPart > leave_channel_id
     JoinPart > part_message
     """
-    server = member.server
+    server = member.guild
     await JoinLeaveHandler(CLIENT).goodbye_user(server.id, member)
 
 
 @CLIENT.event
-async def on_command_error(exception, context):
+async def on_command_error(context, exception):
     """
     Override the default discord.py on_command_error to log our errors to a file in the errors folder.
 
@@ -208,8 +208,8 @@ async def on_command_error(exception, context):
             file=sys.stderr
         )
 
-    if hasattr(context.command, "on_error"):
-        print('Ignoring exception in command {}'.format(context.command), file=sys.stderr)
+    if commands.CommandInvokeError:
+        print('Ignoring exception in command {0}'.format(context.command), file=sys.stderr)
 
     # We are going to ignore A LOT of exceptions via the discord.py error handler
     # Instead, we should be handling error logging on our own via the ErrorLogging class
