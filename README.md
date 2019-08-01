@@ -1,14 +1,16 @@
 # Niftybot-Discord - Discord bot built on [Discord.py](https://github.com/Rapptz/discord.py)  
+## THIS BRANCH IS NOW IN MAINTENANCE MODE.
+### All changes, outside of critical bug fixes, should be made aginst the dev-3.0 branch moving forward. Thank you.
   
-  ### Click [here](https://snoring.ninja/niftybot-discord) for documentation  
-    
-  ## About Branches
-  The only branch that is guaranteed to work is the master branch, as this is the branch where releases are built
-  from.  If you wish to contribute, please submit pull requests against the relevant branch, making sure that you have
-  actually tested your changes before submitting.  While any given development branch is not guaranteed to work, we
-  should make an effort to submit working changes that don't break anything - if your change does break something,
-  it is expected that that will be noted in the pull request or relevant commits where it breaks.  
-  
+### Click [here](https://snoring.ninja/niftybot-discord) for documentation  
+
+## About Branches
+The only branch that is guaranteed to work is the master branch, as this is the branch where releases are built
+from.  If you wish to contribute, please submit pull requests against the relevant branch, making sure that you have
+actually tested your changes before submitting.  While any given development branch is not guaranteed to work, we
+should make an effort to submit working changes that don't break anything - if your change does break something,
+it is expected that that will be noted in the pull request or relevant commits where it breaks.  
+
 ---
 Some things the bot ships with:
 
