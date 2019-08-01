@@ -19,7 +19,7 @@ from resources.config import ConfigLoader
 from resources.database import DatabaseHandler
 
 
-class ApiCommands:
+class ApiCommands():
     """Multiple commands based around the Guild Wars 2 API."""
 
     def __init__(self, bot):
@@ -255,7 +255,7 @@ class ApiCommands:
         return return_string
 
     @commands.command(pass_context=True, no_pm=True)
-    @commands.cooldown(rate=1, per=30, type=commands.BucketType.guild)
+    @commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
     async def build(self, ctx, game_type: str, *, character_name: str, member: discord.Member=None):
         """ Get PvE, WvW, PvP build info for supplied character. """
         member = ctx.message.author

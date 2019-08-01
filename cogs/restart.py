@@ -1,14 +1,24 @@
 # -*- coding: utf-8 -*-
+"""
+restart.py
+@author xNifty
+@site - https://snoring.ninja
+
+Restart the python process
+I wouldn't recommend using this
+"""
+
 import os
 import sys
 
 from discord.ext import commands
 from resources.config import ConfigLoader
 
-class Restart:
-    """
-    Restart the bot python process
-    I wouldn't recommend using this in its current state, as it's fairly buggy and may not always work right
+class Restart():
+    """Restart()
+
+    Restart the bot python process; I wouldn't recommend using
+    this in its current state
     """
     def __init__(self, bot):
         self.bot = bot
@@ -28,9 +38,7 @@ class Restart:
             await self.restart_process()
 
     async def restart_process(self):
-        """
-
-        :return:
+        """Restart the python process
         """
         os.execv(sys.executable, ['python'] + sys.argv)
 

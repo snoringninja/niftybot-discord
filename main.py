@@ -18,7 +18,7 @@ from discord.ext.commands.view import StringView
 from discord.ext import commands
 
 
-BOT_VERSION = "1.0.12"
+BOT_VERSION = "1.0.11"
 
 
 # Check if there is a valid niftybot.ini file
