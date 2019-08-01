@@ -10,7 +10,7 @@ elif platform == "win32":
     pass
 
 
-class Logout:
+class Logout(commands.Cog):
     """
     Handles all logout functionality, depending on which platform the bot is running on.
     """

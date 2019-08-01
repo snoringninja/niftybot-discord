@@ -12,7 +12,7 @@ import discord
 from discord.ext import commands
 
 
-class RoleAssignor:
+class RoleAssignor(commands.Cog):
     """
     Handles commands for adding or removing a role, adding or
     removing a channel, or adding a user to a configured role

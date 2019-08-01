@@ -5,7 +5,8 @@ import sys
 from discord.ext import commands
 from resources.config import ConfigLoader
 
-class Restart:
+
+class Restart(commands.Cog):
     """
     Restart the bot python process
     I wouldn't recommend using this in its current state, as it's fairly buggy and may not always work right

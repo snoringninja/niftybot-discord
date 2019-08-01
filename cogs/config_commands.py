@@ -17,7 +17,7 @@ from resources.config import ConfigLoader
 from resources.bot_resources import BotResources
 
 
-class ConfigCommands:
+class ConfigCommands(commands.Cog):
     """
     Class of different configuration commands that are used in multiple different files and cogs to update the
     configuration file for a server.

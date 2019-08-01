@@ -14,31 +14,13 @@ from datetime import datetime
 
 from resources.database import DatabaseHandler
 from resources.config import ConfigLoader
+from resources.bot_resources import BotResources
 
 import discord
 from discord.ext import commands
 
-# Disable too-many-locals
-# pylint: disable=too-many-locals
 
-
-def is_valid_hour(seconds):
-    """Check if the provided seconds is a
-    valid hour.
-
-    :seconds: provided seconds value
-    """
-    if seconds % 3600 == 0:
-        return True
-    return False
-
-
-def convert_seconds_to_hour(seconds):
-    """Convert seconds to hour."""
-    return seconds / 3600
-
-
-class CreditBet:
+class CreditBet(commands.Cog):
     """
     CreditBet class
     """
@@ -441,9 +423,9 @@ class CreditBet:
                         self.final_minutes,
                         final_seconds
                     )
-                    converted_hour = convert_seconds_to_hour(helpme_timer)
+                    converted_hour = BotResources().convert_seconds_to_hour(helpme_timer)
                     return await self.bot.say(
-                        "{0.mention}, you can only use this command every {1} hours ({2}), " \
+                        "{0.mention}, you can only use this command every {1} hours ({2}), "
                         "and if at or below {3} credits :cry:".format(
                             member,
                             converted_hour,

@@ -18,7 +18,7 @@ from discord.ext.commands.view import StringView
 from discord.ext import commands
 
 
-BOT_VERSION = "1.0.12"
+BOT_VERSION = "3.0.0"
 
 
 # Check if there is a valid niftybot.ini file
@@ -61,7 +61,7 @@ for command in COMMAND_WHITELIST.split():
     whitelist.append('{0}'.format(COMMAND_PREFIX) + command)
 
 # Finally, last thing to set is the information required to do bot stuff
-CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX, description=DESCRIPTION)
+CLIENT = commands.Bot(command_prefix=COMMAND_PREFIX)
 
 
 @CLIENT.event
@@ -145,7 +145,7 @@ async def on_ready():
     print('Setting game to: {0}'.format(GAME_NAME))
     print('Loaded extensions: {0}'.format(EXTENSIONS))
     print('Database name: {0}'.format(DATABASE_NAME))
-    await CLIENT.change_presence(game=discord.Game(type=0, name=GAME_NAME))
+    await CLIENT.change_presence(activity=discord.Game(type=0, name=GAME_NAME))
     print('Good to go!')
     print('------')
 
@@ -166,7 +166,7 @@ async def on_member_join(member):
     JoinPart > assign_role_enabled
     JoinPart > role_assignment_id
     """
-    server = member.server
+    server = member.guild
     await JoinLeaveHandler(CLIENT).on_join_assign_user_role(CLIENT, server.id, member)
     await JoinLeaveHandler(CLIENT).welcome_user(server.id, member, server)
 
@@ -183,7 +183,7 @@ async def on_member_remove(member):
     JoinPart > leave_channel_id
     JoinPart > part_message
     """
-    server = member.server
+    server = member.guild
     await JoinLeaveHandler(CLIENT).goodbye_user(server.id, member)
 
 
