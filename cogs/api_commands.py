@@ -254,7 +254,7 @@ class ApiCommands(commands.Cog):
         return return_string
 
     @commands.command(pass_context=True, no_pm=True)
-    @commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
+    @commands.cooldown(rate=1, per=30, type=commands.BucketType.guild)
     async def build(self, ctx, game_type: str, *, character_name: str, member: discord.Member=None):
         """ Get PvE, WvW, PvP build info for supplied character. """
         member = ctx.message.author

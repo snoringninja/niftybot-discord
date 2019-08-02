@@ -15,7 +15,8 @@ class BotCommands(commands.Cog):
         self.bot = bot
         self.prefix = ConfigLoader().load_config_setting('BotSettings', 'command_prefix')
 
-    @commands.command(pass_context=True, no_pm=False, name='accept')
+    @commands.guild_only()
+    @commands.command(name='accept')
     @commands.cooldown(rate=1, per=1, type=commands.BucketType.user)
     async def add_accepted_user(self, ctx, member: discord.Member=None):
         """
@@ -25,14 +26,15 @@ class BotCommands(commands.Cog):
         """
         member = ctx.message.author
         member_id = ctx.message.author.id
+        channel = ctx.message.channel
 
         has_accepted = BotResources().check_accepted(member_id)
         if has_accepted:
-            return await self.bot.say("You've already accepted my terms of service.")
+            return await channel.send("You've already accepted my terms of service.")
         else:
             query = """INSERT INTO accepted_users (discord_id) VALUES (?)"""
             DatabaseHandler().insert_into_database(query, (str(member_id), ))
-            return await self.bot.say("{0.mention}: thanks for accepting. You may now " \
+            return await channel.send("{0.mention}: thanks for accepting. You may now " \
                                       "use commands.".format(member))
 
     @commands.command(pass_context=True, no_pm=True, name='nick')
@@ -42,6 +44,7 @@ class BotCommands(commands.Cog):
         Change the bot username.
         """
         member_id = ctx.message.author.id
+        channel = ctx.message.channel
 
         if (member_id == ctx.message.server.owner_id
                 or int(member_id) == ConfigLoader().load_config_setting_int(
@@ -50,7 +53,7 @@ class BotCommands(commands.Cog):
                 )
            ):
             await self.bot.change_nickname(ctx.message.server.me, username)
-            return await self.bot.say("Changed my username!")
+            return await channel.send("Changed my username!")
 
     @commands.command(pass_context=True, no_pm=True, name="help")
     @commands.cooldown(rate=1, per=30, type=commands.BucketType.guild)
@@ -59,7 +62,9 @@ class BotCommands(commands.Cog):
         Return the link for the bot documentation.
         """
         member = ctx.message.author
-        return await self.bot.say(
+        channel = ctx.message.channel
+
+        return await channel.send(
             "{0.mention}: Please see https://docs.snoring.ninja " \
             "for now.".format(member)
         )

@@ -255,7 +255,7 @@ class CreditBet(commands.Cog):
                     "to play!".format(member, self.prefix))
 
     @commands.command(pass_context=True, no_pm=True)
-    @commands.cooldown(rate=1, per=30, type=commands.BucketType.server)
+    @commands.cooldown(rate=1, per=30, type=commands.BucketType.guild)
     async def scores(self, ctx, member: discord.Member=None):
         """Display the top 5 with > 0 points.
 
@@ -435,7 +435,7 @@ class CreditBet(commands.Cog):
                     )
 
     @commands.command(pass_context=True, no_pm=True, name='resetlotto')
-    @commands.cooldown(rate=1, per=1, type=commands.BucketType.server)
+    @commands.cooldown(rate=1, per=1, type=commands.BucketType.guild)
     async def reset_lotto_entries(self, ctx, member: discord.Member=None):
         """Reset the lotto entries for the server where
         where the commands is being used.

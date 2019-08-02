@@ -83,8 +83,8 @@ async def on_message(message):
 
     # This is fairly worthless.  While it can purge the message, everyone will still get a notification that there
     # was a message for them.  That's on Discord themselves to correct if the message is deleted.
-    if "@everyone" in message.content:
-        await Moderation(CLIENT).purge_everyone_message(message)
+    # if "@everyone" in message.content:
+    #   await Moderation(CLIENT).purge_everyone_message(message)
 
     if invoked_prefix is None:
         return
@@ -118,7 +118,7 @@ async def on_message(message):
                                 "{user}", message.author.mention).replace(
                                     "{prefix}", COMMAND_PREFIX))
                         await asyncio.sleep(20)
-                        await CLIENT.delete_message(bot_message)
+                        await bot_message.delete()
                 else:
                     # This is needed to prevent infinite looping message posting
                     if message.author.id != CLIENT.user.id:
@@ -128,7 +128,7 @@ async def on_message(message):
                                 "{user}", message.author.mention).replace(
                                     "{prefix}", COMMAND_PREFIX))
                         await asyncio.sleep(20)
-                        await CLIENT.delete_message(bot_message)
+                        await bot_message.delete_message()
 
 
 @CLIENT.event
