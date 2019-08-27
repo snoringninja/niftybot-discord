@@ -1,16 +1,15 @@
-"""
-configgenerator.py
-@author - xNifty
-
-Functions: Generate the config file for a server
-@TODO: generate missing sections and key-values if missing
-"""
-
 import os
 import configparser
 
-class ConfigGenerator():
-    """ConfigGenerator"""
+
+class ConfigGenerator:
+    """
+    This class handles generating the default configuration file for a server when the server owner uses
+    the genconfig command.  Right now, this will only work once and after that it will just do nothing.
+
+    @TODO: allow server owners to use the genconfig whenever they want to add missing section-key-values
+    that might be missing, as long as they are defined in this class.
+    """
     def __init__(self, bot):
         self.bot = bot
         self.server_settings_path = os.path.abspath(
@@ -74,7 +73,7 @@ class ConfigGenerator():
         parser.set('JoinPart', 'welcome_message', 'Welcome to {server}\'s Discord, {user}! Relax and have some fun!')
         parser.set('JoinPart', 'part_message', '{name} ({display_name}) has left the server.')
         parser.set('JoinPart', 'assign_role_enabled', 'false')
-        parser.ser('JoinPart', 'role_assignment_id', 'NOT_SET')
+        parser.set('JoinPart', 'role_assignment_id', 'NOT_SET')
 
         parser.set('BettingGame', 'minimum_bet', '10')
         parser.set('BettingGame', 'enabled', 'false')
@@ -88,7 +87,6 @@ class ConfigGenerator():
         parser.set('ApiCommands', 'enabled', 'false')
         parser.set('ApiCommands', 'api_channel_id', 'NOT_SET')
 
-
         with open(
             '%s.ini' % (
                 os.path.join(
@@ -97,6 +95,6 @@ class ConfigGenerator():
             ) as configfile:
             parser.write(configfile)
         return await self.bot.say(
-            "Configuration file generated. You will need to " \
+            "Configuration file generated. You will need to "
             "configure the file to your desired settings."
         )

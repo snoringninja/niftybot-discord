@@ -91,7 +91,11 @@ async def on_message(message):
 
     invoker = view.get_word()
 
-    # Boy, this got ugly thanks to rewrite
+    # Boy, this got ugly thanks to rewrite...I wonder if we can't still somehow redo this to be cleaner looking
+    # because I really hate that fact that I had to do the for statement followed by the if statement when in the old
+    # version I was able to just do a single if statement and it worked.  I imagine it's still going to be possible
+    # but I'm going to have to mess with it until I can get it working as I want it to.  With that said, this way
+    # does work and does correctly process commands as it should.
     for x in CLIENT.commands:
         if str(x) == invoker:
             # If the message content is a command within the whitelist, run the command
