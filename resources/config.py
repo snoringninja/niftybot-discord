@@ -1,11 +1,3 @@
-"""
-config.py
-@author - Ryan Malacina (xNifty)
-@SnoringNinja - https://snoring.ninja
-
-Handles all config based functions that are not used as bot commands
-"""
-
 # Imports for ConfigLoader
 import os
 import configparser
@@ -13,20 +5,33 @@ import errno
 
 
 def get_config_filename(default_filename):
-    """Return the filename; probably not needed at this point."""
+    """
+    Return the filename; probably not needed at this point...seems counterproductive, honestly
+
+    :param default_filename: the name of the file
+    :return: return the filename
+    """
     return default_filename
 
 
 def load_config(default_filename):
-    """Read in the config file."""
+    """
+    Read in the config file.
+
+    :param default_filename: the name of the file to read in
+    :return: the contents of the file via read
+    """
     config = configparser.ConfigParser()
     return config.read(default_filename)
 
 
-class ConfigLoader():
-    """ConfigLoader"""
+class ConfigLoader:
     def __init__(self, bot=None):
-        """Initialize some variables"""
+        """
+        Handles all config based functions that are not used as bot commands
+
+        :param bot: Pass in the discord.Bot that was created in main
+        """
         self.path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
         self.config = load_config('%s.ini' % (os.path.join(self.path, 'niftybot')),)
 
@@ -41,7 +46,11 @@ class ConfigLoader():
         self.bot = bot
 
     def create_directory(self):
-        """Create an errors directory if needed."""
+        """
+        Create an errors directory if needed.
+
+        :return: Nothing
+        """
         try:
             os.mkdir(self.server_settings_path)
         except OSError as exception:
@@ -49,10 +58,10 @@ class ConfigLoader():
                 raise
 
     def check_for_bot_config(self):
-        """Check if the niftybot.ini file exists
-        and if not, create a blank one.
+        """
+        Check if the niftybot.ini file exists and if not, create a blank one.
 
-        Returns True or False
+        :return: True if the file exists, False if the file is generated for the first time
         """
         if not self.config:
             print("Generating default niftybot.ini file...")
@@ -108,12 +117,24 @@ class ConfigLoader():
         return True
 
     def load_config_setting(self, section, var):
-        """Load a config setting from the bot config."""
+        """
+        Load a config setting from the bot config.
+
+        :param section: the section to load from
+        :param var: the variable to load from that section
+        :return: the value from the section-var
+        """
         self.parser.read(self.config)
         return self.parser.get(section, var)
 
     def load_config_setting_int(self, section, var):
-        """Load int setting from bot config."""
+        """
+        Load int setting from bot config.
+
+        :param section: the section to load from
+        :param var: the integer value from the section
+        :return: the value from the section-var
+        """
         self.parser.read(self.config)
         return int(self.parser.get(section, var))
 
